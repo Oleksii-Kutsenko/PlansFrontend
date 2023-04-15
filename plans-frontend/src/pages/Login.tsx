@@ -27,10 +27,14 @@ const Login: React.FC = () => {
     };
 
     void toast.promise(
-      axios.post('http://127.0.0.1:8000/api/accounts/token/', params).then((response) => {
-        dispatch(authSlice.actions.setToken(response.data));
-        navigate('/');
-      }),
+      axios
+        .post('/api/accounts/token/', params, {
+          baseURL: process.env.REACT_APP_API_URL
+        })
+        .then((response) => {
+          dispatch(authSlice.actions.setToken(response.data));
+          navigate('/');
+        }),
       {
         pending: 'Logging in...',
         success: 'Logged in!',
