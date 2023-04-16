@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import authSlice from '../store/slices/auth';
+import { setToken } from '../store/slices/auth';
 interface LoginFormInputs {
   username: string;
   password: string;
@@ -32,7 +32,7 @@ const Login: React.FC = () => {
           baseURL: process.env.REACT_APP_API_URL
         })
         .then((response) => {
-          dispatch(authSlice.actions.setToken(response.data));
+          dispatch(setToken(response.data));
           navigate('/');
         }),
       {
