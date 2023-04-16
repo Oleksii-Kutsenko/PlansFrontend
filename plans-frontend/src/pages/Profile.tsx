@@ -1,4 +1,4 @@
-import { Col, Container, Row } from 'react-bootstrap';
+import { Col, Container, Row, Spinner } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import { type RootState } from '../store';
 import { useEffect } from 'react';
@@ -16,11 +16,17 @@ const Profile: React.FC = () => {
         console.log(err);
       });
     }
-  }, [dispatch, user]);
+  }, [dispatch, user, userLoading]);
 
-  if (user === null) {
-    return <p>Loading...</p>;
-  } else {
+  if (userLoading) {
+    return (
+      <Container className="mt-4 text-center">
+        <Spinner animation="border" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </Spinner>
+      </Container>
+    );
+  } else if (user !== null) {
     return (
       <Container className="mt-4">
         <Row>
@@ -44,6 +50,8 @@ const Profile: React.FC = () => {
         </Row>
       </Container>
     );
+  } else {
+    return <p>Failed to load profile</p>;
   }
 };
 
