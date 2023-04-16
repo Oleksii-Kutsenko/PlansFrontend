@@ -1,13 +1,19 @@
 import { configureStore } from '@reduxjs/toolkit';
-import authSlice from './slices/auth';
-import countriesSlice from './slices/countries';
-import countriesOptionsSlice from './slices/countriesOptions';
+
+import { authReducer } from './slices/auth';
+import { countriesReducer } from './slices/countries';
+import { countriesOptionsReducer } from './slices/countriesOptions';
+import { userReducer } from './slices/user';
+
+export * from './slices/auth';
+export * from './slices/user';
 
 const store = configureStore({
   reducer: {
-    auth: authSlice.reducer,
-    countries: countriesSlice.reducer,
-    countriesOptions: countriesOptionsSlice.reducer
+    auth: authReducer,
+    countries: countriesReducer,
+    countriesOptions: countriesOptionsReducer,
+    user: userReducer
   }
 });
 

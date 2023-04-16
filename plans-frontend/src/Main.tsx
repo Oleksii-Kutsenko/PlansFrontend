@@ -24,6 +24,11 @@ const CountriesRating = React.lazy(async () => {
   return { default: module.default };
 });
 
+const Profile = React.lazy(async () => {
+  const module = await import('./pages/Profile');
+  return { default: module.default };
+});
+
 const Loading: FC = () => <p>Loading ...</p>;
 
 const Main: FC = () => {
@@ -34,6 +39,7 @@ const Main: FC = () => {
         <Route path="/" element={<ProtectedRoutes />}>
           <Route path="/" element={<Home />} />
           <Route path="/countries" element={<CountriesRating />} />
+          <Route path="/profile" element={<Profile />} />
         </Route>
 
         {/** Public Routes */}

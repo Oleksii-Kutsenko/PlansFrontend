@@ -1,9 +1,9 @@
 import type { FC } from 'react';
-import { Nav } from 'react-bootstrap';
+import { Nav, Navbar } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { NavLink } from 'react-router-dom';
 import type { RootState } from '../store';
-import authSlice from '../store/slices/auth';
+import { logout } from '../store';
 
 const Header: FC = () => {
   const dispatch = useDispatch();
@@ -11,32 +11,41 @@ const Header: FC = () => {
   const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated) || false;
 
   const handleLogout = (): void => {
-    dispatch(authSlice.actions.logout());
+    dispatch(logout());
     window.location.replace('/login');
   };
 
   return (
-    <Nav>
+    <Navbar>
       {isAuthenticated ? (
         <>
-          <Nav.Item>
-            <NavLink to="/" className="nav-link">
-              Home
-            </NavLink>
-          </Nav.Item>
-          <Nav.Item>
-            <NavLink to="/countries" className="nav-link">
-              Countries
-            </NavLink>
-          </Nav.Item>
-          <Nav.Item>
-            <NavLink to="/login" className="nav-link" onClick={handleLogout}>
-              Logout
-            </NavLink>
-          </Nav.Item>
+          <Nav className="me-auto">
+            <Nav.Item>
+              <NavLink to="/" className="nav-link">
+                Home
+              </NavLink>
+            </Nav.Item>
+            <Nav.Item>
+              <NavLink to="/countries" className="nav-link">
+                Countries
+              </NavLink>
+            </Nav.Item>
+          </Nav>
+          <Nav>
+            <Nav.Item>
+              <NavLink to="/profile" className="nav-link">
+                Profile
+              </NavLink>
+            </Nav.Item>
+            <Nav.Item>
+              <NavLink to="/login" className="nav-link" onClick={handleLogout}>
+                Logout
+              </NavLink>
+            </Nav.Item>
+          </Nav>
         </>
       ) : (
-        <>
+        <Nav>
           <Nav.Item>
             <NavLink to="/login" className="nav-link">
               Login
@@ -47,9 +56,9 @@ const Header: FC = () => {
               Register
             </NavLink>
           </Nav.Item>
-        </>
+        </Nav>
       )}
-    </Nav>
+    </Navbar>
   );
 };
 

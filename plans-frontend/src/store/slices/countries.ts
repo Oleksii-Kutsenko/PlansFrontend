@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import fetcher from '../../utils/axios';
 import { type RootState } from '..';
+import { fetcher } from '../../utils/axios';
 
 export interface Country {
   name: string;
@@ -12,18 +12,23 @@ interface State {
   loading: boolean;
 }
 
-const countriesInitialState: State = { countries: [], loading: false };
+const initialState: State = {
+  countries: [],
+  loading: false
+};
 
+// Thunk
 export const fetchCountries = createAsyncThunk('countries/fetchCountries', async () => {
   const { data } = await fetcher.get('/api/countries/rating/');
   return data;
 });
 
+// Slice
 const countriesSlice = createSlice({
   name: 'countries',
-  initialState: countriesInitialState,
+  initialState,
   reducers: {},
-  extraReducers(builder) {
+  extraReducers: (builder) => {
     builder
       .addCase(fetchCountries.fulfilled, (state, action) => {
         state.countries = action.payload;
@@ -38,6 +43,9 @@ const countriesSlice = createSlice({
   }
 });
 
-export default countriesSlice;
-
+// Selectors
 export const getCountries = (state: RootState): Country[] => state.countries.countries;
+
+// Exports
+export const countriesActions = { ...countriesSlice.actions };
+export const countriesReducer = countriesSlice.reducer;
