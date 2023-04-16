@@ -6,24 +6,23 @@ interface State {
   isAuthenticated: boolean;
 }
 
-const initialState: State = {
-  token: localStorage.getItem('access') ?? '',
-  refreshToken: localStorage.getItem('refresh') ?? '',
-  isAuthenticated: Boolean(localStorage.getItem('access'))
-};
+// Slice creation
+
+const initialState: State = createInitialState();
 
 const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
-    setToken(state, action: { payload: { access: string; refresh: string } }) {
-      state.token = action.payload.access;
-      state.refreshToken = action.payload.refresh;
+    setToken(state, action): void {
+      const { access, refresh } = action.payload;
+      state.token = access;
+      state.refreshToken = refresh;
       state.isAuthenticated = true;
-      localStorage.setItem('access', action.payload.access);
-      localStorage.setItem('refresh', action.payload.refresh);
+      localStorage.setItem('access', access);
+      localStorage.setItem('refresh', refresh);
     },
-    logout(state) {
+    logout(state): void {
       state.token = '';
       state.refreshToken = '';
       state.isAuthenticated = false;
@@ -33,8 +32,23 @@ const authSlice = createSlice({
   }
 });
 
+// Exports
+
+export const { setToken, logout } = authSlice.actions;
+export const authReducer = authSlice.reducer;
+
+// Selectors
+
 const selectAuthState = (state: { auth: State }): State => state.auth;
 
 export const getToken = createSelector(selectAuthState, (auth) => auth.token);
 
-export default authSlice;
+// Implementation
+
+function createInitialState(): State {
+  return {
+    token: localStorage.getItem('access') ?? '',
+    refreshToken: localStorage.getItem('refresh') ?? '',
+    isAuthenticated: Boolean(localStorage.getItem('access'))
+  };
+}

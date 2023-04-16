@@ -1,19 +1,19 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import fetcher from '../../utils/axios';
+import { fetcher } from '../../utils/axios';
 
-interface Option {
+export interface Option {
   name: string;
   value_name: string;
   year_name: string;
   normalized_name: string;
 }
 
-interface State {
+export interface State {
   options: Option[];
   loading: boolean;
 }
 
-const countriesOptionsInitialState: State = { options: [], loading: false };
+const initialState: State = { options: [], loading: false };
 
 export const fetchCountriesOptions = createAsyncThunk(
   'countries/fetchCountriesOptions',
@@ -26,21 +26,21 @@ export const fetchCountriesOptions = createAsyncThunk(
 
 const countriesOptionsSlice = createSlice({
   name: 'countriesOptions',
-  initialState: countriesOptionsInitialState,
+  initialState,
   reducers: {},
   extraReducers(builder) {
     builder
+      .addCase(fetchCountriesOptions.pending, (state) => {
+        state.loading = true;
+      })
       .addCase(fetchCountriesOptions.fulfilled, (state, action) => {
         state.options = action.payload;
         state.loading = false;
       })
-      .addCase(fetchCountriesOptions.pending, (state, _) => {
-        state.loading = true;
-      })
-      .addCase(fetchCountriesOptions.rejected, (state, _) => {
+      .addCase(fetchCountriesOptions.rejected, (state) => {
         state.loading = false;
       });
   }
 });
 
-export default countriesOptionsSlice;
+export const countriesOptionsReducer = countriesOptionsSlice.reducer;
