@@ -26,10 +26,10 @@ const refreshAuthLogic = async (failedRequest: any): Promise<any> => {
       .then((resp) => {
         const { access, refresh } = resp.data as { access: string; refresh: string };
         failedRequest.response.config.headers.Authorization = 'Bearer ' + access;
-        store.dispatch(authSlice.actions.setToken({ token: access, refreshToken: refresh }));
+        store.dispatch(authSlice.actions.setToken({ access, refresh }));
       })
       .catch((err) => {
-        if (typeof err.response !== 'undefined' && err.response.status === 401) {
+        if (err?.response?.status === 401) {
           store.dispatch(authSlice.actions.logout());
         }
       });
@@ -83,7 +83,13 @@ axiosService.interceptors.response.use(
 );
 
 export async function fetcher<T = any>(url: string): Promise<T> {
-  return await axiosService.get<T>(url).then((res) => res.data);
+  return await axiosService
+    .get<T>(url)
+    .then((res) => res.data)
+    .catch((err) => {
+      console.log(err);
+      throw err;
+    });
 }
 
 export default axiosService;

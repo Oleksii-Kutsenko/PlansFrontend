@@ -6,20 +6,21 @@ import { useAppDispatch } from '../store/hooks';
 import { fetchCountriesOptions } from '../store/slices/countriesOptions';
 import { fetchCountries } from '../store/slices/countries';
 import { Container, Table } from 'react-bootstrap';
+import type { Country } from '../store/slices/countries';
 
 const CountriesRating: FC = () => {
   const dispatch = useAppDispatch();
 
-  const countriesOptions = useSelector((state: RootState) => state.countriesOptions.options);
-  const isCountriesOptionsLoading = useSelector(
-    (state: RootState) => state.countriesOptions.loading
+  const { options: countriesOptions, loading: isCountriesOptionsLoading } = useSelector(
+    (state: RootState) => state.countriesOptions
   );
   const isCountriesOptionsLoaded = useSelector(
     (state: RootState) => state.countriesOptions.options.length > 0
   );
 
-  const countries = useSelector((state: RootState) => state.countries.countries);
-  const isCountriesLoading = useSelector((state: RootState) => state.countries.loading);
+  const { countries, loading: isCountriesLoading } = useSelector(
+    (state: RootState) => state.countries
+  );
   const isCountriesLoaded = useSelector((state: RootState) => state.countries.countries.length > 0);
 
   function mapValueToColor(value: number | string): string {
@@ -28,7 +29,7 @@ const CountriesRating: FC = () => {
     const max = 100;
     const minColor = [203, 52, 66]; // RGB color for minimum value (red)
     const maxColor = [125, 177, 69]; // RGB color for maximum value (green)
-    const zeroColor = [241, 171, 66]; // RGB color for zero (brown)
+    const zeroColor = [255, 255, 0]; // RGB color for zero (yellow)
     let color: number[] = [];
 
     if (value < 0) {
@@ -46,33 +47,43 @@ const CountriesRating: FC = () => {
 
   useEffect(() => {
     if (!(isCountriesOptionsLoaded || isCountriesOptionsLoading)) {
-      void dispatch(fetchCountriesOptions());
+      dispatch(fetchCountriesOptions()).catch((err) => {
+        console.log(err);
+      });
     }
     if (!(isCountriesLoaded || isCountriesOptionsLoading)) {
-      void dispatch(fetchCountries());
+      dispatch(fetchCountries()).catch((err) => {
+        console.log(err);
+      });
     }
   }, [isCountriesOptionsLoading, isCountriesOptionsLoaded, isCountriesLoading, isCountriesLoaded]);
 
   if (isCountriesOptionsLoading || isCountriesLoading) {
     return <div>Loading...</div>;
   } else {
-    let tableHeader = [];
+    const tableHeader = [];
     tableHeader.push(<th key="name">Name</th>);
-    tableHeader = tableHeader.concat(
-      countriesOptions.map((option, index) => {
-        return <th key={index}>{option.name}</th>;
-      })
-    );
+    countriesOptions.forEach((option, index) => {
+      tableHeader.push(<th key={index}>{option.name}</th>);
+    });
     tableHeader.push(<th key="rating">Rating</th>);
 
-    const tableContent = countries.map((country, index) => {
+    const countriesOptionsNormalizedNames = countriesOptions.map(
+      (option) => option.normalized_name
+    );
+    type ExactCountry = {
+      [K in (typeof countriesOptionsNormalizedNames)[number]]: number;
+    } & Country;
+    const exactCountries = countries as ExactCountry[];
+
+    const tableContent = exactCountries.map((country: ExactCountry, i) => {
       return (
-        <tr key={index}>
+        <tr key={i}>
           <td style={{ backgroundColor: mapValueToColor(country.rating) }}>{country.name}</td>
-          {countriesOptions.map((option, index) => {
+          {countriesOptions.map((option, j) => {
             return (
               <td
-                key={index}
+                key={j}
                 style={{ backgroundColor: mapValueToColor(country[option.normalized_name]) }}>
                 {country[option.normalized_name]}
               </td>

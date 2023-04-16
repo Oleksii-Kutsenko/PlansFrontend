@@ -8,14 +8,13 @@ import authSlice from '../store/slices/auth';
 const Header: FC = () => {
   const dispatch = useDispatch();
 
-  const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated) ?? {
-    isAuthenticated: false
-  };
+  const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated) || false;
 
-  const logout = (): void => {
+  const handleLogout = (): void => {
     dispatch(authSlice.actions.logout());
     window.location.replace('/login');
   };
+
   return (
     <Nav>
       {isAuthenticated ? (
@@ -31,7 +30,7 @@ const Header: FC = () => {
             </NavLink>
           </Nav.Item>
           <Nav.Item>
-            <NavLink to="/login" className="nav-link" onClick={logout}>
+            <NavLink to="/login" className="nav-link" onClick={handleLogout}>
               Logout
             </NavLink>
           </Nav.Item>

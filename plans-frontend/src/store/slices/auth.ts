@@ -1,4 +1,4 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSelector, createSlice } from '@reduxjs/toolkit';
 
 interface State {
   token: string;
@@ -16,7 +16,7 @@ const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
-    setToken(state, action) {
+    setToken(state, action: { payload: { access: string; refresh: string } }) {
       state.token = action.payload.access;
       state.refreshToken = action.payload.refresh;
       state.isAuthenticated = true;
@@ -33,7 +33,8 @@ const authSlice = createSlice({
   }
 });
 
-export const getToken = (state: { token: null; isAuthenticated: boolean }): string | null =>
-  state.token;
+const selectAuthState = (state: { auth: State }): State => state.auth;
+
+export const getToken = createSelector(selectAuthState, (auth) => auth.token);
 
 export default authSlice;

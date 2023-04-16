@@ -2,9 +2,8 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import fetcher from '../../utils/axios';
 import { type RootState } from '..';
 
-interface Country {
-  name: number;
-  [key: string]: number;
+export interface Country {
+  name: string;
   rating: number;
 }
 
@@ -16,8 +15,7 @@ interface State {
 const countriesInitialState: State = { countries: [], loading: false };
 
 export const fetchCountries = createAsyncThunk('countries/fetchCountries', async () => {
-  const response = await fetcher.get('/api/countries/rating/');
-  const data = response.data;
+  const { data } = await fetcher.get('/api/countries/rating/');
   return data;
 });
 
