@@ -30,6 +30,11 @@ const Header: FC = () => {
                 Countries
               </NavLink>
             </Nav.Item>
+            <Nav.Item>
+              <NavLink to="/portfolios" className="nav-link">
+                Portfolios
+              </NavLink>
+            </Nav.Item>
           </Nav>
           <Nav>
             <Nav.Item>
