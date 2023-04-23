@@ -98,7 +98,7 @@ const CountriesRating: FC = () => {
         <Container fluid>
           <h1 className="text-center">Countries Rating</h1>
           <Table bordered className="text-center">
-            <thead style={{ backgroundColor: 'grey' }}>
+            <thead style={{ backgroundColor: 'rgb(220, 220, 220)' }}>
               <tr>{tableHeader}</tr>
             </thead>
             <tbody>{tableContent}</tbody>

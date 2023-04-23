@@ -59,7 +59,11 @@ const initialState: State = {
 const portfoliosSlice = createSlice({
   name,
   initialState,
-  reducers: {},
+  reducers: {
+    setPersonalMaxDrawdown(state: State, action: PayloadAction<number>) {
+      state.personalMaxDrawdown = action.payload;
+    }
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchPortfolios.pending, (state: State) => {
@@ -90,4 +94,8 @@ const portfoliosSlice = createSlice({
 
 // Exports
 export const portfoliosReducer = portfoliosSlice.reducer;
-export const portfoliosActions = { ...portfoliosSlice.actions, fetchPortfolios };
+export const portfoliosActions = {
+  ...portfoliosSlice.actions,
+  fetchPortfolios,
+  fetchPersonalMaxDrawdown
+};
