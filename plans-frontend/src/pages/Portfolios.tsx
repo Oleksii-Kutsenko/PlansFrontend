@@ -5,6 +5,7 @@ import { useSelector } from 'react-redux';
 import type { Portfolio, RootState, Ticker } from '../store';
 import { portfoliosActions } from '../store';
 import { useAppDispatch } from '../store/hooks';
+import { toast } from 'react-toastify';
 
 interface PortfolioFilterFormInputs {
   personalMaxDrawdown: number | null;
@@ -13,12 +14,13 @@ interface PortfolioFilterFormInputs {
 
 const Portfolios: FC = () => {
   const dispatch = useAppDispatch();
+  const portfoliosState = useSelector((state: RootState) => state.portfolios);
   const { portfolios, portfoliosLoading, personalMaxDrawdown, personalMaxDrawdownLoading } =
-    useSelector((state: RootState) => state.portfolios);
+    portfoliosState;
 
-  const initialDate = new Date();
-  initialDate.setFullYear(initialDate.getFullYear() - 15);
-  const [backtestStartDate, setBacktestStartDate] = useState(initialDate);
+  const defaultBacktestStartDate = new Date();
+  defaultBacktestStartDate.setFullYear(defaultBacktestStartDate.getFullYear() - 15);
+  const [backtestStartDate, setBacktestStartDate] = useState(defaultBacktestStartDate);
 
   const {
     register,
@@ -39,21 +41,24 @@ const Portfolios: FC = () => {
     }
   };
   const onReset = (): void => {
-    setBacktestStartDate(initialDate);
+    setBacktestStartDate(defaultBacktestStartDate);
     dispatch(portfoliosActions.fetchPersonalMaxDrawdown()).catch((err) => {
-      console.log(err);
+      const message = err.message.toString() as string;
+      toast.error('Error fetching personal max drawdown: ' + message);
     });
   };
 
   useEffect(() => {
     if (!portfoliosLoading && portfolios.length === 0) {
       dispatch(portfoliosActions.fetchPortfolios()).catch((err) => {
-        console.log(err);
+        const message = err.message.toString() as string;
+        toast.error('Error fetching portfolios: ' + message);
       });
     }
     if (!personalMaxDrawdownLoading && personalMaxDrawdown === null) {
       dispatch(portfoliosActions.fetchPersonalMaxDrawdown()).catch((err) => {
-        console.log(err);
+        const message = err.message.toString() as string;
+        toast.error('Error fetching personal max drawdown: ' + message);
       });
     }
     setInitialValues();
