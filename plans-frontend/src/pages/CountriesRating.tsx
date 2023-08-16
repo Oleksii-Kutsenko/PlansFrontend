@@ -3,25 +3,18 @@ import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import type { RootState } from '../store';
 import { useAppDispatch } from '../store/hooks';
-import { fetchCountriesOptions } from '../store/slices/countriesOptions';
-import { fetchCountries } from '../store/slices/countries';
+import { fetchCountriesOptions, CountriesOptionsStatus } from '../store/slices/countriesOptions';
 import { Container, Table } from 'react-bootstrap';
-import type { Country } from '../store/slices/countries';
+import { CountriesStatus, fetchCountries, type Country } from '../store/slices/countries';
 
 const CountriesRating: FC = () => {
   const dispatch = useAppDispatch();
 
-  const { options: countriesOptions, loading: isCountriesOptionsLoading } = useSelector(
+  const { options: countriesOptions, status: countriesOptionsStatus } = useSelector(
     (state: RootState) => state.countriesOptions
   );
-  const isCountriesOptionsLoaded = useSelector(
-    (state: RootState) => state.countriesOptions.options.length > 0
-  );
 
-  const { countries, loading: isCountriesLoading } = useSelector(
-    (state: RootState) => state.countries
-  );
-  const isCountriesLoaded = useSelector((state: RootState) => state.countries.countries.length > 0);
+  const { countries, status: countriesStatus } = useSelector((state: RootState) => state.countries);
 
   function mapValueToColor(value: number | string): string {
     value = Number(value);
@@ -46,21 +39,29 @@ const CountriesRating: FC = () => {
   }
 
   useEffect(() => {
-    if (!(isCountriesOptionsLoaded || isCountriesOptionsLoading)) {
+    if (countriesOptionsStatus === CountriesOptionsStatus.IDLE) {
       dispatch(fetchCountriesOptions()).catch((err) => {
         console.log(err);
       });
     }
-    if (!(isCountriesLoaded || isCountriesOptionsLoading)) {
+    if (countriesStatus === CountriesStatus.IDLE) {
       dispatch(fetchCountries()).catch((err) => {
         console.log(err);
       });
     }
-  }, [isCountriesOptionsLoading, isCountriesOptionsLoaded, isCountriesLoading, isCountriesLoaded]);
+  }, [countriesOptionsStatus, countriesStatus]);
 
-  if (isCountriesOptionsLoading || isCountriesLoading) {
-    return <div>Loading...</div>;
-  } else {
+  let content;
+
+  if (
+    countriesOptionsStatus === CountriesOptionsStatus.LOADING ||
+    countriesStatus === CountriesStatus.LOADING
+  ) {
+    content = <div>Loading...</div>;
+  } else if (
+    countriesOptionsStatus === CountriesOptionsStatus.SUCCEEDED &&
+    countriesStatus === CountriesStatus.SUCCEEDED
+  ) {
     const tableHeader = [];
     tableHeader.push(<th key="name">Name</th>);
     countriesOptions.forEach((option, index) => {
@@ -93,19 +94,25 @@ const CountriesRating: FC = () => {
         </tr>
       );
     });
-    return (
-      <>
-        <Container fluid>
-          <h1 className="text-center">Countries Rating</h1>
-          <Table bordered className="text-center">
-            <thead style={{ backgroundColor: 'rgb(220, 220, 220)' }}>
-              <tr>{tableHeader}</tr>
-            </thead>
-            <tbody>{tableContent}</tbody>
-          </Table>
-        </Container>
-      </>
+    content = (
+      <Container fluid>
+        <h1 className="text-center">Countries Rating</h1>
+        <Table bordered className="text-center">
+          <thead style={{ backgroundColor: 'rgb(220, 220, 220)' }}>
+            <tr>{tableHeader}</tr>
+          </thead>
+          <tbody>{tableContent}</tbody>
+        </Table>
+        condition
+      </Container>
     );
+  } else if (
+    countriesOptionsStatus === CountriesOptionsStatus.FAILED ||
+    countriesStatus === CountriesStatus.FAILED
+  ) {
+    content = <div>Failed to load countries options</div>;
   }
+
+  return <>{content}</>;
 };
 export default CountriesRating;
