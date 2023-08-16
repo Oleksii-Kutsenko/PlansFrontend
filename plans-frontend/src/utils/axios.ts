@@ -44,7 +44,9 @@ fetcher.interceptors.response.use(
       err.response?.status,
       err.response?.data
     );
-    await refreshAuthLogic(err);
+    if (err?.response?.status === 401) {
+      await refreshAuthLogic(err);
+    }
     return await Promise.reject(err);
   }
 );
@@ -52,7 +54,7 @@ fetcher.interceptors.response.use(
 const refreshAuthLogic = async (failedRequest: any): Promise<any> => {
   const { refreshToken } = store.getState().auth;
   if (refreshToken != null) {
-    await axios
+    await fetcher
       .post(
         '/api/accounts/refresh/',
         {
