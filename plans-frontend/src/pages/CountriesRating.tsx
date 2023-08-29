@@ -1,11 +1,15 @@
 import type { FC } from 'react';
 import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import type { RootState } from '../store';
+import type { RootState, Country } from '../store';
 import { useAppDispatch } from '../store/hooks';
-import { fetchCountriesOptions, CountriesOptionsStatus } from '../store/slices/countriesOptions';
+import {
+  fetchCountriesOptions,
+  CountriesOptionsStatus,
+  CountriesStatus,
+  fetchCountries
+} from '../store';
 import { Container, Table } from 'react-bootstrap';
-import { CountriesStatus, fetchCountries, type Country } from '../store/slices/countries';
 
 const CountriesRating: FC = () => {
   const dispatch = useAppDispatch();

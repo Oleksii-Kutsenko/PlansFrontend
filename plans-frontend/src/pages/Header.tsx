@@ -35,6 +35,11 @@ const Header: FC = () => {
                 Portfolios
               </NavLink>
             </Nav.Item>
+            <Nav.Item>
+              <NavLink to="/wealth-management" className="nav-link">
+                Wealth Management
+              </NavLink>
+            </Nav.Item>
           </Nav>
           <Nav>
             <Nav.Item>
