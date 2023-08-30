@@ -8,8 +8,29 @@ export enum WealthManagementStatus {
   FAILED = 'failed'
 }
 
+interface Asset {
+  name: string;
+}
+
+interface AssetAllocation {
+  asset_name: string;
+  asset: Asset;
+  current_amount: number;
+  target_amount: number;
+  target_percentage: number;
+  difference: number;
+}
+
+export interface Allocation {
+  asset_allocations: AssetAllocation[];
+  asset_type: { name: string };
+  current_amount: number;
+  target_amount: number;
+  target_percentage: number;
+}
+
 interface WealthManagement {
-  allocations: any[];
+  allocations: Allocation[];
 }
 
 interface State {

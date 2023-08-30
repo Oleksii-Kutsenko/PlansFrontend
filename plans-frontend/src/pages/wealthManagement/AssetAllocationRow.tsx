@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { type Allocation } from './ExpandableTable';
+import { type Allocation } from '../../store';
 
 export const AssetAllocationRow = ({
   assetAllocation,
@@ -21,24 +21,25 @@ export const AssetAllocationRow = ({
           <i className={`bi bi-chevron-${expanded ? 'down' : 'right'}`}></i>
         </td>
         <td>{assetAllocation.asset_type.name}</td>
-        <td></td>
-        <td>{assetAllocation.allocation_amount}</td>
+        <td>{assetAllocation.current_amount !== null ? assetAllocation.current_amount : '0.00'}</td>
+        <td>{assetAllocation.target_amount}</td>
         <td>
           {assetAllocation.target_percentage != null
             ? assetAllocation.target_percentage.toFixed(2) + '%'
             : ''}
         </td>
+        <td></td>
       </tr>
       {expanded && (
         <tr>
           <td colSpan={6} className="inner-table-container">
             <table className="inner-table">
-              <thead>
+              <thead className="table-head">
                 <tr>
                   <th className="asset-name">Asset Name</th>
                   <th className="asset">Asset</th>
                   <th>Current Amount</th>
-                  <th>Allocation Amount</th>
+                  <th>Target Amount</th>
                   <th>Target Percentage</th>
                   <th>Difference</th>
                 </tr>

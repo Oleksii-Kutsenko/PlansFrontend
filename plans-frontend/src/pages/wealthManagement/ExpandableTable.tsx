@@ -1,21 +1,7 @@
 import React from 'react';
 import './ExpandableTable.css';
 import { AssetAllocationRow } from './AssetAllocationRow';
-
-interface Asset {
-  asset_name: string;
-  asset: { name: string };
-  current_amount: number;
-  target_amount: number;
-  target_percentage: number;
-}
-
-export interface Allocation {
-  asset_allocations: Asset[];
-  asset_type: { name: string };
-  allocation_amount: number;
-  target_percentage: number;
-}
+import { type Allocation } from '../../store';
 
 interface ExpandableTableProps {
   data: Allocation[];
@@ -30,7 +16,7 @@ export function ExpandableTable({ data }: ExpandableTableProps): React.ReactElem
       }, 0)
     );
   }, 0);
-  const totalAllocationAmount = data.reduce((total, item) => total + item.allocation_amount, 0);
+  const totalAllocationAmount = data.reduce((total, item) => total + item.target_amount, 0);
   const totalTargetPercentage = data.reduce((total, item) => total + item.target_percentage, 0);
 
   return (
@@ -41,7 +27,7 @@ export function ExpandableTable({ data }: ExpandableTableProps): React.ReactElem
             <th className="chevron"></th>
             <th className="asset-type">Asset Type</th>
             <th className="current-amount">Current Amount</th>
-            <th className="allocation-amount">Allocation Amount</th>
+            <th className="allocation-amount">Target Amount</th>
             <th className="target-percentage">Target Percentage</th>
             <th className="difference">Difference</th>
           </tr>
@@ -62,6 +48,7 @@ export function ExpandableTable({ data }: ExpandableTableProps): React.ReactElem
             <td>{totalCurrentAmount.toFixed(2)}</td>
             <td>{totalAllocationAmount.toFixed(2)}</td>
             <td>{totalTargetPercentage.toFixed(2)}%</td>
+            <td></td>
           </tr>
         </tbody>
       </table>
