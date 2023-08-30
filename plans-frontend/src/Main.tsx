@@ -35,7 +35,7 @@ const Portfolios = React.lazy(async () => {
 });
 
 const WealthManagement = React.lazy(async () => {
-  const module = await import('./pages/WealthManagement');
+  const module = await import('./pages/wealthManagement/WealthManagement');
   return { default: module.default };
 });
 

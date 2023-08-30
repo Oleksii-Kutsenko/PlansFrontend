@@ -1,0 +1,81 @@
+/* Global Reset */
+table,
+th,
+td {
+    border: none;
+}
+
+/* Containers */
+.table-container {
+    background-color: white;
+    width: 75%;
+    margin: 0 auto;
+}
+
+.inner-table-container {
+    padding: 0.6em;
+    background-color: #e5e7eb;
+}
+
+/* Tables */
+
+.outer-table {
+    background-color: white;
+    border-collapse: collapse;
+    text-align: center;
+}
+
+.table-head th {
+    background-color: #f9fafb;
+}
+
+.inner-table {
+    border-collapse: collapse;
+    padding: 1rem;
+    border-radius: 5px;
+    background-color: white;
+    width: 100%;
+}
+
+.inner-table th {
+    padding: 0.6em;
+    background-color: #f9fafb;
+    border-radius: 5px;
+}
+
+/* Table Rows */
+
+.total-row {
+    background-color: #f9fafb;
+    font-weight: bold;
+}
+
+/* Cell Widths */
+.chevron {
+    width: 2%;
+}
+
+.asset-type,
+.current-amount,
+.allocation-amount,
+.target-percentage,
+.difference,
+.asset-name,
+.asset {
+    width: 19.6%;
+}
+
+.asset-name,
+.asset {
+    width: 16.67%;
+}
+
+/* Cell Padding */
+
+th {
+    padding: 0.25em;
+}
+
+td {
+    padding: 0.25em;
+}
