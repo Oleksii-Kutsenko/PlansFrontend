@@ -5,11 +5,14 @@ import { countriesReducer } from './slices/countries';
 import { countriesOptionsReducer } from './slices/countriesOptions';
 import { userReducer } from './slices/user';
 import { portfoliosReducer } from './slices/portfolios';
+import { wealthManagementReducer } from './slices/wealthManagement';
 
 export * from './slices/auth';
 export * from './slices/countries';
+export * from './slices/countriesOptions';
 export * from './slices/user';
 export * from './slices/portfolios';
+export * from './slices/wealthManagement';
 
 const store = configureStore({
   reducer: {
@@ -17,7 +20,8 @@ const store = configureStore({
     countries: countriesReducer,
     countriesOptions: countriesOptionsReducer,
     portfolios: portfoliosReducer,
-    user: userReducer
+    user: userReducer,
+    wealthManagement: wealthManagementReducer
   }
 });
 

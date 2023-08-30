@@ -34,6 +34,11 @@ const Portfolios = React.lazy(async () => {
   return { default: module.default };
 });
 
+const WealthManagement = React.lazy(async () => {
+  const module = await import('./pages/wealthManagement/WealthManagement');
+  return { default: module.default };
+});
+
 const Loading: FC = () => <p>Loading ...</p>;
 
 const Main: FC = () => {
@@ -46,6 +51,7 @@ const Main: FC = () => {
           <Route path="/countries" element={<CountriesRating />} />
           <Route path="/portfolios" element={<Portfolios />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/wealth-management" element={<WealthManagement />} />
         </Route>
 
         {/** Public Routes */}
