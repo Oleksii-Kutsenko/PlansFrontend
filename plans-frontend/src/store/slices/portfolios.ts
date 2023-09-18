@@ -1,5 +1,12 @@
-import { type PayloadAction, createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import { fetcher } from '../../utils/axios';
+
+export enum LoadStatus {
+  IDLE = 'idle',
+  LOADING = 'loading',
+  SUCCEEDED = 'succeeded',
+  FAILED = 'failed'
+}
 
 interface BacktestData {
   cagr: number;
@@ -23,36 +30,50 @@ export interface Portfolio {
 
 interface State {
   portfolios: Portfolio[];
-  portfoliosLoading: boolean;
+  portfoliosLoadingStatus: LoadStatus;
   personalMaxDrawdown: number | null;
-  personalMaxDrawdownLoading: boolean;
+  personalMaxDrawdownLoadingStatus: LoadStatus;
+  backtestStartDate: Date | null;
+  ageMaxDrawdownDependence: number[][];
+  ageMaxDrawdownDependenceLoadingStatus: LoadStatus;
 }
 
 const name = 'portfolios';
 
-// Thunk
-export const fetchPortfolios = createAsyncThunk(
+// Thunk Action Creators
+export const fetchPortfolios = createAsyncThunk<Portfolio[]>(
   `${name}/fetchPortfolios`,
-  async (): Promise<Portfolio[]> => {
+  async () => {
     const response = await fetcher.get('/api/investments/portfolios/');
     return response.data;
   }
 );
 
-export const fetchPersonalMaxDrawdown = createAsyncThunk(
+export const fetchPersonalMaxDrawdown = createAsyncThunk<number>(
   `${name}/fetchPersonalMaxDrawdown`,
-  async (): Promise<number> => {
+  async () => {
     const response = await fetcher.get('/api/investments/portfolios/personal-max-drawdown/');
     return response.data.personalMaxDrawdown;
+  }
+);
+
+export const fetchAgeMaxDrawdownDependence = createAsyncThunk<number[][]>(
+  `${name}/fetchAgeMaxDrawdownDependence`,
+  async () => {
+    const response = await fetcher.get('/api/investments/portfolios/age-max-drawdown-dependence/');
+    return response.data;
   }
 );
 
 // Initial state
 const initialState: State = {
   portfolios: [],
-  portfoliosLoading: false,
+  portfoliosLoadingStatus: LoadStatus.IDLE,
   personalMaxDrawdown: null,
-  personalMaxDrawdownLoading: false
+  personalMaxDrawdownLoadingStatus: LoadStatus.IDLE,
+  backtestStartDate: null,
+  ageMaxDrawdownDependence: [],
+  ageMaxDrawdownDependenceLoadingStatus: LoadStatus.IDLE
 };
 
 // Slice
@@ -60,42 +81,51 @@ const portfoliosSlice = createSlice({
   name,
   initialState,
   reducers: {
-    setPersonalMaxDrawdown(state: State, action: PayloadAction<number>) {
+    setPersonalMaxDrawdown: (state, action: PayloadAction<number>) => {
       state.personalMaxDrawdown = action.payload;
     }
   },
   extraReducers: (builder) => {
     builder
-      .addCase(fetchPortfolios.pending, (state: State) => {
-        state.portfoliosLoading = true;
+      .addCase(fetchPortfolios.pending, (state) => {
+        state.portfoliosLoadingStatus = LoadStatus.LOADING;
       })
-      .addCase(fetchPortfolios.fulfilled, (state: State, action: PayloadAction<Portfolio[]>) => {
+      .addCase(fetchPortfolios.fulfilled, (state, action) => {
         state.portfolios = action.payload;
-        state.portfoliosLoading = false;
+        state.portfoliosLoadingStatus = LoadStatus.SUCCEEDED;
       })
-      .addCase(fetchPortfolios.rejected, (state: State) => {
-        state.portfoliosLoading = false;
+      .addCase(fetchPortfolios.rejected, (state) => {
+        state.portfoliosLoadingStatus = LoadStatus.FAILED;
       })
-      .addCase(fetchPersonalMaxDrawdown.pending, (state: State) => {
-        state.personalMaxDrawdownLoading = true;
+      .addCase(fetchPersonalMaxDrawdown.pending, (state) => {
+        state.personalMaxDrawdownLoadingStatus = LoadStatus.LOADING;
       })
-      .addCase(
-        fetchPersonalMaxDrawdown.fulfilled,
-        (state: State, action: PayloadAction<number>) => {
-          state.personalMaxDrawdown = action.payload;
-          state.personalMaxDrawdownLoading = false;
-        }
-      )
-      .addCase(fetchPersonalMaxDrawdown.rejected, (state: State) => {
-        state.personalMaxDrawdownLoading = false;
+      .addCase(fetchPersonalMaxDrawdown.fulfilled, (state, action) => {
+        state.personalMaxDrawdown = action.payload;
+        state.personalMaxDrawdownLoadingStatus = LoadStatus.SUCCEEDED;
+      })
+      .addCase(fetchPersonalMaxDrawdown.rejected, (state) => {
+        state.personalMaxDrawdownLoadingStatus = LoadStatus.FAILED;
+      })
+      .addCase(fetchAgeMaxDrawdownDependence.pending, (state) => {
+        state.ageMaxDrawdownDependenceLoadingStatus = LoadStatus.LOADING;
+      })
+      .addCase(fetchAgeMaxDrawdownDependence.fulfilled, (state, action) => {
+        state.ageMaxDrawdownDependence = action.payload;
+        state.ageMaxDrawdownDependenceLoadingStatus = LoadStatus.SUCCEEDED;
+      })
+      .addCase(fetchAgeMaxDrawdownDependence.rejected, (state) => {
+        state.ageMaxDrawdownDependenceLoadingStatus = LoadStatus.FAILED;
       });
   }
 });
 
 // Exports
+export const { setPersonalMaxDrawdown } = portfoliosSlice.actions;
 export const portfoliosReducer = portfoliosSlice.reducer;
 export const portfoliosActions = {
   ...portfoliosSlice.actions,
   fetchPortfolios,
-  fetchPersonalMaxDrawdown
+  fetchPersonalMaxDrawdown,
+  fetchAgeMaxDrawdownDependence
 };

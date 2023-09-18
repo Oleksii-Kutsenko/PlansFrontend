@@ -20,21 +20,21 @@ const Profile: React.FC = () => {
 
   if (userLoading) {
     return (
-      <Container className="mt-4 text-center">
-        <Spinner animation="border" role="status">
-          <span className="visually-hidden">Loading...</span>
+      <Container className='mt-4 text-center'>
+        <Spinner animation='border' role='status'>
+          <span className='visually-hidden'>Loading...</span>
         </Spinner>
       </Container>
     );
   } else if (user !== null) {
     return (
-      <Container className="mt-4">
+      <Container className='mt-4'>
         <Row>
           <Col>
             <h2>Profile</h2>
           </Col>
         </Row>
-        <Row className="mt-4">
+        <Row className='mt-4'>
           <Col md={6}>
             <h5>Username:</h5>
             <p>{user.username}</p>

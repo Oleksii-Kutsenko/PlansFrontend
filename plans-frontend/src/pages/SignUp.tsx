@@ -75,22 +75,22 @@ const SignUp: FC = () => {
 
   return (
     <Container>
-      <Row className="justify-content-center align-items-center" style={{ minHeight: '100vh' }}>
+      <Row className='justify-content-center align-items-center' style={{ minHeight: '100vh' }}>
         <Col sm={12} md={6}>
-          <Card className="mb-3 mt-3 rounded">
+          <Card className='mb-3 mt-3 rounded'>
             <Card.Body>
-              <h3 className="card-title text-center text-secondary mt-3 mb-3">Sign Up Form</h3>
-              <Form autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
+              <h3 className='card-title text-center text-secondary mt-3 mb-3'>Sign Up Form</h3>
+              <Form autoComplete='off' onSubmit={handleSubmit(onSubmit)}>
                 <Form.Group>
                   <Form.Label>Birth Date</Form.Label>
                   <Form.Control
-                    type="date"
+                    type='date'
                     {...register('birthDate', {
                       required: 'Birth Date is required!'
                     })}
                   />
                   {errors.birthDate != null && (
-                    <Form.Text className="text-danger" style={{ fontSize: 14 }}>
+                    <Form.Text className='text-danger' style={{ fontSize: 14 }}>
                       {errors.birthDate.message?.toString()}
                     </Form.Text>
                   )}
@@ -98,7 +98,7 @@ const SignUp: FC = () => {
                 <Form.Group>
                   <Form.Label>Country</Form.Label>
                   <Controller
-                    name="country"
+                    name='country'
                     control={control}
                     rules={{ required: 'Country is required!' }}
                     render={({ field }) => (
@@ -115,13 +115,13 @@ const SignUp: FC = () => {
                 <Form.Group>
                   <Form.Label>Username</Form.Label>
                   <Form.Control
-                    type="text"
+                    type='text'
                     {...register('username', {
                       required: 'Username is required!'
                     })}
                   />
                   {errors.username != null && (
-                    <Form.Text className="text-danger" style={{ fontSize: 14 }}>
+                    <Form.Text className='text-danger' style={{ fontSize: 14 }}>
                       {errors.username.message?.toString()}
                     </Form.Text>
                   )}
@@ -129,13 +129,13 @@ const SignUp: FC = () => {
                 <Form.Group>
                   <Form.Label>Password</Form.Label>
                   <Form.Control
-                    type="password"
+                    type='password'
                     {...register('password', {
                       required: 'Password is required!'
                     })}
                   />
                   {errors.password != null && (
-                    <Form.Text className="text-danger" style={{ fontSize: 14 }}>
+                    <Form.Text className='text-danger' style={{ fontSize: 14 }}>
                       {errors.password.message?.toString()}
                     </Form.Text>
                   )}
@@ -143,23 +143,23 @@ const SignUp: FC = () => {
                 <Form.Group>
                   <Form.Label>Confirm Password</Form.Label>
                   <Form.Control
-                    type="password"
+                    type='password'
                     {...register('password2', {
                       required: 'Confirm Password is required',
-                      validate: (value) => value === watch('password') || "Passwords don't match."
+                      validate: (value) => value === watch('password') || `Passwords don't match.`
                     })}
                   />
                   {errors.password2 != null && (
-                    <Form.Text className="text-danger" style={{ fontSize: 14 }}>
+                    <Form.Text className='text-danger' style={{ fontSize: 14 }}>
                       {errors.password2.message?.toString()}
                     </Form.Text>
                   )}
                 </Form.Group>
-                <div className="text-center mt-4">
-                  <Button className="text-center mb-3" type="submit">
+                <div className='text-center mt-4'>
+                  <Button className='text-center mb-3' type='submit'>
                     Submit
                   </Button>
-                  <p className="card-text">
+                  <p className='card-text'>
                     Already have an account?{' '}
                     <Link style={{ textDecoration: 'none' }} to={'/login'}>
                       Log In

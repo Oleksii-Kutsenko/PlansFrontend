@@ -1,10 +1,9 @@
 import { useEffect, type FC } from 'react';
-import { useAppDispatch } from '../../store/hooks';
-import { useSelector } from 'react-redux';
-import { WealthManagementStatus, type RootState } from '../../store';
-import { fetchWealthManagement } from '../../store';
-import { ExpandableTable } from './ExpandableTable';
 import { Container } from 'react-bootstrap';
+import { useSelector } from 'react-redux';
+import { WealthManagementStatus, fetchWealthManagement, type RootState } from '../../store';
+import { useAppDispatch } from '../../store/hooks';
+import { ExpandableTable } from './ExpandableTable';
 
 const WealthManagement: FC = () => {
   const dispatch = useAppDispatch();
@@ -29,7 +28,7 @@ const WealthManagement: FC = () => {
       if (wealthManagement != null) {
         content = (
           <>
-            <h1 className="text-center">Wealth Management</h1>
+            <h1 className='text-center'>Wealth Management</h1>
             <ExpandableTable data={wealthManagement.allocations} />
           </>
         );

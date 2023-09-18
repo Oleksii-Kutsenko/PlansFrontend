@@ -67,11 +67,11 @@ const CountriesRating: FC = () => {
     countriesStatus === CountriesStatus.SUCCEEDED
   ) {
     const tableHeader = [];
-    tableHeader.push(<th key="name">Name</th>);
+    tableHeader.push(<th key='name'>Name</th>);
     countriesOptions.forEach((option, index) => {
       tableHeader.push(<th key={index}>{option.name}</th>);
     });
-    tableHeader.push(<th key="rating">Rating</th>);
+    tableHeader.push(<th key='rating'>Rating</th>);
 
     const countriesOptionsNormalizedNames = countriesOptions.map(
       (option) => option.normalized_name
@@ -89,7 +89,8 @@ const CountriesRating: FC = () => {
             return (
               <td
                 key={j}
-                style={{ backgroundColor: mapValueToColor(country[option.normalized_name]) }}>
+                style={{ backgroundColor: mapValueToColor(country[option.normalized_name]) }}
+              >
                 {country[option.normalized_name]}
               </td>
             );
@@ -100,8 +101,8 @@ const CountriesRating: FC = () => {
     });
     content = (
       <Container fluid>
-        <h1 className="text-center">Countries Rating</h1>
-        <Table bordered className="text-center">
+        <h1 className='text-center'>Countries Rating</h1>
+        <Table bordered className='text-center'>
           <thead style={{ backgroundColor: 'rgb(220, 220, 220)' }}>
             <tr>{tableHeader}</tr>
           </thead>

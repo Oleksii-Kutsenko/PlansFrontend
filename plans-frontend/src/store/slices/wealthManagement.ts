@@ -13,7 +13,7 @@ interface Asset {
 }
 
 interface AssetAllocation {
-  asset_name: string;
+  name: string;
   asset: Asset;
   current_amount: number;
   target_amount: number;
