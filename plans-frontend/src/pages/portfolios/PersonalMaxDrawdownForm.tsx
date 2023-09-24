@@ -65,34 +65,40 @@ export const PersonalMaxDrawdownForm: FC = () => {
     return <div>Personal max drawdown not found.</div>;
   } else {
     return (
-      <Form
-        className='border border-secondary rounded m-3 p-3'
-        style={{ backgroundColor: 'rgb(70, 130, 180)' }}
-        onSubmit={handleSubmit(handleFormSubmit)}
-      >
-        <Form.Group>
-          <Form.Label htmlFor='personalMaxDrawdown'>Personal Max Drawdown</Form.Label>
-          <Form.Control type='text' id='personalMaxDrawdown' {...register('personalMaxDrawdown')} />
-          {errors.personalMaxDrawdown != null && (
-            <Form.Control.Feedback type='invalid'>This field has an error.</Form.Control.Feedback>
-          )}
-        </Form.Group>
-        <Form.Group>
-          <Form.Label>Backtest Start Date</Form.Label>
-          <Form.Control type='date' id='backtestStartDate' {...register('backtestStartDate')} />
-          {errors.backtestStartDate != null && (
-            <Form.Control.Feedback type='invalid'>This field has an error.</Form.Control.Feedback>
-          )}
-        </Form.Group>
-        <Form.Group className='d-flex justify-content-between'>
-          <Button type='submit' className='mt-3 mr-auto'>
-            Apply
-          </Button>
-          <Button type='reset' className='mt-3 ml-auto' onClick={handleFormReset}>
-            Reset
-          </Button>
-        </Form.Group>
-      </Form>
+      <div className='my-auto'>
+        <Form
+          className='border border-secondary rounded m-3 p-3'
+          style={{ backgroundColor: 'rgb(70, 130, 180)' }}
+          onSubmit={handleSubmit(handleFormSubmit)}
+        >
+          <Form.Group>
+            <Form.Label htmlFor='personalMaxDrawdown'>Personal Max Drawdown</Form.Label>
+            <Form.Control
+              type='text'
+              id='personalMaxDrawdown'
+              {...register('personalMaxDrawdown')}
+            />
+            {errors.personalMaxDrawdown != null && (
+              <Form.Control.Feedback type='invalid'>This field has an error.</Form.Control.Feedback>
+            )}
+          </Form.Group>
+          <Form.Group>
+            <Form.Label>Backtest Start Date</Form.Label>
+            <Form.Control type='date' id='backtestStartDate' {...register('backtestStartDate')} />
+            {errors.backtestStartDate != null && (
+              <Form.Control.Feedback type='invalid'>This field has an error.</Form.Control.Feedback>
+            )}
+          </Form.Group>
+          <Form.Group className='d-flex justify-content-between'>
+            <Button type='submit' className='mt-3 mr-auto'>
+              Apply
+            </Button>
+            <Button type='reset' className='mt-3 ml-auto' onClick={handleFormReset}>
+              Reset
+            </Button>
+          </Form.Group>
+        </Form>
+      </div>
     );
   }
 };
