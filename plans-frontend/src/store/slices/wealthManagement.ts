@@ -74,3 +74,4 @@ const wealthManagementSlice = createSlice({
 
 // Exports
 export const wealthManagementReducer = wealthManagementSlice.reducer;
+export const wealthManagementActions = { ...wealthManagementSlice.actions, fetchWealthManagement };

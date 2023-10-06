@@ -27,14 +27,10 @@ const Portfolios: FC = () => {
   const {
     portfolios,
     portfoliosLoadingStatus,
-    personalMaxDrawdown,
     personalMaxDrawdownLoadingStatus,
     ageMaxDrawdownDependence,
     ageMaxDrawdownDependenceLoadingStatus
   } = useSelector((state: RootState) => state.portfolios);
-
-  const backtestStartDate = new Date();
-  backtestStartDate.setFullYear(backtestStartDate.getFullYear() - 15);
 
   useEffect(() => {
     const fetchIfNeeded = (status: LoadStatus, action: AsyncThunk<any, void, any>) => {
@@ -83,11 +79,7 @@ const Portfolios: FC = () => {
             <AgeMaxDrawdownDependenceGraph data={ageMaxDrawdownDependence} />
           </Col>
         </Row>
-        <PortfolioList
-          portfolios={portfolios}
-          personalMaxDrawdown={personalMaxDrawdown}
-          backtestStartDate={backtestStartDate}
-        />
+        <PortfolioList portfolios={portfolios} />
       </Container>
     );
   } else {
