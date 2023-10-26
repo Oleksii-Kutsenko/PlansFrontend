@@ -16,7 +16,8 @@ export const AssetAllocationRow = ({
         style={{ cursor: 'pointer' }}
         onClick={() => {
           setExpanded(!expanded);
-        }}>
+        }}
+      >
         <td>
           <i className={`bi bi-chevron-${expanded ? 'down' : 'right'}`}></i>
         </td>
@@ -32,12 +33,12 @@ export const AssetAllocationRow = ({
       </tr>
       {expanded && (
         <tr>
-          <td colSpan={6} className="inner-table-container">
-            <table className="inner-table">
-              <thead className="table-head">
+          <td colSpan={6} className='inner-table-container'>
+            <table className='inner-table'>
+              <thead className='table-head'>
                 <tr>
-                  <th className="asset-name">Asset Name</th>
-                  <th className="asset">Asset</th>
+                  <th className='asset-name'>Asset Name</th>
+                  <th className='asset'>Asset</th>
                   <th>Current Amount</th>
                   <th>Target Amount</th>
                   <th>Target Percentage</th>
@@ -48,7 +49,7 @@ export const AssetAllocationRow = ({
                 {assetAllocation.asset_allocations.map((asset, index) => {
                   return (
                     <tr key={index}>
-                      <td>{asset.asset_name}</td>
+                      <td>{asset.name}</td>
                       <td>{asset.asset.name}</td>
                       <td>{asset.current_amount}</td>
                       <td>

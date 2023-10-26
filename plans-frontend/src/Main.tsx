@@ -30,7 +30,7 @@ const Profile = React.lazy(async () => {
 });
 
 const Portfolios = React.lazy(async () => {
-  const module = await import('./pages/Portfolios');
+  const module = await import('./pages/portfolios/Portfolios');
   return { default: module.default };
 });
 
@@ -46,18 +46,18 @@ const Main: FC = () => {
     <React.Suspense fallback={<Loading />}>
       <Routes>
         {/** Protected Routes */}
-        <Route path="/" element={<ProtectedRoutes />}>
-          <Route path="/" element={<Home />} />
-          <Route path="/countries" element={<CountriesRating />} />
-          <Route path="/portfolios" element={<Portfolios />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/wealth-management" element={<WealthManagement />} />
+        <Route path='/' element={<ProtectedRoutes />}>
+          <Route path='/' element={<Home />} />
+          <Route path='/countries' element={<CountriesRating />} />
+          <Route path='/portfolios' element={<Portfolios />} />
+          <Route path='/profile' element={<Profile />} />
+          <Route path='/wealth-management' element={<WealthManagement />} />
         </Route>
 
         {/** Public Routes */}
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<SignUp />} />
-        <Route path="*" element={<h1>Not Found</h1>} />
+        <Route path='/login' element={<Login />} />
+        <Route path='/register' element={<SignUp />} />
+        <Route path='*' element={<h1>Not Found</h1>} />
       </Routes>
     </React.Suspense>
   );

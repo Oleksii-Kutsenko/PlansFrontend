@@ -20,16 +20,16 @@ export function ExpandableTable({ data }: ExpandableTableProps): React.ReactElem
   const totalTargetPercentage = data.reduce((total, item) => total + item.target_percentage, 0);
 
   return (
-    <div className="table-container">
-      <table className="outer-table">
-        <thead className="table-head">
+    <div className='table-container'>
+      <table className='outer-table'>
+        <thead className='table-head'>
           <tr>
-            <th className="chevron"></th>
-            <th className="asset-type">Asset Type</th>
-            <th className="current-amount">Current Amount</th>
-            <th className="allocation-amount">Target Amount</th>
-            <th className="target-percentage">Target Percentage</th>
-            <th className="difference">Difference</th>
+            <th className='chevron'></th>
+            <th className='asset-type'>Asset Type</th>
+            <th className='current-amount'>Current Amount</th>
+            <th className='allocation-amount'>Target Amount</th>
+            <th className='target-percentage'>Target Percentage</th>
+            <th className='difference'>Difference</th>
           </tr>
         </thead>
         <tbody>
@@ -42,7 +42,7 @@ export function ExpandableTable({ data }: ExpandableTableProps): React.ReactElem
               />
             );
           })}
-          <tr className="total-row">
+          <tr className='total-row'>
             <td>Total</td>
             <td></td>
             <td>{totalCurrentAmount.toFixed(2)}</td>

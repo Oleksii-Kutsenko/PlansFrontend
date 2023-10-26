@@ -19,36 +19,36 @@ const Header: FC = () => {
     <Navbar>
       {isAuthenticated ? (
         <>
-          <Nav className="me-auto">
+          <Nav className='me-auto'>
             <Nav.Item>
-              <NavLink to="/" className="nav-link">
+              <NavLink to='/' className='nav-link'>
                 Home
               </NavLink>
             </Nav.Item>
             <Nav.Item>
-              <NavLink to="/countries" className="nav-link">
+              <NavLink to='/countries' className='nav-link'>
                 Countries
               </NavLink>
             </Nav.Item>
             <Nav.Item>
-              <NavLink to="/portfolios" className="nav-link">
+              <NavLink to='/portfolios' className='nav-link'>
                 Portfolios
               </NavLink>
             </Nav.Item>
             <Nav.Item>
-              <NavLink to="/wealth-management" className="nav-link">
+              <NavLink to='/wealth-management' className='nav-link'>
                 Wealth Management
               </NavLink>
             </Nav.Item>
           </Nav>
           <Nav>
             <Nav.Item>
-              <NavLink to="/profile" className="nav-link">
+              <NavLink to='/profile' className='nav-link'>
                 Profile
               </NavLink>
             </Nav.Item>
             <Nav.Item>
-              <NavLink to="/login" className="nav-link" onClick={handleLogout}>
+              <NavLink to='/login' className='nav-link' onClick={handleLogout}>
                 Logout
               </NavLink>
             </Nav.Item>
@@ -57,12 +57,12 @@ const Header: FC = () => {
       ) : (
         <Nav>
           <Nav.Item>
-            <NavLink to="/login" className="nav-link">
+            <NavLink to='/login' className='nav-link'>
               Login
             </NavLink>
           </Nav.Item>
           <Nav.Item>
-            <NavLink to="/register" className="nav-link">
+            <NavLink to='/register' className='nav-link'>
               Register
             </NavLink>
           </Nav.Item>
