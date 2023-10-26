@@ -28,13 +28,18 @@ export interface Portfolio {
   tickers: Ticker[];
 }
 
+export interface AgeMaxDrawdownDependency {
+  age: number;
+  maxDrawdown: number;
+}
+
 interface State {
   portfolios: Portfolio[];
   portfoliosLoadingStatus: LoadStatus;
   personalMaxDrawdown: number | null;
   personalMaxDrawdownLoadingStatus: LoadStatus;
-  backtestStartDate: Date | null;
-  ageMaxDrawdownDependence: number[][];
+  backtestStartDate: string;
+  ageMaxDrawdownDependence: AgeMaxDrawdownDependency[];
   ageMaxDrawdownDependenceLoadingStatus: LoadStatus;
 }
 
@@ -57,24 +62,37 @@ export const fetchPersonalMaxDrawdown = createAsyncThunk<number>(
   }
 );
 
-export const fetchAgeMaxDrawdownDependence = createAsyncThunk<number[][]>(
-  `${name}/fetchAgeMaxDrawdownDependence`,
-  async () => {
-    const response = await fetcher.get('/api/investments/portfolios/age-max-drawdown-dependence/');
-    return response.data;
+export const fetchAgeMaxDrawdownDependence = createAsyncThunk<
+  AgeMaxDrawdownDependency[],
+  number | void
+>(`${name}/fetchAgeMaxDrawdownDependence`, async (age: number | void) => {
+  let response;
+  if (!age) {
+    response = await fetcher.get('/api/investments/portfolios/age-max-drawdown-dependence/');
+  } else {
+    response = await fetcher.get(
+      `/api/investments/portfolios/age-max-drawdown-dependence/?age=${age}`
+    );
   }
-);
+  return response.data;
+});
 
 // Initial state
-const initialState: State = {
-  portfolios: [],
-  portfoliosLoadingStatus: LoadStatus.IDLE,
-  personalMaxDrawdown: null,
-  personalMaxDrawdownLoadingStatus: LoadStatus.IDLE,
-  backtestStartDate: null,
-  ageMaxDrawdownDependence: [],
-  ageMaxDrawdownDependenceLoadingStatus: LoadStatus.IDLE
-};
+function createInitialState(): State {
+  const fifteenYearsAgo = new Date();
+  fifteenYearsAgo.setFullYear(fifteenYearsAgo.getFullYear() - 15);
+
+  return {
+    portfolios: [],
+    portfoliosLoadingStatus: LoadStatus.IDLE,
+    personalMaxDrawdown: null,
+    personalMaxDrawdownLoadingStatus: LoadStatus.IDLE,
+    backtestStartDate: fifteenYearsAgo.toISOString(),
+    ageMaxDrawdownDependence: [],
+    ageMaxDrawdownDependenceLoadingStatus: LoadStatus.IDLE
+  };
+}
+const initialState: State = createInitialState();
 
 // Slice
 const portfoliosSlice = createSlice({

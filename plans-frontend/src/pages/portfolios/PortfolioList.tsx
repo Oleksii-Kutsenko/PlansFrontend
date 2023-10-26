@@ -7,25 +7,20 @@ import { type Portfolio as PortfolioType, type Ticker as TickerType } from '../.
 const PortfolioList: FC<{
   portfolios: Portfolio[];
 }> = ({ portfolios }) => {
-  const { personalMaxDrawdown, portfoliosLoadingStatus } = useSelector(
+  const { personalMaxDrawdown, portfoliosLoadingStatus, backtestStartDate } = useSelector(
     (state: RootState) => state.portfolios
   );
   const [toBeRenderedPortfolios, setToBeRenderedPortfolios] = useState<PortfolioType[]>([]);
-  const [backtestStartDate, setBacktestStartDate] = useState(new Date());
 
   useEffect(() => {
-    const fifteenYearsAgo = new Date();
-    fifteenYearsAgo.setFullYear(fifteenYearsAgo.getFullYear() - 15);
-    setBacktestStartDate(fifteenYearsAgo);
-
     const filteredPortfolios = portfolios.filter((portfolio: PortfolioType) => {
       return (
         portfolio.backtestData.maxDrawdown >= personalMaxDrawdown! &&
-        new Date(portfolio.backtestData.startDate) <= backtestStartDate
+        new Date(portfolio.backtestData.startDate) <= new Date(backtestStartDate)
       );
     });
     setToBeRenderedPortfolios(filteredPortfolios.slice(0, 10));
-  }, [portfolios, personalMaxDrawdown]);
+  }, [portfolios, personalMaxDrawdown, backtestStartDate]);
 
   if (portfoliosLoadingStatus === LoadStatus.LOADING) {
     return <p>Loading...</p>;

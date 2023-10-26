@@ -17,7 +17,7 @@ import {
 } from 'chart.js';
 import { PersonalMaxDrawdownForm } from './PersonalMaxDrawdownForm';
 import type { AsyncThunk } from '@reduxjs/toolkit';
-import AgeMaxDrawdownDependenceGraph from './AgeMaxDrawdownDependenceGraph';
+import AgeMaxDrawdownDependenceGraph from './AgeMaxDrawdownDependenceGraph/AgeMaxDrawdownDependenceGraph';
 import PortfolioList from './PortfolioList';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
@@ -33,9 +33,13 @@ const Portfolios: FC = () => {
   } = useSelector((state: RootState) => state.portfolios);
 
   useEffect(() => {
-    const fetchIfNeeded = (status: LoadStatus, action: AsyncThunk<any, void, any>) => {
+    const fetchIfNeeded = (
+      status: LoadStatus,
+      action: AsyncThunk<any, any, any>,
+      args: any | null = null
+    ) => {
       if (status === LoadStatus.IDLE || status === LoadStatus.FAILED) {
-        dispatch(action()).catch((err: string | any) => {
+        dispatch(action(args)).catch((err: string | any) => {
           const errorMessage = err.message.toString() as string;
           toast.error(`Error fetching data: ${errorMessage}`);
         });
@@ -45,7 +49,8 @@ const Portfolios: FC = () => {
     fetchIfNeeded(portfoliosLoadingStatus, portfoliosActions.fetchPortfolios);
     fetchIfNeeded(
       ageMaxDrawdownDependenceLoadingStatus,
-      portfoliosActions.fetchAgeMaxDrawdownDependence
+      portfoliosActions.fetchAgeMaxDrawdownDependence,
+      80
     );
     fetchIfNeeded(personalMaxDrawdownLoadingStatus, portfoliosActions.fetchPersonalMaxDrawdown);
   }, [
@@ -76,7 +81,7 @@ const Portfolios: FC = () => {
             <PersonalMaxDrawdownForm />
           </Col>
           <Col xs={9}>
-            <AgeMaxDrawdownDependenceGraph data={ageMaxDrawdownDependence} />
+            <AgeMaxDrawdownDependenceGraph graphData={ageMaxDrawdownDependence} />
           </Col>
         </Row>
         <PortfolioList portfolios={portfolios} />
