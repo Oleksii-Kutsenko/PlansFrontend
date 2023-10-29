@@ -22,7 +22,11 @@ export const AssetAllocationRow = ({
           <i className={`bi bi-chevron-${expanded ? 'down' : 'right'}`}></i>
         </td>
         <td>{assetAllocation.asset_type.name}</td>
-        <td>{assetAllocation.current_amount !== null ? assetAllocation.current_amount : '0.00'}</td>
+        <td>
+          {assetAllocation.current_amount !== null
+            ? assetAllocation.current_amount.toFixed(2)
+            : '0.00'}
+        </td>
         <td>{assetAllocation.target_amount}</td>
         <td>
           {assetAllocation.target_percentage != null
@@ -46,27 +50,40 @@ export const AssetAllocationRow = ({
                 </tr>
               </thead>
               <tbody>
-                {assetAllocation.asset_allocations.map((asset, index) => {
+                {/* TODO: Maybe we need to extract this into separate method */}
+                {/* Continue work on displaying currency */}
+                {assetAllocation.asset_allocations.map((assetAllocation, index) => {
                   return (
                     <tr key={index}>
-                      <td>{asset.name}</td>
-                      <td>{asset.asset.name}</td>
-                      <td>{asset.current_amount}</td>
+                      <td>{assetAllocation.name}</td>
+                      <td>{assetAllocation.asset.name}</td>
                       <td>
-                        {asset.target_amount != null ? asset.target_amount.toFixed(2) : 'N/A'}
+                        {assetAllocation.current_amount !== null
+                          ? assetAllocation.current_amount.toFixed(2) +
+                            assetAllocation.asset.currency.symbol
+                          : '0.00'}
                       </td>
                       <td>
-                        {asset.target_percentage != null
-                          ? asset.target_percentage.toFixed(2) + '%'
+                        {assetAllocation.target_amount != null
+                          ? assetAllocation.target_amount.toFixed(2)
                           : 'N/A'}
                       </td>
                       <td>
-                        {asset.target_amount != null && asset.current_amount != null
-                          ? (asset.target_amount - asset.current_amount).toFixed(2)
-                          : asset.target_percentage != null && asset.current_amount != null
+                        {assetAllocation.target_percentage != null
+                          ? assetAllocation.target_percentage.toFixed(2) + '%'
+                          : 'N/A'}
+                      </td>
+                      <td>
+                        {assetAllocation.target_amount != null &&
+                        assetAllocation.current_amount != null
                           ? (
-                              asset.target_percentage -
-                              (asset.current_amount / totalAllocationAmount) * 100
+                              assetAllocation.target_amount - assetAllocation.current_amount
+                            ).toFixed(2)
+                          : assetAllocation.target_percentage != null &&
+                            assetAllocation.current_amount != null
+                          ? (
+                              assetAllocation.target_percentage -
+                              (assetAllocation.current_amount / totalAllocationAmount) * 100
                             ).toFixed(2) + '%'
                           : 'N/A'}
                       </td>

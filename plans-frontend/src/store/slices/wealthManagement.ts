@@ -8,8 +8,14 @@ export enum WealthManagementStatus {
   FAILED = 'failed'
 }
 
+interface Currency {
+  name: string;
+  symbol: string;
+}
+
 interface Asset {
   name: string;
+  currency: Currency;
 }
 
 interface AssetAllocation {
