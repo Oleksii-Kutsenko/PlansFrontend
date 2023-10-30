@@ -1,14 +1,19 @@
 import React from 'react';
 import './ExpandableTable.css';
 import { AssetAllocationRow } from './AssetAllocationRow';
-import { type Allocation } from '../../store';
+import { Currency, type Allocation } from '../../store';
+import { formatNumber, formatPercentage } from './formatting';
 
 interface ExpandableTableProps {
-  data: Allocation[];
+  allocations: Allocation[];
+  baseCurrency: Currency;
 }
 
-export function ExpandableTable({ data }: ExpandableTableProps): React.ReactElement {
-  const totalCurrentAmount = data.reduce((total, item) => {
+export function ExpandableTable({
+  allocations,
+  baseCurrency
+}: ExpandableTableProps): React.ReactElement {
+  const totalCurrentAmount = allocations.reduce((total, item) => {
     return (
       total +
       item.asset_allocations.reduce((subTotal, asset) => {
@@ -16,8 +21,11 @@ export function ExpandableTable({ data }: ExpandableTableProps): React.ReactElem
       }, 0)
     );
   }, 0);
-  const totalAllocationAmount = data.reduce((total, item) => total + item.target_amount, 0);
-  const totalTargetPercentage = data.reduce((total, item) => total + item.target_percentage, 0);
+  const totalAllocationAmount = allocations.reduce((total, item) => total + item.target_amount, 0);
+  const totalTargetPercentage = allocations.reduce(
+    (total, item) => total + item.target_percentage,
+    0
+  );
 
   return (
     <div className='table-container'>
@@ -28,26 +36,29 @@ export function ExpandableTable({ data }: ExpandableTableProps): React.ReactElem
             <th className='asset-type'>Asset Type</th>
             <th className='current-amount'>Current Amount</th>
             <th className='allocation-amount'>Target Amount</th>
+            <th className='allocated-percentage'>Allocated Percentage</th>
             <th className='target-percentage'>Target Percentage</th>
-            <th className='difference'>Difference</th>
+            <th className='difference'>Delta</th>
           </tr>
         </thead>
         <tbody>
-          {data.map((item, index) => {
+          {allocations.map((item, index) => {
             return (
               <AssetAllocationRow
                 key={index}
                 assetAllocation={item}
+                baseCurrency={baseCurrency}
                 totalAllocationAmount={totalAllocationAmount}
               />
             );
           })}
           <tr className='total-row'>
-            <td>Total</td>
             <td></td>
-            <td>{totalCurrentAmount.toFixed(2)}</td>
-            <td>{totalAllocationAmount.toFixed(2)}</td>
-            <td>{totalTargetPercentage.toFixed(2)}%</td>
+            <td>Total</td>
+            <td>{formatNumber(totalCurrentAmount, baseCurrency.symbol)}</td>
+            <td>{formatNumber(totalAllocationAmount, baseCurrency.symbol)}</td>
+            <td></td>
+            <td>{formatPercentage(totalTargetPercentage)}</td>
             <td></td>
           </tr>
         </tbody>

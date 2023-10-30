@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
-import { type Allocation } from '../../store';
+import { Currency, type Allocation } from '../../store';
+import { formatNumber, formatPercentage } from './formatting';
 
 export const AssetAllocationRow = ({
   assetAllocation,
+  baseCurrency,
   totalAllocationAmount
 }: {
   assetAllocation: Allocation;
+  baseCurrency: Currency;
   totalAllocationAmount: number;
 }): React.ReactElement => {
   const [expanded, setExpanded] = useState(false);
@@ -22,22 +25,19 @@ export const AssetAllocationRow = ({
           <i className={`bi bi-chevron-${expanded ? 'down' : 'right'}`}></i>
         </td>
         <td>{assetAllocation.asset_type.name}</td>
-        <td>
-          {assetAllocation.current_amount !== null
-            ? assetAllocation.current_amount.toFixed(2)
-            : '0.00'}
-        </td>
-        <td>{assetAllocation.target_amount}</td>
-        <td>
-          {assetAllocation.target_percentage != null
-            ? assetAllocation.target_percentage.toFixed(2) + '%'
-            : ''}
-        </td>
-        <td></td>
+        <td>{formatNumber(assetAllocation.current_amount, baseCurrency.symbol)}</td>
+        <td>{formatNumber(assetAllocation.target_amount, baseCurrency.symbol)}</td>
+        <td>{assetAllocation.allocated_percentage}</td>
+        <td>{formatPercentage(assetAllocation.target_percentage)}</td>
+        {assetAllocation.target_percentage === null ? (
+          <td>{formatNumber(assetAllocation.delta, baseCurrency.symbol)}</td>
+        ) : (
+          <td>{formatPercentage(assetAllocation.delta)}</td>
+        )}
       </tr>
       {expanded && (
         <tr>
-          <td colSpan={6} className='inner-table-container'>
+          <td colSpan={7} className='inner-table-container'>
             <table className='inner-table'>
               <thead className='table-head'>
                 <tr>
@@ -46,47 +46,29 @@ export const AssetAllocationRow = ({
                   <th>Current Amount</th>
                   <th>Target Amount</th>
                   <th>Target Percentage</th>
-                  <th>Difference</th>
+                  <th>Delta</th>
                 </tr>
               </thead>
               <tbody>
-                {/* TODO: Maybe we need to extract this into separate method */}
-                {/* Continue work on displaying currency */}
                 {assetAllocation.asset_allocations.map((assetAllocation, index) => {
                   return (
                     <tr key={index}>
                       <td>{assetAllocation.name}</td>
                       <td>{assetAllocation.asset.name}</td>
                       <td>
-                        {assetAllocation.current_amount !== null
-                          ? assetAllocation.current_amount.toFixed(2) +
-                            assetAllocation.asset.currency.symbol
-                          : '0.00'}
+                        {formatNumber(
+                          assetAllocation.current_amount,
+                          assetAllocation.currency.symbol
+                        )}
                       </td>
                       <td>
-                        {assetAllocation.target_amount != null
-                          ? assetAllocation.target_amount.toFixed(2)
-                          : 'N/A'}
+                        {formatNumber(
+                          assetAllocation.target_amount,
+                          assetAllocation.currency.symbol
+                        )}
                       </td>
-                      <td>
-                        {assetAllocation.target_percentage != null
-                          ? assetAllocation.target_percentage.toFixed(2) + '%'
-                          : 'N/A'}
-                      </td>
-                      <td>
-                        {assetAllocation.target_amount != null &&
-                        assetAllocation.current_amount != null
-                          ? (
-                              assetAllocation.target_amount - assetAllocation.current_amount
-                            ).toFixed(2)
-                          : assetAllocation.target_percentage != null &&
-                            assetAllocation.current_amount != null
-                          ? (
-                              assetAllocation.target_percentage -
-                              (assetAllocation.current_amount / totalAllocationAmount) * 100
-                            ).toFixed(2) + '%'
-                          : 'N/A'}
-                      </td>
+                      <td>{formatPercentage(assetAllocation.target_percentage)}</td>
+                      <td>{assetAllocation.delta < 0 ? '-' : '+'}</td>
                     </tr>
                   );
                 })}

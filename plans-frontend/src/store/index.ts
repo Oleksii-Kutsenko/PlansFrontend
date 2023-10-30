@@ -5,7 +5,7 @@ import { countriesReducer } from './slices/countries';
 import { countriesOptionsReducer } from './slices/countriesOptions';
 import { userReducer } from './slices/user';
 import { portfoliosReducer } from './slices/portfolios';
-import { wealthManagementReducer } from './slices/wealthManagement';
+import { wealthManagementReducer } from './slices/wealthManagement/';
 
 export * from './slices/auth';
 export * from './slices/countries';
