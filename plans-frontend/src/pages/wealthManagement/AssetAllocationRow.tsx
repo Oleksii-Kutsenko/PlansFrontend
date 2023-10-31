@@ -1,15 +1,13 @@
 import React, { useState } from 'react';
-import { Currency, type Allocation } from '../../store';
+import { type Currency, type Allocation } from '../../store';
 import { formatNumber, formatPercentage } from './formatting';
 
 export const AssetAllocationRow = ({
   assetAllocation,
-  baseCurrency,
-  totalAllocationAmount
+  baseCurrency
 }: {
   assetAllocation: Allocation;
   baseCurrency: Currency;
-  totalAllocationAmount: number;
 }): React.ReactElement => {
   const [expanded, setExpanded] = useState(false);
 
@@ -27,7 +25,7 @@ export const AssetAllocationRow = ({
         <td>{assetAllocation.asset_type.name}</td>
         <td>{formatNumber(assetAllocation.current_amount, baseCurrency.symbol)}</td>
         <td>{formatNumber(assetAllocation.target_amount, baseCurrency.symbol)}</td>
-        <td>{assetAllocation.allocated_percentage}</td>
+        <td>{formatPercentage(assetAllocation.allocatedPercentage)}</td>
         <td>{formatPercentage(assetAllocation.target_percentage)}</td>
         {assetAllocation.target_percentage === null ? (
           <td>{formatNumber(assetAllocation.delta, baseCurrency.symbol)}</td>

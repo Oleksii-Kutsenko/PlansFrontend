@@ -1,31 +1,15 @@
 import React from 'react';
 import './ExpandableTable.css';
 import { AssetAllocationRow } from './AssetAllocationRow';
-import { Currency, type Allocation } from '../../store';
+import { WealthManagement } from '../../store';
 import { formatNumber, formatPercentage } from './formatting';
 
 interface ExpandableTableProps {
-  allocations: Allocation[];
-  baseCurrency: Currency;
+  wealthManagement: WealthManagement;
 }
 
-export function ExpandableTable({
-  allocations,
-  baseCurrency
-}: ExpandableTableProps): React.ReactElement {
-  const totalCurrentAmount = allocations.reduce((total, item) => {
-    return (
-      total +
-      item.asset_allocations.reduce((subTotal, asset) => {
-        return subTotal + asset.current_amount;
-      }, 0)
-    );
-  }, 0);
-  const totalAllocationAmount = allocations.reduce((total, item) => total + item.target_amount, 0);
-  const totalTargetPercentage = allocations.reduce(
-    (total, item) => total + item.target_percentage,
-    0
-  );
+export function ExpandableTable({ wealthManagement }: ExpandableTableProps): React.ReactElement {
+  const baseCurrency = wealthManagement.base_currency;
 
   return (
     <div className='table-container'>
@@ -42,23 +26,18 @@ export function ExpandableTable({
           </tr>
         </thead>
         <tbody>
-          {allocations.map((item, index) => {
+          {wealthManagement.allocations.map((item, index) => {
             return (
-              <AssetAllocationRow
-                key={index}
-                assetAllocation={item}
-                baseCurrency={baseCurrency}
-                totalAllocationAmount={totalAllocationAmount}
-              />
+              <AssetAllocationRow key={index} assetAllocation={item} baseCurrency={baseCurrency} />
             );
           })}
           <tr className='total-row'>
             <td></td>
             <td>Total</td>
-            <td>{formatNumber(totalCurrentAmount, baseCurrency.symbol)}</td>
-            <td>{formatNumber(totalAllocationAmount, baseCurrency.symbol)}</td>
+            <td>{formatNumber(wealthManagement.totalAllocatedAmount, baseCurrency.symbol)}</td>
+            <td>{formatNumber(wealthManagement.totalTargetAmount, baseCurrency.symbol)}</td>
             <td></td>
-            <td>{formatPercentage(totalTargetPercentage)}</td>
+            <td>{formatPercentage(wealthManagement.totalTargetPercentage)}</td>
             <td></td>
           </tr>
         </tbody>

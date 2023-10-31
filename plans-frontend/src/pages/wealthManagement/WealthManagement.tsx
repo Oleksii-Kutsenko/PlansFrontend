@@ -29,10 +29,7 @@ const WealthManagement: FC = () => {
         content = (
           <>
             <h1 className='text-center'>Wealth Management</h1>
-            <ExpandableTable
-              allocations={wealthManagement.allocations}
-              baseCurrency={wealthManagement.base_currency}
-            />
+            <ExpandableTable wealthManagement={wealthManagement} />
           </>
         );
       } else {

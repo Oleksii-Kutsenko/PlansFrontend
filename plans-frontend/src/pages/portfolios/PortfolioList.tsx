@@ -13,13 +13,15 @@ const PortfolioList: FC<{
   const [toBeRenderedPortfolios, setToBeRenderedPortfolios] = useState<PortfolioType[]>([]);
 
   useEffect(() => {
-    const filteredPortfolios = portfolios.filter((portfolio: PortfolioType) => {
-      return (
-        portfolio.backtestData.maxDrawdown >= personalMaxDrawdown! &&
-        new Date(portfolio.backtestData.startDate) <= new Date(backtestStartDate)
-      );
-    });
-    setToBeRenderedPortfolios(filteredPortfolios.slice(0, 10));
+    if (personalMaxDrawdown !== null) {
+      const filteredPortfolios = portfolios.filter((portfolio: PortfolioType) => {
+        return (
+          portfolio.backtestData.maxDrawdown >= personalMaxDrawdown &&
+          new Date(portfolio.backtestData.startDate) <= new Date(backtestStartDate)
+        );
+      });
+      setToBeRenderedPortfolios(filteredPortfolios.slice(0, 10));
+    }
   }, [portfolios, personalMaxDrawdown, backtestStartDate]);
 
   if (portfoliosLoadingStatus === LoadStatus.LOADING) {

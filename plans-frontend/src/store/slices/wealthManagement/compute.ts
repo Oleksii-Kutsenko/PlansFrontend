@@ -18,13 +18,21 @@ export const computeDelta = (wealthManagement: WealthManagement): WealthManageme
       }, 0)
     );
   }, 0);
+  const totalTargetPercentage = wealthManagement.allocations.reduce((acc, allocation) => {
+    return acc + allocation.target_percentage;
+  }, 0);
+
+  wealthManagement.totalAllocatedAmount = totalAllocatedAmount;
+  wealthManagement.totalTargetAmount = totalTargetAmount;
+  wealthManagement.totalTargetPercentage = totalTargetPercentage;
 
   for (const allocation of wealthManagement.allocations) {
     if (allocation.target_percentage !== null) {
-      allocation.allocated_percentage = (allocation.current_amount / totalAllocatedAmount) * 100;
+      allocation.allocatedPercentage = (allocation.current_amount / totalAllocatedAmount) * 100;
       allocation.delta =
         allocation.target_percentage - (allocation.current_amount / totalAllocatedAmount) * 100;
     } else {
+      allocation.allocatedPercentage = null;
       allocation.delta = allocation.target_amount - allocation.current_amount;
     }
     for (const assetAllocation of allocation.asset_allocations) {

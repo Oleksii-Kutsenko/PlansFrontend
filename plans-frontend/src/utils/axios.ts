@@ -1,4 +1,4 @@
-import type { AxiosResponse, InternalAxiosRequestConfig } from 'axios';
+import type { AxiosError, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
 import axios from 'axios';
 import store, { setToken, logout } from '../store';
 
@@ -28,56 +28,45 @@ function authHeader(): string {
 
 fetcher.interceptors.response.use(
   async (res: AxiosResponse<InternalAxiosRequestConfig, any>) => {
-    if (res.config.baseURL !== undefined && res.config.url !== undefined) {
+    if (res.config.baseURL && res.config.url) {
       console.debug('[Response]', res.config.baseURL + res.config.url, res.status, res.data);
     }
-    return await Promise.resolve(res);
+    return res;
   },
-  async (err: {
-    config: { baseURL: string; url: string };
-    response?: { status: number; data: object };
-  }) => {
-    console.debug(
-      '[Response]',
-      err.config.baseURL,
-      err.config.url,
-      err.response?.status,
-      err.response?.data
-    );
-    if (err?.response?.status === 401) {
-      await refreshAuthLogic(err);
+  async (err: AxiosError) => {
+    if (err && err.config) {
+      console.debug(
+        '[Response]',
+        err.config.baseURL,
+        err.config.url,
+        err.response?.status,
+        err.response?.data
+      );
+      if (err.response?.status === 401) {
+        await refreshAuthLogic(err);
+      }
+      return Promise.reject(err);
     }
-    return await Promise.reject(err);
   }
 );
 
-const refreshAuthLogic = async (failedRequest: any): Promise<any> => {
+const refreshAuthLogic = async (error: AxiosError) => {
   const { refreshToken } = store.getState().auth;
-  if (refreshToken != null) {
-    await fetcher
-      .post(
-        '/api/accounts/refresh/',
-        {
-          refresh: refreshToken
-        },
-        {
-          baseURL: process.env.REACT_APP_API_URL
-        }
-      )
-      .then((resp) => {
-        const { access, refresh } = resp.data as { access: string; refresh: string };
-        console.log('Refreshed token: ', access, refresh);
-        failedRequest.response.config.headers.Authorization = 'Bearer ' + access;
-        store.dispatch(setToken({ access, refresh }));
-      })
-      .catch((err) => {
-        if (err?.response?.status === 401) {
-          store.dispatch(logout());
-        }
+  if (refreshToken && error.response?.config.headers) {
+    try {
+      const resp = await fetcher.post('/api/accounts/refresh/', {
+        refresh: refreshToken
       });
-    return;
+      const { access, refresh } = resp.data as { access: string; refresh: string };
+      console.log('Refreshed token:', access, refresh);
+      error.response.config.headers.Authorization = `Bearer ${access}`;
+      store.dispatch(setToken({ access, refresh }));
+    } catch (error: any) {
+      if (error.response?.status === 401) {
+        store.dispatch(logout());
+      }
+    }
   } else {
     store.dispatch(logout());
   }
-  return await Promise.reject(new Error('Refresh token is null'));
 };
