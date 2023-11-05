@@ -9,7 +9,7 @@ import { toast } from 'react-toastify';
 
 interface FormValues {
   birthDate: string;
-  country: { label: string };
+  country: { label: string; value: number };
   username: string;
   password: string;
   password2: string;
@@ -25,13 +25,19 @@ const SignUp: FC = () => {
     watch,
     formState: { errors }
   } = useForm<FormValues>({
-    defaultValues: { birthDate: '', country: {}, username: '', password: '', password2: '' }
+    defaultValues: {
+      birthDate: '',
+      country: { label: '', value: -1 },
+      username: '',
+      password: '',
+      password2: ''
+    }
   });
   const [options, setOptions] = useState([]);
   const onSubmit = (data: FormValues): void => {
     const params = {
       birth_date: data.birthDate,
-      country: data.country.label,
+      country: data.country.value,
       username: data.username,
       password: data.password,
       password2: data.password2
@@ -62,8 +68,8 @@ const SignUp: FC = () => {
     const fetchData = async (): Promise<void> => {
       try {
         const response = await axios.get('http://127.0.0.1:8000/api/countries/');
-        const newOptions = response.data.map((country: { name: string }) => {
-          return { label: country.name };
+        const newOptions = response.data.map((country: { name: string; id: number }) => {
+          return { label: country.name, value: country.id };
         });
         setOptions(newOptions);
       } catch (error) {
@@ -97,6 +103,12 @@ const SignUp: FC = () => {
                 </Form.Group>
                 <Form.Group>
                   <Form.Label>Country</Form.Label>
+                  <br />
+                  {errors.country != null && (
+                    <Form.Text className='text-danger' style={{ fontSize: 14 }}>
+                      {errors.country.message?.toString()}
+                    </Form.Text>
+                  )}
                   <Controller
                     name='country'
                     control={control}
@@ -104,7 +116,7 @@ const SignUp: FC = () => {
                     render={({ field }) => (
                       <Select
                         {...field}
-                        value={field.value}
+                        value={field.value || null}
                         onChange={field.onChange}
                         ref={field.ref}
                         options={options}

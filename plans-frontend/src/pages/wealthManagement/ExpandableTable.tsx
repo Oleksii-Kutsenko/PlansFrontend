@@ -1,23 +1,15 @@
 import React from 'react';
 import './ExpandableTable.css';
 import { AssetAllocationRow } from './AssetAllocationRow';
-import { type Allocation } from '../../store';
+import { WealthManagement } from '../../store';
+import { formatNumber, formatPercentage } from './formatting';
 
 interface ExpandableTableProps {
-  data: Allocation[];
+  wealthManagement: WealthManagement;
 }
 
-export function ExpandableTable({ data }: ExpandableTableProps): React.ReactElement {
-  const totalCurrentAmount = data.reduce((total, item) => {
-    return (
-      total +
-      item.asset_allocations.reduce((subTotal, asset) => {
-        return subTotal + asset.current_amount;
-      }, 0)
-    );
-  }, 0);
-  const totalAllocationAmount = data.reduce((total, item) => total + item.target_amount, 0);
-  const totalTargetPercentage = data.reduce((total, item) => total + item.target_percentage, 0);
+export function ExpandableTable({ wealthManagement }: ExpandableTableProps): React.ReactElement {
+  const baseCurrency = wealthManagement.base_currency;
 
   return (
     <div className='table-container'>
@@ -28,26 +20,24 @@ export function ExpandableTable({ data }: ExpandableTableProps): React.ReactElem
             <th className='asset-type'>Asset Type</th>
             <th className='current-amount'>Current Amount</th>
             <th className='allocation-amount'>Target Amount</th>
+            <th className='allocated-percentage'>Allocated Percentage</th>
             <th className='target-percentage'>Target Percentage</th>
-            <th className='difference'>Difference</th>
+            <th className='difference'>Delta</th>
           </tr>
         </thead>
         <tbody>
-          {data.map((item, index) => {
+          {wealthManagement.allocations.map((item, index) => {
             return (
-              <AssetAllocationRow
-                key={index}
-                assetAllocation={item}
-                totalAllocationAmount={totalAllocationAmount}
-              />
+              <AssetAllocationRow key={index} assetAllocation={item} baseCurrency={baseCurrency} />
             );
           })}
           <tr className='total-row'>
-            <td>Total</td>
             <td></td>
-            <td>{totalCurrentAmount.toFixed(2)}</td>
-            <td>{totalAllocationAmount.toFixed(2)}</td>
-            <td>{totalTargetPercentage.toFixed(2)}%</td>
+            <td>Total</td>
+            <td>{formatNumber(wealthManagement.total_current_amount, baseCurrency.symbol)}</td>
+            <td>{formatNumber(wealthManagement.totalTargetAmount, baseCurrency.symbol)}</td>
+            <td></td>
+            <td>{formatPercentage(wealthManagement.totalTargetPercentage)}</td>
             <td></td>
           </tr>
         </tbody>

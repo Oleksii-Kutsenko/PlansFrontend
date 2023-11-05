@@ -1,5 +1,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { fetcher } from '../../utils/axios';
+import { fetcher } from '../../../utils/axios';
+import { WealthManagement } from './interfaces';
+import { computeDelta } from './compute';
 
 export enum WealthManagementStatus {
   IDLE = 'idle',
@@ -7,32 +9,6 @@ export enum WealthManagementStatus {
   SUCCEEDED = 'succeeded',
   FAILED = 'failed'
 }
-
-interface Asset {
-  name: string;
-}
-
-interface AssetAllocation {
-  name: string;
-  asset: Asset;
-  current_amount: number;
-  target_amount: number;
-  target_percentage: number;
-  difference: number;
-}
-
-export interface Allocation {
-  asset_allocations: AssetAllocation[];
-  asset_type: { name: string };
-  current_amount: number;
-  target_amount: number;
-  target_percentage: number;
-}
-
-interface WealthManagement {
-  allocations: Allocation[];
-}
-
 interface State {
   wealthManagement: WealthManagement | undefined;
   status: WealthManagementStatus;
@@ -60,7 +36,7 @@ const wealthManagementSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(fetchWealthManagement.fulfilled, (state, action) => {
-        state.wealthManagement = action.payload;
+        state.wealthManagement = computeDelta(action.payload);
         state.status = WealthManagementStatus.SUCCEEDED;
       })
       .addCase(fetchWealthManagement.pending, (state) => {

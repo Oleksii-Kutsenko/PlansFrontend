@@ -39,7 +39,7 @@ const Portfolios: FC = () => {
       args: any | null = null
     ) => {
       if (status === LoadStatus.IDLE || status === LoadStatus.FAILED) {
-        dispatch(action(args)).catch((err: string | any) => {
+        dispatch(action(args)).catch((err: { message: string }) => {
           const errorMessage = err.message.toString() as string;
           toast.error(`Error fetching data: ${errorMessage}`);
         });
