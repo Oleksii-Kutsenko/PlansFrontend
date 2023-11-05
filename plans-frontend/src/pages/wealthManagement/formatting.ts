@@ -1,6 +1,6 @@
 export const formatNumber = (number: number | null, currencySymbol: string) => {
   if (number === null) {
-    return 'N/A';
+    return `${currencySymbol}0.00`;
   }
   return `${currencySymbol}${number.toFixed(2)}`;
 };

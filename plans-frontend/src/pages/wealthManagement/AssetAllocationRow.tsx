@@ -39,10 +39,11 @@ export const AssetAllocationRow = ({
             <table className='inner-table'>
               <thead className='table-head'>
                 <tr>
-                  <th className='asset-name'>Asset Name</th>
-                  <th className='asset'>Asset</th>
+                  <th>Asset Name</th>
+                  <th>Asset</th>
                   <th>Current Amount</th>
                   <th>Target Amount</th>
+                  <th>Allocated Percentage</th>
                   <th>Target Percentage</th>
                   <th>Delta</th>
                 </tr>
@@ -65,8 +66,15 @@ export const AssetAllocationRow = ({
                           assetAllocation.currency.symbol
                         )}
                       </td>
+                      <td>{formatPercentage(assetAllocation.allocated_percentage)}</td>
                       <td>{formatPercentage(assetAllocation.target_percentage)}</td>
-                      <td>{assetAllocation.delta < 0 ? '-' : '+'}</td>
+                      {assetAllocation.target_percentage === null ? (
+                        <td>
+                          {formatNumber(assetAllocation.delta, assetAllocation.currency.symbol)}
+                        </td>
+                      ) : (
+                        <td>{formatPercentage(assetAllocation.delta)}</td>
+                      )}
                     </tr>
                   );
                 })}

@@ -62,16 +62,12 @@ td {
 .asset-type,
 .current-amount,
 .allocation-amount,
+.allocated-percentage,
 .target-percentage,
 .difference,
 .asset-name,
 .asset {
-  width: 19.6%;
-}
-
-.asset-name,
-.asset {
-  width: 16.67%;
+  width: 12.25%;
 }
 
 /* Cell Padding */

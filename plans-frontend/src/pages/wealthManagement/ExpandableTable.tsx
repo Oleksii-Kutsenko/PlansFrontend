@@ -34,7 +34,7 @@ export function ExpandableTable({ wealthManagement }: ExpandableTableProps): Rea
           <tr className='total-row'>
             <td></td>
             <td>Total</td>
-            <td>{formatNumber(wealthManagement.totalAllocatedAmount, baseCurrency.symbol)}</td>
+            <td>{formatNumber(wealthManagement.total_current_amount, baseCurrency.symbol)}</td>
             <td>{formatNumber(wealthManagement.totalTargetAmount, baseCurrency.symbol)}</td>
             <td></td>
             <td>{formatPercentage(wealthManagement.totalTargetPercentage)}</td>

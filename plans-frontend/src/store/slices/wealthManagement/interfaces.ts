@@ -2,11 +2,14 @@ export interface Currency {
   name: string;
   symbol: string;
 }
+
 interface Asset {
   name: string;
   symbol: string;
 }
+
 interface AssetAllocation {
+  allocated_percentage: number;
   currency: Currency;
   delta: number;
   name: string;
@@ -17,7 +20,7 @@ interface AssetAllocation {
 }
 
 export interface Allocation {
-  allocatedPercentage: number | null;
+  allocatedPercentage: number;
   asset_allocations: AssetAllocation[];
   asset_type: { name: string };
   current_amount: number;
@@ -27,9 +30,9 @@ export interface Allocation {
 }
 
 export interface WealthManagement {
+  total_current_amount: number;
   allocations: Allocation[];
   base_currency: Currency;
-  totalAllocatedAmount: number;
   totalTargetAmount: number;
   totalTargetPercentage: number;
 }
