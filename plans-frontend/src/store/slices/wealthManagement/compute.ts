@@ -1,5 +1,10 @@
 import { WealthManagement } from './interfaces';
 
+/**
+ * Calculates and returns an updated WealthManagement object with computed values.
+ * @param wealthManagement - The input wealth management object.
+ * @returns An updated wealth management object with the delta values computed.
+ */
 export const computeDelta = (wealthManagement: WealthManagement): WealthManagement => {
   const totalAllocatedAmount = wealthManagement.total_current_amount;
   const totalTargetAmount = wealthManagement.allocations.reduce((acc, allocation) => {
@@ -9,10 +14,13 @@ export const computeDelta = (wealthManagement: WealthManagement): WealthManageme
     return acc + allocation.target_percentage;
   }, 0);
 
-  wealthManagement.totalTargetAmount = totalTargetAmount;
-  wealthManagement.totalTargetPercentage = totalTargetPercentage;
+  const updatedWealthManagement: WealthManagement = {
+    ...wealthManagement,
+    totalTargetAmount,
+    totalTargetPercentage
+  };
 
-  for (const allocation of wealthManagement.allocations) {
+  for (const allocation of updatedWealthManagement.allocations) {
     allocation.allocatedPercentage = (allocation.current_amount / totalAllocatedAmount) * 100;
     if (allocation.target_percentage !== null) {
       allocation.delta =
@@ -30,5 +38,5 @@ export const computeDelta = (wealthManagement: WealthManagement): WealthManageme
       }
     }
   }
-  return wealthManagement;
+  return updatedWealthManagement;
 };
