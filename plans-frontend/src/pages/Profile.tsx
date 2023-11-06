@@ -8,7 +8,7 @@ import { userActions } from '../store';
 const Profile: React.FC = () => {
   const dispatch = useAppDispatch();
 
-  const { user, userLoading } = useSelector((state: RootState) => state.user);
+  const { user, userLoading } = useSelector((state: RootState) => state.userInfo);
 
   useEffect(() => {
     if (user === null && !userLoading) {

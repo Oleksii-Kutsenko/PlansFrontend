@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { type Currency, type Allocation } from '../../store';
 import { formatNumber, formatPercentage } from './formatting';
+import { CurrencyInput } from 'components/CurrencyInput';
 
 export const AssetAllocationRow = ({
   assetAllocation,
@@ -55,10 +56,10 @@ export const AssetAllocationRow = ({
                       <td>{assetAllocation.name}</td>
                       <td>{assetAllocation.asset.name}</td>
                       <td>
-                        {formatNumber(
-                          assetAllocation.current_amount,
-                          assetAllocation.currency.symbol
-                        )}
+                        <CurrencyInput
+                          value={assetAllocation.current_amount}
+                          updateValue={() => {}}
+                        />
                       </td>
                       <td>
                         {formatNumber(

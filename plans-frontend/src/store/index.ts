@@ -20,7 +20,7 @@ const store = configureStore({
     countries: countriesReducer,
     countriesOptions: countriesOptionsReducer,
     portfolios: portfoliosReducer,
-    user: userReducer,
+    userInfo: userReducer,
     wealthManagement: wealthManagementReducer
   }
 });

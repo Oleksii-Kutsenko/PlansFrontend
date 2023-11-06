@@ -22,8 +22,8 @@ const initialState: State = {
 // Thunk
 export const fetchWealthManagement = createAsyncThunk(
   'wealthManagement/fetchWealthManagement',
-  async () => {
-    const { data } = await fetcher.get('/api/assets/wealth-management/');
+  async (wealthManagementId: number) => {
+    const { data } = await fetcher.get(`/api/assets/wealth-management/${wealthManagementId}`);
     return data;
   }
 );

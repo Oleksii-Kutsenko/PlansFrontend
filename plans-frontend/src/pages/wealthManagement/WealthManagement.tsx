@@ -1,7 +1,12 @@
 import { useEffect, type FC } from 'react';
 import { Container } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
-import { WealthManagementStatus, fetchWealthManagement, type RootState } from '../../store';
+import {
+  WealthManagementStatus,
+  fetchWealthManagement,
+  type RootState,
+  userActions
+} from '../../store';
 import { useAppDispatch } from '../../store/hooks';
 import { ExpandableTable } from './ExpandableTable';
 
@@ -11,12 +16,21 @@ const WealthManagement: FC = () => {
   const { wealthManagement, status: wealthManagementStatus } = useSelector(
     (state: RootState) => state.wealthManagement
   );
+  const user = useSelector((state: RootState) => state.userInfo.user);
 
   useEffect(() => {
-    dispatch(fetchWealthManagement()).catch((err) => {
-      console.log(err);
-    });
-  }, []);
+    if (user === null) {
+      dispatch(userActions.fetchCurrentUser()).catch((err) => {
+        console.log(err);
+      });
+    }
+
+    if (user && user.wealthManagementID) {
+      dispatch(fetchWealthManagement(user.wealthManagementID)).catch((err) => {
+        console.log(err);
+      });
+    }
+  }, [user]);
 
   let content;
 

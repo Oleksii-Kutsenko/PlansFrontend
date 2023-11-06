@@ -2,10 +2,11 @@ import { createAsyncThunk, createSlice, type PayloadAction } from '@reduxjs/tool
 import { fetcher } from '../../utils/axios';
 
 interface User {
-  username: string;
   birthDate: string;
   country: string;
   isAdmin: boolean;
+  username: string;
+  wealthManagementID: number;
 }
 
 interface State {
