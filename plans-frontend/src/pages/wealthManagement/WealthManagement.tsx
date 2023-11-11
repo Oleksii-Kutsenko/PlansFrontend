@@ -3,9 +3,9 @@ import { Container } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import {
   WealthManagementStatus,
-  fetchWealthManagement,
   type RootState,
-  userActions
+  userActions,
+  wealthManagementActions
 } from '../../store';
 import { useAppDispatch } from '../../store/hooks';
 import { ExpandableTable } from './ExpandableTable';
@@ -13,9 +13,11 @@ import { ExpandableTable } from './ExpandableTable';
 const WealthManagement: FC = () => {
   const dispatch = useAppDispatch();
 
-  const { wealthManagement, status: wealthManagementStatus } = useSelector(
-    (state: RootState) => state.wealthManagement
-  );
+  const {
+    wealthManagement,
+    wealthManagementChanged,
+    status: wealthManagementStatus
+  } = useSelector((state: RootState) => state.wealthManagement);
   const user = useSelector((state: RootState) => state.userInfo.user);
 
   useEffect(() => {
@@ -25,12 +27,20 @@ const WealthManagement: FC = () => {
       });
     }
 
-    if (user && user.wealthManagementID) {
-      dispatch(fetchWealthManagement(user.wealthManagementID)).catch((err) => {
-        console.log(err);
-      });
+    if (
+      user &&
+      user.wealthManagementID &&
+      (wealthManagementStatus === WealthManagementStatus.IDLE || wealthManagementChanged)
+    ) {
+      dispatch(wealthManagementActions.setWealthManagementChanged(false));
+      dispatch(wealthManagementActions.fetchWealthManagement(user.wealthManagementID)).catch(
+        (err) => {
+          console.log(err);
+        }
+      );
     }
-  }, [user]);
+    console.log('wealthManagementChanged');
+  }, [user, wealthManagementChanged, wealthManagementStatus]);
 
   let content;
 

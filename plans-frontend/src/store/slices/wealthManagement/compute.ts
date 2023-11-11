@@ -33,8 +33,10 @@ export const computeDelta = (wealthManagement: WealthManagement): WealthManageme
       if (assetAllocation.target_percentage !== null) {
         assetAllocation.delta =
           assetAllocation.target_percentage - assetAllocation.allocated_percentage;
-      } else {
+      } else if (assetAllocation.target_amount !== null) {
         assetAllocation.delta = assetAllocation.target_amount - assetAllocation.current_amount;
+      } else {
+        throw new Error('Invalid asset allocation');
       }
     }
   }
