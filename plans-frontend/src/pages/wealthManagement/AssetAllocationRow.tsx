@@ -70,29 +70,29 @@ export const AssetAllocationRow = ({
                       <td>
                         <CurrencyInput
                           symbol={assetAllocation.currency.symbol}
-                          value={assetAllocation.current_amount}
+                          value={assetAllocation.currentAmount}
                           onSubmit={handleSubmit('current_amount', assetAllocation.id)}
                         />
                       </td>
                       <td>
                         <CurrencyInput
                           symbol={assetAllocation.currency.symbol}
-                          value={assetAllocation.target_amount}
-                          onSubmit={() => {}}
+                          value={assetAllocation.targetAmount}
+                          onSubmit={handleSubmit('target_amount', assetAllocation.id)}
                         />
                       </td>
                       <td>{formatPercentage(assetAllocation.allocated_percentage)}</td>
                       <td>
-                        {assetAllocation.target_percentage === null ? (
+                        {assetAllocation.targetPercentage === null ? (
                           <span>N/A</span>
                         ) : (
                           <PercentageInput
-                            value={assetAllocation.target_percentage}
-                            onSubmit={() => {}}
+                            value={assetAllocation.targetPercentage}
+                            onSubmit={handleSubmit('target_percentage', assetAllocation.id)}
                           />
                         )}
                       </td>
-                      {assetAllocation.target_percentage === null ? (
+                      {assetAllocation.targetPercentage === null ? (
                         <td>
                           {formatNumber(assetAllocation.delta, assetAllocation.currency.symbol)}
                         </td>

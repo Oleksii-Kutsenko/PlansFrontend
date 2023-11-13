@@ -9,15 +9,16 @@ interface Asset {
 }
 
 export interface AssetAllocation {
+  exchangedAmount: number;
   id: number;
   allocated_percentage: number;
   currency: Currency;
   delta: number;
   name: string;
   asset: Asset;
-  current_amount: number;
-  target_amount: number | null;
-  target_percentage: number | null;
+  currentAmount: number;
+  targetAmount: number | null;
+  targetPercentage: number | null;
 }
 
 export interface UpdateAssetAllocation {
@@ -35,8 +36,8 @@ export interface Allocation {
   target_percentage: number;
 }
 
-export interface WealthManagement {
-  total_current_amount: number;
+export interface WealthManagementObject {
+  totalCurrentAmount: number;
   allocations: Allocation[];
   base_currency: Currency;
   totalTargetAmount: number;

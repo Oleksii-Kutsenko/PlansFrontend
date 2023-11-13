@@ -1,12 +1,12 @@
-import { WealthManagement } from './interfaces';
+import { WealthManagementObject } from './interfaces';
 
 /**
  * Calculates and returns an updated WealthManagement object with computed values.
  * @param wealthManagement - The input wealth management object.
  * @returns An updated wealth management object with the delta values computed.
  */
-export const computeDelta = (wealthManagement: WealthManagement): WealthManagement => {
-  const totalAllocatedAmount = wealthManagement.total_current_amount;
+export const computeDelta = (wealthManagement: WealthManagementObject): WealthManagementObject => {
+  const totalAllocatedAmount = wealthManagement.totalCurrentAmount;
   const totalTargetAmount = wealthManagement.allocations.reduce((acc, allocation) => {
     return acc + allocation.target_amount;
   }, 0);
@@ -14,7 +14,7 @@ export const computeDelta = (wealthManagement: WealthManagement): WealthManageme
     return acc + allocation.target_percentage;
   }, 0);
 
-  const updatedWealthManagement: WealthManagement = {
+  const updatedWealthManagement: WealthManagementObject = {
     ...wealthManagement,
     totalTargetAmount,
     totalTargetPercentage
@@ -30,11 +30,11 @@ export const computeDelta = (wealthManagement: WealthManagement): WealthManageme
     }
 
     for (const assetAllocation of allocation.asset_allocations) {
-      if (assetAllocation.target_percentage !== null) {
+      if (assetAllocation.targetPercentage !== null) {
         assetAllocation.delta =
-          assetAllocation.target_percentage - assetAllocation.allocated_percentage;
-      } else if (assetAllocation.target_amount !== null) {
-        assetAllocation.delta = assetAllocation.target_amount - assetAllocation.current_amount;
+          assetAllocation.targetPercentage - assetAllocation.allocated_percentage;
+      } else if (assetAllocation.targetAmount !== null) {
+        assetAllocation.delta = assetAllocation.targetAmount - assetAllocation.currentAmount;
       } else {
         throw new Error('Invalid asset allocation');
       }

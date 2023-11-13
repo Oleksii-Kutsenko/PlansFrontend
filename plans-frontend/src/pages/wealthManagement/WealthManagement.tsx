@@ -1,23 +1,25 @@
-import { useEffect, type FC } from 'react';
+import { useEffect, type FC, useState } from 'react';
 import { Container } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import {
   WealthManagementStatus,
   type RootState,
   userActions,
-  wealthManagementActions
+  wealthManagementActions,
+  WealthManagementObject
 } from '../../store';
 import { useAppDispatch } from '../../store/hooks';
 import { ExpandableTable } from './ExpandableTable';
 
 const WealthManagement: FC = () => {
   const dispatch = useAppDispatch();
+  const [wealthManagement, setWealthManagement] = useState<WealthManagementObject | undefined>(
+    undefined
+  );
 
-  const {
-    wealthManagement,
-    wealthManagementChanged,
-    status: wealthManagementStatus
-  } = useSelector((state: RootState) => state.wealthManagement);
+  const { wealthManagement: reduxWealthManagement, status: wealthManagementStatus } = useSelector(
+    (state: RootState) => state.wealthManagement
+  );
   const user = useSelector((state: RootState) => state.userInfo.user);
 
   useEffect(() => {
@@ -30,17 +32,22 @@ const WealthManagement: FC = () => {
     if (
       user &&
       user.wealthManagementID &&
-      (wealthManagementStatus === WealthManagementStatus.IDLE || wealthManagementChanged)
+      (wealthManagementStatus === WealthManagementStatus.IDLE || wealthManagement === undefined)
     ) {
-      dispatch(wealthManagementActions.setWealthManagementChanged(false));
       dispatch(wealthManagementActions.fetchWealthManagement(user.wealthManagementID)).catch(
         (err) => {
           console.log(err);
         }
       );
     }
-    console.log('wealthManagementChanged');
-  }, [user, wealthManagementChanged, wealthManagementStatus]);
+  }, [user, wealthManagementStatus]);
+  // TODO: Update asset allocation with patch wealth management endpoint, and re-set wealth management state
+  useEffect(() => {
+    console.log('reduxWealthManagement');
+    if (reduxWealthManagement) {
+      setWealthManagement(reduxWealthManagement);
+    }
+  }, [reduxWealthManagement]);
 
   let content;
 

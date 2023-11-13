@@ -1,6 +1,6 @@
-import { PayloadAction, createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { fetcher } from '../../../utils/axios';
-import { WealthManagement, UpdateAssetAllocation } from './interfaces';
+import { WealthManagementObject, UpdateAssetAllocation } from './interfaces';
 import { computeDelta } from './compute';
 
 const name = 'wealthManagement';
@@ -13,14 +13,12 @@ export enum WealthManagementStatus {
 }
 
 interface State {
-  wealthManagement: WealthManagement | undefined;
-  wealthManagementChanged: boolean;
+  wealthManagement: WealthManagementObject | undefined;
   status: WealthManagementStatus;
 }
 
 const initialState: State = {
   wealthManagement: undefined,
-  wealthManagementChanged: false,
   status: WealthManagementStatus.IDLE
 };
 
@@ -34,14 +32,14 @@ export const fetchWealthManagement = createAsyncThunk(
 );
 
 export const updateAssetAllocation = createAsyncThunk<
-  any,
+  UpdateAssetAllocation,
   { assetAllocationId: number; assetAllocation: UpdateAssetAllocation }
 >(
   `${name}/updateAssetAllocation`,
-  async ({ assetAllocationId, assetAllocation: asset_allocation }) => {
+  async ({ assetAllocationId, assetAllocation: assetAllocation }) => {
     const { data } = await fetcher.patch(
       `/api/assets/asset-allocation/${assetAllocationId}/`,
-      asset_allocation
+      assetAllocation
     );
     return data;
   }
@@ -52,8 +50,8 @@ const wealthManagementSlice = createSlice({
   name: name,
   initialState,
   reducers: {
-    setWealthManagementChanged: (state, action: PayloadAction<boolean>) => {
-      state.wealthManagementChanged = action.payload;
+    setWealthManagement: (state, action) => {
+      state.wealthManagement = action.payload;
     }
   },
   extraReducers: (builder) => {
@@ -69,7 +67,7 @@ const wealthManagementSlice = createSlice({
         state.status = WealthManagementStatus.FAILED;
       })
       .addCase(updateAssetAllocation.fulfilled, (state) => {
-        state.wealthManagementChanged = true;
+        state.wealthManagement = undefined;
       });
   }
 });
