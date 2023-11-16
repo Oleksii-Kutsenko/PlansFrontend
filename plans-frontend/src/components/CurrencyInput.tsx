@@ -1,16 +1,18 @@
 import { ChangeEvent, FC, useState } from 'react';
 import { Button, Form, InputGroup } from 'react-bootstrap';
 import { toast } from 'react-toastify';
+import { PayloadAction } from '@reduxjs/toolkit';
 
 interface Props {
   symbol: string;
   value: number | null;
-  onSubmit?: (value: number) => void;
+  onSubmit?: (value: number) => Promise<void>;
 }
 
 export const CurrencyInput: FC<Props> = ({ symbol, value, onSubmit }) => {
   const [isInputDisabled, setIsInputDisabled] = useState<boolean>(true);
   const [currentValue, updateCurrentValue] = useState<number>(value ? value : 0);
+  let previousValue = value ? value : 0;
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>): void => {
     const {
@@ -29,6 +31,7 @@ export const CurrencyInput: FC<Props> = ({ symbol, value, onSubmit }) => {
       money = 0;
     }
 
+    previousValue = money;
     updateCurrentValue(money);
   };
 
@@ -39,7 +42,17 @@ export const CurrencyInput: FC<Props> = ({ symbol, value, onSubmit }) => {
   const handleSubmit = (): void => {
     setIsInputDisabled(true);
     if (onSubmit) {
-      onSubmit(currentValue);
+      onSubmit(currentValue).catch((err) => {
+        console.log(err);
+        toast.error('Failed to update value');
+        updateCurrentValue(previousValue);
+      });
+    }
+  };
+
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>): void => {
+    if (event.key === 'Enter') {
+      handleSubmit();
     }
   };
 
@@ -55,6 +68,7 @@ export const CurrencyInput: FC<Props> = ({ symbol, value, onSubmit }) => {
         type='number'
         value={currentValue}
         min='0'
+        onKeyDown={handleKeyDown}
       />
       <Button variant='outline-secondary' id='edit-button' onClick={handleEdit}>
         <i className='bi bi-pencil'></i>

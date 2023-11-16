@@ -15,13 +15,18 @@ export const AssetAllocationRow = ({
   const dispatch = useAppDispatch();
   const [expanded, setExpanded] = useState(false);
 
-  const handleSubmit = (fieldName: string, assetAllocationId: number) => async (value: number) => {
-    dispatch(
-      wealthManagementActions.updateAssetAllocation({
-        assetAllocationId: assetAllocationId,
-        assetAllocation: { [fieldName]: value }
-      })
-    );
+  const handleSubmit = (
+    fieldName: string,
+    assetAllocationId: number
+  ): ((value: number) => Promise<void>) => {
+    return async (value: number): Promise<void> => {
+      await dispatch(
+        wealthManagementActions.updateAssetAllocation({
+          assetAllocationId: assetAllocationId,
+          assetAllocation: { [fieldName]: value }
+        })
+      );
+    };
   };
 
   return (

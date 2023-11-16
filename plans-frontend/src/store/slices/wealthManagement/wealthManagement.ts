@@ -14,11 +14,13 @@ export enum WealthManagementStatus {
 
 interface State {
   wealthManagement: WealthManagementObject | undefined;
+  wealthManagementChanged: boolean;
   status: WealthManagementStatus;
 }
 
 const initialState: State = {
   wealthManagement: undefined,
+  wealthManagementChanged: false,
   status: WealthManagementStatus.IDLE
 };
 
@@ -52,6 +54,9 @@ const wealthManagementSlice = createSlice({
   reducers: {
     setWealthManagement: (state, action) => {
       state.wealthManagement = action.payload;
+    },
+    setWealthManagementChanged: (state, action) => {
+      state.wealthManagementChanged = action.payload;
     }
   },
   extraReducers: (builder) => {
@@ -67,7 +72,7 @@ const wealthManagementSlice = createSlice({
         state.status = WealthManagementStatus.FAILED;
       })
       .addCase(updateAssetAllocation.fulfilled, (state) => {
-        state.wealthManagement = undefined;
+        state.wealthManagementChanged = true;
       });
   }
 });

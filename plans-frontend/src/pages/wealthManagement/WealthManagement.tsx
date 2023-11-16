@@ -12,14 +12,16 @@ import { useAppDispatch } from '../../store/hooks';
 import { ExpandableTable } from './ExpandableTable';
 
 const WealthManagement: FC = () => {
-  const dispatch = useAppDispatch();
   const [wealthManagement, setWealthManagement] = useState<WealthManagementObject | undefined>(
     undefined
   );
 
-  const { wealthManagement: reduxWealthManagement, status: wealthManagementStatus } = useSelector(
-    (state: RootState) => state.wealthManagement
-  );
+  const dispatch = useAppDispatch();
+  const {
+    wealthManagement: reduxWealthManagement,
+    status: wealthManagementStatus,
+    wealthManagementChanged
+  } = useSelector((state: RootState) => state.wealthManagement);
   const user = useSelector((state: RootState) => state.userInfo.user);
 
   useEffect(() => {
@@ -29,11 +31,7 @@ const WealthManagement: FC = () => {
       });
     }
 
-    if (
-      user &&
-      user.wealthManagementID &&
-      (wealthManagementStatus === WealthManagementStatus.IDLE || wealthManagement === undefined)
-    ) {
+    if (user && user.wealthManagementID && wealthManagementStatus === WealthManagementStatus.IDLE) {
       dispatch(wealthManagementActions.fetchWealthManagement(user.wealthManagementID)).catch(
         (err) => {
           console.log(err);
@@ -41,9 +39,21 @@ const WealthManagement: FC = () => {
       );
     }
   }, [user, wealthManagementStatus]);
-  // TODO: Update asset allocation with patch wealth management endpoint, and re-set wealth management state
+
   useEffect(() => {
-    console.log('reduxWealthManagement');
+    if (wealthManagementChanged) {
+      dispatch(wealthManagementActions.setWealthManagementChanged(false));
+      if (user && user.wealthManagementID) {
+        dispatch(wealthManagementActions.fetchWealthManagement(user.wealthManagementID)).catch(
+          (err) => {
+            console.log(err);
+          }
+        );
+      }
+    }
+  }, [wealthManagementChanged]);
+
+  useEffect(() => {
     if (reduxWealthManagement) {
       setWealthManagement(reduxWealthManagement);
     }
@@ -51,27 +61,27 @@ const WealthManagement: FC = () => {
 
   let content;
 
-  switch (wealthManagementStatus) {
-    case WealthManagementStatus.LOADING:
-      content = <div>Loading...</div>;
-      break;
-    case WealthManagementStatus.SUCCEEDED:
-      if (wealthManagement != null) {
-        content = (
-          <>
-            <h1 className='text-center'>Wealth Management</h1>
-            <ExpandableTable wealthManagement={wealthManagement} />
-          </>
-        );
-      } else {
+  if (wealthManagement) {
+    content = (
+      <>
+        <h1 className='text-center'>Wealth Management</h1>
+        <ExpandableTable wealthManagement={wealthManagement} />
+      </>
+    );
+  } else {
+    switch (wealthManagementStatus) {
+      case WealthManagementStatus.LOADING:
+        content = <div>Loading...</div>;
+        break;
+      case WealthManagementStatus.SUCCEEDED:
         content = <div>Failed to load wealth management data.</div>;
-      }
-      break;
-    case WealthManagementStatus.FAILED:
-      content = <div>Failed to load wealth management data.</div>;
-      break;
-    default:
-      content = <div>Unknown error.</div>;
+        break;
+      case WealthManagementStatus.FAILED:
+        content = <div>Failed to load wealth management data.</div>;
+        break;
+      default:
+        content = <div>Unknown error.</div>;
+    }
   }
 
   return <Container fluid>{content}</Container>;
