@@ -27,7 +27,14 @@ export function ExpandableTable({ wealthManagement }: ExpandableTableProps): Rea
         </thead>
         <tbody>
           {wealthManagement.allocations.map((item, index) => {
-            return <AssetAllocationRow key={index} allocation={item} baseCurrency={baseCurrency} />;
+            return (
+              <AssetAllocationRow
+                key={index}
+                allocation={item}
+                baseCurrency={baseCurrency}
+                wealthManagementID={wealthManagement.id}
+              />
+            );
           })}
           <tr className='total-row'>
             <td></td>

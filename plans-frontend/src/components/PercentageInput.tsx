@@ -3,7 +3,7 @@ import { CurrencyInput } from './CurrencyInput';
 
 interface Props {
   value: number | null;
-  onSubmit?: (value: number) => void;
+  onSubmit?: (value: number) => Promise<void>;
 }
 
 export const PercentageInput: FC<Props> = ({ value, onSubmit }) => {

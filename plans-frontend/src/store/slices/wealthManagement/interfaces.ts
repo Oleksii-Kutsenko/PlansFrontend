@@ -37,6 +37,7 @@ export interface Allocation {
 }
 
 export interface WealthManagementObject {
+  id: number;
   totalCurrentAmount: number;
   allocations: Allocation[];
   base_currency: Currency;

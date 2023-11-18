@@ -3,14 +3,17 @@ import { type Currency, type Allocation, wealthManagementActions } from '../../s
 import { formatNumber, formatPercentage } from './formatting';
 import { CurrencyInput } from 'components/CurrencyInput';
 import { PercentageInput } from 'components/PercentageInput';
-import { useAppDispatch } from 'store/hooks';
+import { fetcher } from '../../utils/axios';
+import { useAppDispatch } from '../../store/hooks';
 
 export const AssetAllocationRow = ({
   allocation,
-  baseCurrency
+  baseCurrency,
+  wealthManagementID
 }: {
   allocation: Allocation;
   baseCurrency: Currency;
+  wealthManagementID: number;
 }): React.ReactElement => {
   const dispatch = useAppDispatch();
   const [expanded, setExpanded] = useState(false);
@@ -20,12 +23,13 @@ export const AssetAllocationRow = ({
     assetAllocationId: number
   ): ((value: number) => Promise<void>) => {
     return async (value: number): Promise<void> => {
-      await dispatch(
-        wealthManagementActions.updateAssetAllocation({
-          assetAllocationId: assetAllocationId,
-          assetAllocation: { [fieldName]: value }
+      return fetcher
+        .patch(`/api/assets/asset-allocation/${assetAllocationId}/`, {
+          [fieldName]: value
         })
-      );
+        .then(() => {
+          dispatch(wealthManagementActions.fetchWealthManagement(wealthManagementID));
+        });
     };
   };
 
