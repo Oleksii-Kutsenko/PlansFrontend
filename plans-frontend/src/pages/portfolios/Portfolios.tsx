@@ -38,7 +38,7 @@ const Portfolios: FC = () => {
       action: AsyncThunk<any, any, any>,
       args: any | null = null
     ) => {
-      if (status === LoadStatus.IDLE || status === LoadStatus.FAILED) {
+      if (status === LoadStatus.IDLE) {
         dispatch(action(args)).catch((err: { message: string }) => {
           const errorMessage = err.message.toString() as string;
           toast.error(`Error fetching data: ${errorMessage}`);
