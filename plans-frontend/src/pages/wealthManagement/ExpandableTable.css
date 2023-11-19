@@ -79,3 +79,7 @@ th {
 td {
   padding: 0.25em;
 }
+
+.inner-table-container thead tr th {
+  width: 14.28%;
+}

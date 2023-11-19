@@ -2,10 +2,12 @@ import axios from 'axios';
 import React from 'react';
 import { Button, Card, Col, Container, Form, Row } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
-import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { setToken } from '../store/slices/auth';
+import { userActions } from '../store';
+import { useAppDispatch } from '../store/hooks';
+
 interface LoginFormInputs {
   username: string;
   password: string;
@@ -17,7 +19,7 @@ const Login: React.FC = () => {
     handleSubmit,
     formState: { errors }
   } = useForm<LoginFormInputs>();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
   const onSubmit = (data: LoginFormInputs): void => {
@@ -33,6 +35,7 @@ const Login: React.FC = () => {
         })
         .then((response) => {
           dispatch(setToken(response.data));
+          dispatch(userActions.fetchCurrentUser());
           navigate('/');
         }),
       {

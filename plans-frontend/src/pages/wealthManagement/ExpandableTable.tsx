@@ -1,11 +1,11 @@
 import React from 'react';
 import './ExpandableTable.css';
 import { AssetAllocationRow } from './AssetAllocationRow';
-import { WealthManagement } from '../../store';
+import { WealthManagementModel } from '../../store';
 import { formatNumber, formatPercentage } from './formatting';
 
 interface ExpandableTableProps {
-  wealthManagement: WealthManagement;
+  wealthManagement: WealthManagementModel;
 }
 
 export function ExpandableTable({ wealthManagement }: ExpandableTableProps): React.ReactElement {
@@ -28,13 +28,18 @@ export function ExpandableTable({ wealthManagement }: ExpandableTableProps): Rea
         <tbody>
           {wealthManagement.allocations.map((item, index) => {
             return (
-              <AssetAllocationRow key={index} assetAllocation={item} baseCurrency={baseCurrency} />
+              <AssetAllocationRow
+                key={index}
+                allocation={item}
+                baseCurrency={baseCurrency}
+                wealthManagementID={wealthManagement.id}
+              />
             );
           })}
           <tr className='total-row'>
             <td></td>
             <td>Total</td>
-            <td>{formatNumber(wealthManagement.total_current_amount, baseCurrency.symbol)}</td>
+            <td>{formatNumber(wealthManagement.totalCurrentAmount, baseCurrency.symbol)}</td>
             <td>{formatNumber(wealthManagement.totalTargetAmount, baseCurrency.symbol)}</td>
             <td></td>
             <td>{formatPercentage(wealthManagement.totalTargetPercentage)}</td>
