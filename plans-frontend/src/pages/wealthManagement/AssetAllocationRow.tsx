@@ -23,13 +23,15 @@ export const AssetAllocationRow = ({
     assetAllocationId: number
   ): ((value: number) => Promise<void>) => {
     return async (value: number): Promise<void> => {
-      return fetcher
-        .patch(`/api/assets/asset-allocation/${assetAllocationId}/`, {
+      try {
+        await fetcher.patch(`/api/assets/asset-allocation/${assetAllocationId}/`, {
           [fieldName]: value
-        })
-        .then(() => {
-          dispatch(wealthManagementActions.fetchWealthManagement(wealthManagementID));
         });
+        dispatch(wealthManagementActions.fetchWealthManagement(wealthManagementID));
+      } catch (err) {
+        console.log(err);
+        return Promise.reject(err);
+      }
     };
   };
 

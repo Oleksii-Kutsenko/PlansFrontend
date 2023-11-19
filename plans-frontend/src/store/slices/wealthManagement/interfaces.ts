@@ -36,7 +36,7 @@ export interface Allocation {
   target_percentage: number;
 }
 
-export interface WealthManagementObject {
+export interface WealthManagementModel {
   id: number;
   totalCurrentAmount: number;
   allocations: Allocation[];

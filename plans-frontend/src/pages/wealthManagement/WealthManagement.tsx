@@ -6,13 +6,13 @@ import {
   type RootState,
   userActions,
   wealthManagementActions,
-  WealthManagementObject
+  WealthManagementModel
 } from '../../store';
 import { useAppDispatch } from '../../store/hooks';
 import { ExpandableTable } from './ExpandableTable';
 
 const WealthManagement: FC = () => {
-  const [wealthManagement, setWealthManagement] = useState<WealthManagementObject | undefined>(
+  const [wealthManagement, setWealthManagement] = useState<WealthManagementModel | undefined>(
     undefined
   );
 

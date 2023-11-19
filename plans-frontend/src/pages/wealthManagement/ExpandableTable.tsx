@@ -1,11 +1,11 @@
 import React from 'react';
 import './ExpandableTable.css';
 import { AssetAllocationRow } from './AssetAllocationRow';
-import { WealthManagementObject } from '../../store';
+import { WealthManagementModel } from '../../store';
 import { formatNumber, formatPercentage } from './formatting';
 
 interface ExpandableTableProps {
-  wealthManagement: WealthManagementObject;
+  wealthManagement: WealthManagementModel;
 }
 
 export function ExpandableTable({ wealthManagement }: ExpandableTableProps): React.ReactElement {

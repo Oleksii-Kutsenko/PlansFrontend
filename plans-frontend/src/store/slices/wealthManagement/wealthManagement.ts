@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { fetcher } from '../../../utils/axios';
-import { WealthManagementObject, UpdateAssetAllocation } from './interfaces';
+import { WealthManagementModel, UpdateAssetAllocation } from './interfaces';
 import { computeDelta } from './compute';
 
 const name = 'wealthManagement';
@@ -13,7 +13,7 @@ export enum WealthManagementStatus {
 }
 
 interface State {
-  wealthManagement: WealthManagementObject | undefined;
+  wealthManagement: WealthManagementModel | undefined;
   wealthManagementChanged: boolean;
   status: WealthManagementStatus;
 }
