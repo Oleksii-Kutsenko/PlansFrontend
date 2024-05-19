@@ -1,5 +1,4 @@
 import { Route, Routes } from 'react-router-dom';
-
 import type { FC } from 'react';
 import React from 'react';
 import ProtectedRoutes from './routes/ProtectedRoutes';
