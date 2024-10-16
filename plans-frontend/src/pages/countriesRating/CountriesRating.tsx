@@ -61,27 +61,6 @@ const CountriesRating: FC = () => {
     } & Country;
     const exactCountries = countries as ExactCountry[];
 
-    // const tableContent = exactCountries.map((country: ExactCountry, i) => {
-    //   return (
-    //     <tr key={i}>
-    //       <td style={{ backgroundColor: mapValueToColor(country.rating) }}>
-    //         <i className={`bi bi-chevron-${false ? 'down' : 'right'}`}></i>
-    //       </td>
-    //       <td style={{ backgroundColor: mapValueToColor(country.rating) }}>{country.name}</td>
-    //       {countriesOptions.map((option, j) => {
-    //         return (
-    //           <td
-    //             key={j}
-    //             style={{ backgroundColor: mapValueToColor(country[option.normalized_name]) }}
-    //           >
-    //             {country[option.normalized_name]}
-    //           </td>
-    //         );
-    //       })}
-    //       <td style={{ backgroundColor: mapValueToColor(country.rating) }}>{country.rating}</td>
-    //     </tr>
-    //   );
-    // });
     const tableContent = exactCountries.map((country: ExactCountry, i) => {
       return (
         <CountriesRatingHistory key={i} country={country} countriesOptions={countriesOptions} />
