@@ -61,9 +61,13 @@ const CountriesRating: FC = () => {
     } & Country;
     const exactCountries = countries as ExactCountry[];
 
-    const tableContent = exactCountries.map((country: ExactCountry, i) => {
+    const tableContent = exactCountries.map((country: ExactCountry) => {
       return (
-        <CountriesRatingHistory key={i} country={country} countriesOptions={countriesOptions} />
+        <CountriesRatingHistory
+          key={country.id}
+          country={country}
+          countriesOptions={countriesOptions}
+        />
       );
     });
     content = (

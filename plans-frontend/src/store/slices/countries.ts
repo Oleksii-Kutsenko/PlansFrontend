@@ -64,6 +64,9 @@ const countriesSlice = createSlice({
         const history: Map<number, Country[]> = new Map(state.countriesRatingHistory);
         history.set(action.meta.arg, action.payload);
         state.countriesRatingHistory = Array.from(history);
+      })
+      .addCase(fetchCountryRatingHistory.rejected, () => {
+        console.debug('Failed to load country rating history');
       });
   }
 });

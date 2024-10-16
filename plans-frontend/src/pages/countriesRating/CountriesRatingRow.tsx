@@ -30,7 +30,7 @@ export const CountriesRatingHistory = ({
   console.log(countriesRatingHistory);
 
   function mapValueToColor(value: number | string): string {
-    const numValue = Number(value);
+    const numValue = isNaN(Number(value)) ? 0 : Number(value);
     const min = -100;
     const max = 100;
     const minColor = [203, 52, 66]; // RGB color for minimum value (red)
@@ -61,18 +61,16 @@ export const CountriesRatingHistory = ({
   }, [expanded, countriesRatingHistory, country.id, dispatch]);
 
   const values = countriesRatingHistoryMap.get(country.id);
-  const valuesMap = values ? values.map((val) => val.rating) : [];
-  const labels = values ? values.map((val) => val.year) : [];
-  console.log(labels);
-  console.log(valuesMap);
+  const valuesMap = values?.map((val) => val.rating) ?? [];
+  const labels = values?.map((val) => val.year) ?? [];
 
   const data = {
-    labels: labels,
+    labels,
     datasets: [
       {
         label: `Rating ${country.name} history`,
         data: valuesMap,
-        borderColor: valuesMap.map((value) => mapValueToColor(value)),
+        borderColor: 'rgba(75, 192, 192, 1)',
         backgroundColor: 'rgba(255, 99, 132, 0.5)'
       }
     ]
