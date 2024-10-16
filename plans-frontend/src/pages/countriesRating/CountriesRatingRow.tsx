@@ -27,7 +27,6 @@ export const CountriesRatingHistory = ({
   const dispatch = useAppDispatch();
   const [expanded, setExpanded] = useState(false);
   const { countriesRatingHistory } = useSelector((state: RootState) => state.countries);
-  console.log(countriesRatingHistory);
 
   function mapValueToColor(value: number | string): string {
     const numValue = isNaN(Number(value)) ? 0 : Number(value);
