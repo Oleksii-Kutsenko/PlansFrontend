@@ -19,7 +19,7 @@ const Home = React.lazy(async () => {
 });
 
 const CountriesRating = React.lazy(async () => {
-  const module = await import('./pages/CountriesRating');
+  const module = await import('./pages/countriesRating/CountriesRating');
   return { default: module.default };
 });
 
