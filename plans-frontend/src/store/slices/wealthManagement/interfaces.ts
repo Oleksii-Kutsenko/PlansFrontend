@@ -8,6 +8,11 @@ interface Asset {
   symbol: string;
 }
 
+export enum AcquisitionType {
+  LIMITED_PURCHASE = 'LIMITED_PURCHASE',
+  CONTINUOUS_PURCHASE = 'CONTINUOUS_PURCHASE'
+}
+
 export interface AssetAllocation {
   exchangedAmount: number;
   id: number;
@@ -19,6 +24,7 @@ export interface AssetAllocation {
   currentAmount: number;
   targetAmount: number | null;
   targetPercentage: number | null;
+  acquisitionType: AcquisitionType;
 }
 
 export interface UpdateAssetAllocation {

@@ -6,7 +6,8 @@ import {
   type RootState,
   userActions,
   wealthManagementActions,
-  WealthManagementModel
+  WealthManagementModel,
+  AcquisitionType
 } from '../../store';
 import { useAppDispatch } from '../../store/hooks';
 import { ExpandableTable } from './ExpandableTable';
@@ -15,8 +16,8 @@ const WealthManagement: FC = () => {
   const [wealthManagement, setWealthManagement] = useState<WealthManagementModel | undefined>(
     undefined
   );
-
   const dispatch = useAppDispatch();
+
   const {
     wealthManagement: reduxWealthManagement,
     status: wealthManagementStatus,
@@ -25,65 +26,82 @@ const WealthManagement: FC = () => {
   const user = useSelector((state: RootState) => state.userInfo.user);
 
   useEffect(() => {
-    if (user === null) {
-      dispatch(userActions.fetchCurrentUser()).catch((err) => {
-        console.log(err);
-      });
-    }
-
-    if (user && user.wealthManagementID && wealthManagementStatus === WealthManagementStatus.IDLE) {
+    if (!user) {
+      dispatch(userActions.fetchCurrentUser()).catch(console.error);
+    } else if (user.wealthManagementID && wealthManagementStatus === WealthManagementStatus.IDLE) {
       dispatch(wealthManagementActions.fetchWealthManagement(user.wealthManagementID)).catch(
-        (err) => {
-          console.log(err);
-        }
+        console.error
       );
     }
-  }, [user, wealthManagementStatus]);
+  }, [user, wealthManagementStatus, dispatch]);
 
   useEffect(() => {
-    if (wealthManagementChanged) {
+    if (wealthManagementChanged && user?.wealthManagementID) {
       dispatch(wealthManagementActions.setWealthManagementChanged(false));
-      if (user && user.wealthManagementID) {
-        dispatch(wealthManagementActions.fetchWealthManagement(user.wealthManagementID)).catch(
-          (err) => {
-            console.log(err);
-          }
-        );
-      }
+      dispatch(wealthManagementActions.fetchWealthManagement(user.wealthManagementID)).catch(
+        console.error
+      );
     }
-  }, [wealthManagementChanged]);
+  }, [wealthManagementChanged, user, dispatch]);
 
   useEffect(() => {
-    if (reduxWealthManagement) {
-      setWealthManagement(reduxWealthManagement);
-    }
+    setWealthManagement(reduxWealthManagement);
   }, [reduxWealthManagement]);
 
-  let content;
+  const filterAllocations = (acquisitionType: AcquisitionType) =>
+    wealthManagement?.allocations
+      .map((allocation) => ({
+        ...allocation,
+        asset_allocations: allocation.asset_allocations.filter(
+          (asset) => asset.acquisitionType === acquisitionType
+        )
+      }))
+      .filter((allocation) => allocation.asset_allocations.length > 0);
 
-  if (wealthManagement) {
-    content = (
+  const allocationLimitedPurchase = filterAllocations(AcquisitionType.LIMITED_PURCHASE);
+  const allocationContinuousPurchase = filterAllocations(AcquisitionType.CONTINUOUS_PURCHASE);
+  const wealthManagementLimitedPurchase = {
+    ...wealthManagement,
+    allocations: allocationLimitedPurchase
+  };
+  const wealthManagementContinuousPurchase = {
+    ...wealthManagement,
+    allocations: allocationContinuousPurchase
+  };
+  console.debug(wealthManagementLimitedPurchase);
+  console.debug(wealthManagementContinuousPurchase);
+
+  const renderContent = () => {
+    if (!wealthManagement) {
+      return (
+        {
+          [WealthManagementStatus.LOADING]: <div>Loading...</div>,
+          [WealthManagementStatus.FAILED]: <div>Failed to load wealth management data.</div>
+        }[status] || <div>Unknown error.</div>
+      );
+    }
+
+    return (
       <>
-        <h1 className='text-center'>Wealth Management</h1>
-        <ExpandableTable wealthManagement={wealthManagement} />
+        <header>
+          <h1 className='text-right'>Wealth Management Dashboard</h1>
+        </header>
+        <section>
+          <h2>Limited Purchase</h2>
+          <ExpandableTable wealthManagement={wealthManagementLimitedPurchase} />
+        </section>
+        <section>
+          <h2>Continuous Purchase</h2>
+          <ExpandableTable wealthManagement={wealthManagementContinuousPurchase} />
+        </section>
       </>
     );
-  } else {
-    switch (wealthManagementStatus) {
-      case WealthManagementStatus.LOADING:
-        content = <div>Loading...</div>;
-        break;
-      case WealthManagementStatus.SUCCEEDED:
-        content = <div>Failed to load wealth management data.</div>;
-        break;
-      case WealthManagementStatus.FAILED:
-        content = <div>Failed to load wealth management data.</div>;
-        break;
-      default:
-        content = <div>Unknown error.</div>;
-    }
-  }
+  };
 
-  return <Container fluid>{content}</Container>;
+  return (
+    <Container fluid>
+      <main>{renderContent()}</main>
+    </Container>
+  );
 };
 export default WealthManagement;

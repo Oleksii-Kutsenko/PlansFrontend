@@ -44,7 +44,9 @@ export const AssetAllocationRow = ({
         }}
       >
         <td>
-          <i className={`bi bi-chevron-${expanded ? 'down' : 'right'}`}></i>
+          <a>
+            <i className={`bi bi-chevron-${expanded ? 'down' : 'right'}`}></i>
+          </a>
         </td>
         <td>{allocation.asset_type.name}</td>
         <td>{formatNumber(allocation.current_amount, baseCurrency.symbol)}</td>

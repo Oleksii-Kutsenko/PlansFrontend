@@ -9,7 +9,6 @@ td {
 /* Containers */
 .table-container {
   background-color: white;
-  width: 75%;
   margin: 0 auto;
 }
 
@@ -65,9 +64,8 @@ td {
 .allocated-percentage,
 .target-percentage,
 .difference,
-.asset-name,
 .asset {
-  width: 12.25%;
+  width: 12.5%;
 }
 
 /* Cell Padding */
