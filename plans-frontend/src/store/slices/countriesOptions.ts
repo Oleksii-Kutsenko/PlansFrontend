@@ -1,12 +1,6 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { fetcher } from '../../utils/axios';
-
-export enum CountriesOptionsStatus {
-  IDLE = 'idle',
-  LOADING = 'loading',
-  SUCCEEDED = 'succeeded',
-  FAILED = 'failed'
-}
+import { LoadingStatus } from './utils';
 
 export interface Option {
   name: string;
@@ -17,10 +11,10 @@ export interface Option {
 
 export interface State {
   options: Option[];
-  status: CountriesOptionsStatus;
+  status: LoadingStatus;
 }
 
-const initialState: State = { options: [], status: CountriesOptionsStatus.IDLE };
+const initialState: State = { options: [], status: LoadingStatus.IDLE };
 
 export const fetchCountriesOptions = createAsyncThunk(
   'countries/fetchCountriesOptions',
@@ -38,14 +32,14 @@ const countriesOptionsSlice = createSlice({
   extraReducers(builder) {
     builder
       .addCase(fetchCountriesOptions.pending, (state) => {
-        state.status = CountriesOptionsStatus.LOADING;
+        state.status = LoadingStatus.LOADING;
       })
       .addCase(fetchCountriesOptions.fulfilled, (state, action) => {
         state.options = action.payload;
-        state.status = CountriesOptionsStatus.SUCCEEDED;
+        state.status = LoadingStatus.SUCCEEDED;
       })
       .addCase(fetchCountriesOptions.rejected, (state) => {
-        state.status = CountriesOptionsStatus.FAILED;
+        state.status = LoadingStatus.FAILED;
       });
   }
 });

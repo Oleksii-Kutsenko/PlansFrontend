@@ -1,13 +1,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { type RootState } from '..';
 import { fetcher } from '../../utils/axios';
-
-export enum CountriesStatus {
-  IDLE = 'idle',
-  LOADING = 'loading',
-  SUCCEEDED = 'succeeded',
-  FAILED = 'failed'
-}
+import { LoadingStatus } from './utils';
 
 export interface Country {
   id: number;
@@ -19,13 +13,13 @@ export interface Country {
 
 interface State {
   countries: Country[];
-  status: CountriesStatus;
+  status: LoadingStatus;
   countriesRatingHistory: Array<[number, Country[]]>;
 }
 
 const initialState: State = {
   countries: [],
-  status: CountriesStatus.IDLE,
+  status: LoadingStatus.IDLE,
   countriesRatingHistory: []
 };
 
@@ -37,8 +31,8 @@ export const fetchCountries = createAsyncThunk('countries/fetchCountries', async
 
 export const fetchCountryRatingHistory = createAsyncThunk<Country[], number>(
   'countries/fetchCountryRatingHistory',
-  async (country_id: number) => {
-    const { data } = await fetcher.get(`/api/countries/${country_id}/rating-history/`);
+  async (countryId: number) => {
+    const { data } = await fetcher.get(`/api/countries/${countryId}/rating-history/`);
     return data;
   }
 );
@@ -52,13 +46,13 @@ const countriesSlice = createSlice({
     builder
       .addCase(fetchCountries.fulfilled, (state, action) => {
         state.countries = action.payload;
-        state.status = CountriesStatus.SUCCEEDED;
+        state.status = LoadingStatus.SUCCEEDED;
       })
       .addCase(fetchCountries.pending, (state) => {
-        state.status = CountriesStatus.LOADING;
+        state.status = LoadingStatus.LOADING;
       })
       .addCase(fetchCountries.rejected, (state) => {
-        state.status = CountriesStatus.FAILED;
+        state.status = LoadingStatus.FAILED;
       })
       .addCase(fetchCountryRatingHistory.fulfilled, (state, action) => {
         const history: Map<number, Country[]> = new Map(state.countriesRatingHistory);

@@ -6,8 +6,10 @@ import { countriesOptionsReducer } from './slices/countriesOptions';
 import { userReducer } from './slices/user';
 import { portfoliosReducer } from './slices/portfolios';
 import { wealthManagementReducer } from './slices/wealthManagement/';
+import { clothingReducer } from './slices/clothing';
 
 export * from './slices/auth';
+export * from './slices/clothing';
 export * from './slices/countries';
 export * from './slices/countriesOptions';
 export * from './slices/user';
@@ -18,6 +20,7 @@ const store = configureStore({
   reducer: {
     auth: authReducer,
     countries: countriesReducer,
+    clothing: clothingReducer,
     countriesOptions: countriesOptionsReducer,
     portfolios: portfoliosReducer,
     userInfo: userReducer,

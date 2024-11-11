@@ -3,8 +3,9 @@ import { Button, Form } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
-import { type RootState, portfoliosActions, LoadStatus } from '../../store';
+import { type RootState, portfoliosActions } from '../../store';
 import { useAppDispatch } from '../../store/hooks';
+import { LoadingStatus } from 'store/slices/utils';
 
 interface PortfolioFilterFormInputs {
   personalMaxDrawdown: number | null;
@@ -59,7 +60,7 @@ export const PersonalMaxDrawdownForm: FC = () => {
     setInitialFormValues();
   }, [personalMaxDrawdown]);
 
-  if (personalMaxDrawdownLoadingStatus === LoadStatus.LOADING) {
+  if (personalMaxDrawdownLoadingStatus === LoadingStatus.LOADING) {
     return <div>Loading...</div>;
   } else if (personalMaxDrawdown == null) {
     return <div>Personal max drawdown not found.</div>;

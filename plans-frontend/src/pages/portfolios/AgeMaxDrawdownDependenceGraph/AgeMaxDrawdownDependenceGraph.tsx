@@ -1,12 +1,13 @@
 import type { FC } from 'react';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { LoadStatus, RootState } from '../../../store';
+import { RootState } from '../../../store';
 import { Line } from 'react-chartjs-2';
 import { Col, Container, Form, Row } from 'react-bootstrap';
 import { portfoliosActions, AgeMaxDrawdownDependency } from '../../../store';
 import { useAppDispatch } from '../../../store/hooks';
 import './styles.css';
+import { LoadingStatus } from 'store/slices/utils';
 const AGE_MIN = 18;
 type AgeMaxDrawdownDependenceGraphProps = {
   graphData: AgeMaxDrawdownDependency[];
@@ -67,9 +68,9 @@ const AgeMaxDrawdownDependenceGraph: FC<AgeMaxDrawdownDependenceGraphProps> = ({
     <Container>
       <Row>
         <Col>
-          {ageMaxDrawdownDependenceLoadingStatus === LoadStatus.LOADING ? (
+          {ageMaxDrawdownDependenceLoadingStatus === LoadingStatus.LOADING ? (
             <p>Loading...</p>
-          ) : ageMaxDrawdownDependenceLoadingStatus === LoadStatus.FAILED ? (
+          ) : ageMaxDrawdownDependenceLoadingStatus === LoadingStatus.FAILED ? (
             <p>Failed to load age max drawdown dependence data.</p>
           ) : (
             <Line data={chartData} height={'100%'} />

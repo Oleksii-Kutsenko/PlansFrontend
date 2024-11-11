@@ -1,8 +1,9 @@
 import { FC, useEffect, useState } from 'react';
-import { LoadStatus, Portfolio, RootState } from '../../store';
+import { Portfolio, RootState } from '../../store';
 import { Card, Col, Container, Row, Table } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import { type Portfolio as PortfolioType, type Ticker as TickerType } from '../../store';
+import { LoadingStatus } from 'store/slices/utils';
 
 const PortfolioList: FC<{
   portfolios: Portfolio[];
@@ -24,10 +25,10 @@ const PortfolioList: FC<{
     }
   }, [portfolios, personalMaxDrawdown, backtestStartDate]);
 
-  if (portfoliosLoadingStatus === LoadStatus.LOADING) {
+  if (portfoliosLoadingStatus === LoadingStatus.LOADING) {
     return <p>Loading...</p>;
   } else if (
-    portfoliosLoadingStatus === LoadStatus.SUCCEEDED &&
+    portfoliosLoadingStatus === LoadingStatus.SUCCEEDED &&
     toBeRenderedPortfolios.length > 0
   ) {
     return (

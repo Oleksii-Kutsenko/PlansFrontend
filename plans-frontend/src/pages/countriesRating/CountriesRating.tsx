@@ -3,14 +3,10 @@ import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import type { RootState, Country } from '../../store';
 import { useAppDispatch } from '../../store/hooks';
-import {
-  fetchCountriesOptions,
-  CountriesOptionsStatus,
-  CountriesStatus,
-  countriesActions
-} from '../../store';
+import { fetchCountriesOptions, countriesActions } from '../../store';
 import { Container, Table } from 'react-bootstrap';
 import { CountriesRatingHistory } from './CountriesRatingRow';
+import { LoadingStatus } from 'store/slices/utils';
 
 const CountriesRating: FC = () => {
   const dispatch = useAppDispatch();
@@ -22,12 +18,12 @@ const CountriesRating: FC = () => {
   const { countries, status: countriesStatus } = useSelector((state: RootState) => state.countries);
 
   useEffect(() => {
-    if (countriesOptionsStatus === CountriesOptionsStatus.IDLE) {
+    if (countriesOptionsStatus === LoadingStatus.IDLE) {
       dispatch(fetchCountriesOptions()).catch((err) => {
         console.log(err);
       });
     }
-    if (countriesStatus === CountriesStatus.IDLE) {
+    if (countriesStatus === LoadingStatus.IDLE) {
       dispatch(countriesActions.fetchCountries()).catch((err) => {
         console.log(err);
       });
@@ -37,13 +33,13 @@ const CountriesRating: FC = () => {
   let content;
 
   if (
-    countriesOptionsStatus === CountriesOptionsStatus.LOADING ||
-    countriesStatus === CountriesStatus.LOADING
+    countriesOptionsStatus === LoadingStatus.LOADING ||
+    countriesStatus === LoadingStatus.LOADING
   ) {
     content = <div>Loading...</div>;
   } else if (
-    countriesOptionsStatus === CountriesOptionsStatus.SUCCEEDED &&
-    countriesStatus === CountriesStatus.SUCCEEDED
+    countriesOptionsStatus === LoadingStatus.SUCCEEDED &&
+    countriesStatus === LoadingStatus.SUCCEEDED
   ) {
     const tableHeader = [];
     tableHeader.push(<th key='chevron'></th>);
@@ -82,8 +78,8 @@ const CountriesRating: FC = () => {
       </Container>
     );
   } else if (
-    countriesOptionsStatus === CountriesOptionsStatus.FAILED ||
-    countriesStatus === CountriesStatus.FAILED
+    countriesOptionsStatus === LoadingStatus.FAILED ||
+    countriesStatus === LoadingStatus.FAILED
   ) {
     content = <div>Failed to load countries options</div>;
   }

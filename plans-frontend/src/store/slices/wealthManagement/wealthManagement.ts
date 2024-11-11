@@ -2,26 +2,20 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { fetcher } from '../../../utils/axios';
 import { WealthManagementModel, UpdateAssetAllocation } from './interfaces';
 import { computeDelta } from './compute';
+import { LoadingStatus } from '../utils';
 
 const name = 'wealthManagement';
-
-export enum WealthManagementStatus {
-  IDLE = 'idle',
-  LOADING = 'loading',
-  SUCCEEDED = 'succeeded',
-  FAILED = 'failed'
-}
 
 interface State {
   wealthManagement: WealthManagementModel | undefined;
   wealthManagementChanged: boolean;
-  status: WealthManagementStatus;
+  status: LoadingStatus;
 }
 
 const initialState: State = {
   wealthManagement: undefined,
   wealthManagementChanged: false,
-  status: WealthManagementStatus.IDLE
+  status: LoadingStatus.IDLE
 };
 
 // Thunk
@@ -63,13 +57,13 @@ const wealthManagementSlice = createSlice({
     builder
       .addCase(fetchWealthManagement.fulfilled, (state, action) => {
         state.wealthManagement = computeDelta(action.payload);
-        state.status = WealthManagementStatus.SUCCEEDED;
+        state.status = LoadingStatus.SUCCEEDED;
       })
       .addCase(fetchWealthManagement.pending, (state) => {
-        state.status = WealthManagementStatus.LOADING;
+        state.status = LoadingStatus.LOADING;
       })
       .addCase(fetchWealthManagement.rejected, (state) => {
-        state.status = WealthManagementStatus.FAILED;
+        state.status = LoadingStatus.FAILED;
       })
       .addCase(updateAssetAllocation.fulfilled, (state) => {
         state.wealthManagementChanged = true;

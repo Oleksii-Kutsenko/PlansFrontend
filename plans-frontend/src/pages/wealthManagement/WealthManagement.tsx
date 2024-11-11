@@ -2,7 +2,6 @@ import { useEffect, type FC, useState } from 'react';
 import { Container } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import {
-  WealthManagementStatus,
   type RootState,
   userActions,
   wealthManagementActions,
@@ -10,6 +9,7 @@ import {
 } from '../../store';
 import { useAppDispatch } from '../../store/hooks';
 import { ExpandableTable } from './ExpandableTable';
+import { LoadingStatus } from 'store/slices/utils';
 
 const WealthManagement: FC = () => {
   const [wealthManagement, setWealthManagement] = useState<WealthManagementModel | undefined>(
@@ -31,7 +31,7 @@ const WealthManagement: FC = () => {
       });
     }
 
-    if (user && user.wealthManagementID && wealthManagementStatus === WealthManagementStatus.IDLE) {
+    if (user && user.wealthManagementID && wealthManagementStatus === LoadingStatus.IDLE) {
       dispatch(wealthManagementActions.fetchWealthManagement(user.wealthManagementID)).catch(
         (err) => {
           console.log(err);
@@ -70,13 +70,13 @@ const WealthManagement: FC = () => {
     );
   } else {
     switch (wealthManagementStatus) {
-      case WealthManagementStatus.LOADING:
+      case LoadingStatus.LOADING:
         content = <div>Loading...</div>;
         break;
-      case WealthManagementStatus.SUCCEEDED:
+      case LoadingStatus.SUCCEEDED:
         content = <div>Failed to load wealth management data.</div>;
         break;
-      case WealthManagementStatus.FAILED:
+      case LoadingStatus.FAILED:
         content = <div>Failed to load wealth management data.</div>;
         break;
       default:

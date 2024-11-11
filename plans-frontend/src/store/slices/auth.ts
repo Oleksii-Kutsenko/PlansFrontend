@@ -6,8 +6,6 @@ interface State {
   isAuthenticated: boolean;
 }
 
-// Slice creation
-
 const initialState: State = createInitialState();
 
 const authSlice = createSlice({

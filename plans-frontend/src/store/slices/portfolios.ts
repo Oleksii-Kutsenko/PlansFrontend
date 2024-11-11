@@ -1,12 +1,6 @@
 import { createAsyncThunk, createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import { fetcher } from '../../utils/axios';
-
-export enum LoadStatus {
-  IDLE = 'idle',
-  LOADING = 'loading',
-  SUCCEEDED = 'succeeded',
-  FAILED = 'failed'
-}
+import { LoadingStatus } from './utils';
 
 interface BacktestData {
   cagr: number;
@@ -35,12 +29,12 @@ export interface AgeMaxDrawdownDependency {
 
 interface State {
   portfolios: Portfolio[];
-  portfoliosLoadingStatus: LoadStatus;
+  portfoliosLoadingStatus: LoadingStatus;
   personalMaxDrawdown: number | null;
-  personalMaxDrawdownLoadingStatus: LoadStatus;
+  personalMaxDrawdownLoadingStatus: LoadingStatus;
   backtestStartDate: string;
   ageMaxDrawdownDependence: AgeMaxDrawdownDependency[];
-  ageMaxDrawdownDependenceLoadingStatus: LoadStatus;
+  ageMaxDrawdownDependenceLoadingStatus: LoadingStatus;
 }
 
 const name = 'portfolios';
@@ -84,12 +78,12 @@ function createInitialState(): State {
 
   return {
     portfolios: [],
-    portfoliosLoadingStatus: LoadStatus.IDLE,
+    portfoliosLoadingStatus: LoadingStatus.IDLE,
     personalMaxDrawdown: null,
-    personalMaxDrawdownLoadingStatus: LoadStatus.IDLE,
+    personalMaxDrawdownLoadingStatus: LoadingStatus.IDLE,
     backtestStartDate: fifteenYearsAgo.toISOString(),
     ageMaxDrawdownDependence: [],
-    ageMaxDrawdownDependenceLoadingStatus: LoadStatus.IDLE
+    ageMaxDrawdownDependenceLoadingStatus: LoadingStatus.IDLE
   };
 }
 const initialState: State = createInitialState();
@@ -106,34 +100,34 @@ const portfoliosSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(fetchPortfolios.pending, (state) => {
-        state.portfoliosLoadingStatus = LoadStatus.LOADING;
+        state.portfoliosLoadingStatus = LoadingStatus.LOADING;
       })
       .addCase(fetchPortfolios.fulfilled, (state, action) => {
         state.portfolios = action.payload;
-        state.portfoliosLoadingStatus = LoadStatus.SUCCEEDED;
+        state.portfoliosLoadingStatus = LoadingStatus.SUCCEEDED;
       })
       .addCase(fetchPortfolios.rejected, (state) => {
-        state.portfoliosLoadingStatus = LoadStatus.FAILED;
+        state.portfoliosLoadingStatus = LoadingStatus.FAILED;
       })
       .addCase(fetchPersonalMaxDrawdown.pending, (state) => {
-        state.personalMaxDrawdownLoadingStatus = LoadStatus.LOADING;
+        state.personalMaxDrawdownLoadingStatus = LoadingStatus.LOADING;
       })
       .addCase(fetchPersonalMaxDrawdown.fulfilled, (state, action) => {
         state.personalMaxDrawdown = action.payload;
-        state.personalMaxDrawdownLoadingStatus = LoadStatus.SUCCEEDED;
+        state.personalMaxDrawdownLoadingStatus = LoadingStatus.SUCCEEDED;
       })
       .addCase(fetchPersonalMaxDrawdown.rejected, (state) => {
-        state.personalMaxDrawdownLoadingStatus = LoadStatus.FAILED;
+        state.personalMaxDrawdownLoadingStatus = LoadingStatus.FAILED;
       })
       .addCase(fetchAgeMaxDrawdownDependence.pending, (state) => {
-        state.ageMaxDrawdownDependenceLoadingStatus = LoadStatus.LOADING;
+        state.ageMaxDrawdownDependenceLoadingStatus = LoadingStatus.LOADING;
       })
       .addCase(fetchAgeMaxDrawdownDependence.fulfilled, (state, action) => {
         state.ageMaxDrawdownDependence = action.payload;
-        state.ageMaxDrawdownDependenceLoadingStatus = LoadStatus.SUCCEEDED;
+        state.ageMaxDrawdownDependenceLoadingStatus = LoadingStatus.SUCCEEDED;
       })
       .addCase(fetchAgeMaxDrawdownDependence.rejected, (state) => {
-        state.ageMaxDrawdownDependenceLoadingStatus = LoadStatus.FAILED;
+        state.ageMaxDrawdownDependenceLoadingStatus = LoadingStatus.FAILED;
       });
   }
 });

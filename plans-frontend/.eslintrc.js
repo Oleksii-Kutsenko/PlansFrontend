@@ -1,7 +1,7 @@
 module.exports = {
   env: {
     browser: true,
-    es2021: true,
+    es2021: true
   },
   extends: [
     'eslint:recommended',
@@ -27,7 +27,7 @@ module.exports = {
     'prettier/prettier': 'error',
     camelcase: 'warn',
     'spaced-comment': 'error',
-    "quotes": ["error", "single", { "allowTemplateLiterals": true }]
+    quotes: ['error', 'single', { allowTemplateLiterals: true }]
   },
   settings: {
     react: {

@@ -2,7 +2,7 @@ import type { FC } from 'react';
 import { useEffect } from 'react';
 import { Col, Container, Row } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
-import { type RootState, LoadStatus, portfoliosActions } from '../../store';
+import { type RootState, portfoliosActions } from '../../store';
 import { useAppDispatch } from '../../store/hooks';
 import { toast } from 'react-toastify';
 import {
@@ -19,6 +19,7 @@ import { PersonalMaxDrawdownForm } from './PersonalMaxDrawdownForm';
 import type { AsyncThunk } from '@reduxjs/toolkit';
 import AgeMaxDrawdownDependenceGraph from './AgeMaxDrawdownDependenceGraph/AgeMaxDrawdownDependenceGraph';
 import PortfolioList from './PortfolioList';
+import { LoadingStatus } from 'store/slices/utils';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
@@ -34,11 +35,11 @@ const Portfolios: FC = () => {
 
   useEffect(() => {
     const fetchIfNeeded = (
-      status: LoadStatus,
+      status: LoadingStatus,
       action: AsyncThunk<any, any, any>,
       args: any | null = null
     ) => {
-      if (status === LoadStatus.IDLE) {
+      if (status === LoadingStatus.IDLE) {
         dispatch(action(args)).catch((err: { message: string }) => {
           const errorMessage = err.message.toString() as string;
           toast.error(`Error fetching data: ${errorMessage}`);
@@ -61,15 +62,15 @@ const Portfolios: FC = () => {
   ]);
 
   if (
-    portfoliosLoadingStatus === LoadStatus.LOADING ||
-    personalMaxDrawdownLoadingStatus === LoadStatus.LOADING ||
-    ageMaxDrawdownDependenceLoadingStatus === LoadStatus.LOADING
+    portfoliosLoadingStatus === LoadingStatus.LOADING ||
+    personalMaxDrawdownLoadingStatus === LoadingStatus.LOADING ||
+    ageMaxDrawdownDependenceLoadingStatus === LoadingStatus.LOADING
   ) {
     return <p>Loading...</p>;
   } else if (
-    portfoliosLoadingStatus === LoadStatus.SUCCEEDED &&
-    personalMaxDrawdownLoadingStatus === LoadStatus.SUCCEEDED &&
-    ageMaxDrawdownDependenceLoadingStatus === LoadStatus.SUCCEEDED
+    portfoliosLoadingStatus === LoadingStatus.SUCCEEDED &&
+    personalMaxDrawdownLoadingStatus === LoadingStatus.SUCCEEDED &&
+    ageMaxDrawdownDependenceLoadingStatus === LoadingStatus.SUCCEEDED
   ) {
     return (
       <Container>
