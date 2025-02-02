@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { fetcher } from '../../utils/axios';
-import { LoadingStatus } from './utils';
+import { LoadingStatus, ValidationErrors } from './utils';
+import { AxiosError } from 'axios';
 
 export interface Clothing {
   id: number;
@@ -11,34 +12,52 @@ export interface Clothing {
   outfit: number | null;
 }
 
+interface Outfit {
+
+}
+
 export interface ClothingCreate {
   name: string;
-  clothingType: string;
+  clothing_type: string;
   season: string;
-  image?: File | null;
-  outfitId?: number | null;
+  image_path?: File | null;
 }
 
 interface State {
-  clothings: Clothing[];
+  clothing: Clothing[];
+  outfit: Outfit[];
   status: LoadingStatus;
 }
 
 const initialState: State = {
-  clothings: [],
+  clothing: [],
+  outfit: [],
   status: LoadingStatus.IDLE
 };
 
 export const fetchClothing = createAsyncThunk('clothing/fetchClothing', async () => {
-  const { data } = await fetcher.get('/clothing');
+  const { data } = await fetcher.get('/api/clothing/clothing');
+  return data;
+});
+
+export const fetchOutfits = createAsyncThunk('clothing/fetchOutfit', async () => {
+  const { data } = await fetcher.get('/api/clothing/outfit');
   return data;
 });
 
 export const createClothing = createAsyncThunk(
   'clothing/createClothing',
-  async (clothing: ClothingCreate) => {
-    const { data } = await fetcher.post('/clothing/', clothing);
-    return data;
+  async (clothing: ClothingCreate, { rejectWithValue }) => {
+    try {
+      const { data } = await fetcher.post('/api/clothing/clothing/', clothing);
+      return data;
+    } catch (err) {
+      const error = err as AxiosError<ValidationErrors>;
+      if (!error.response) {
+        throw error;
+      }
+      return rejectWithValue(error.response.data);
+    }
   }
 );
 
@@ -54,13 +73,16 @@ const clothingSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(fetchClothing.fulfilled, (state, action) => {
-        state.clothings = action.payload;
+        state.clothing = action.payload;
       })
       .addCase(createClothing.fulfilled, (state, action) => {
-        state.clothings.push(action.payload);
+        state.clothing.push(action.payload);
+      })
+      .addCase(createClothing.rejected, (state, _action) => {
+        state.status = LoadingStatus.FAILED;
       })
       .addCase(deleteClothing.fulfilled, (state, action) => {
-        state.clothings = state.clothings.filter((item: Clothing) => item.id !== action.payload);
+        state.clothing = state.clothing.filter((item: Clothing) => item.id !== action.payload);
       });
   }
 });

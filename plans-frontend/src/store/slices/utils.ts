@@ -4,3 +4,7 @@ export enum LoadingStatus {
   SUCCEEDED = 'succeeded',
   FAILED = 'failed'
 }
+
+export interface ValidationErrors {
+  [key: string]: string[];
+}

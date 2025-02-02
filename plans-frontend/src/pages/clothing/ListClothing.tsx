@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 const ClothingList: FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const clothingItems = useSelector((state: RootState) => state.clothing.clothings);
+  const clothingItems = useSelector((state: RootState) => state.clothing.clothing);
 
   useEffect(() => {
     dispatch(fetchClothing());
