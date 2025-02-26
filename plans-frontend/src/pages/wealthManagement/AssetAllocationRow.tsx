@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { type Currency, type Allocation, wealthManagementActions } from '../../store';
 import { formatNumber, formatPercentage } from './formatting';
-import { CurrencyInput } from 'components/CurrencyInput';
-import { PercentageInput } from 'components/PercentageInput';
+import { PercentageInput } from '@/components/PercentageInput';
 import { fetcher } from '../../utils/axios';
 import { useAppDispatch } from '../../store/hooks';
+import { CurrencyInput } from '@/components/CurrencyInput';
 
 export const AssetAllocationRow = ({
   allocation,

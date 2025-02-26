@@ -31,7 +31,7 @@ const Login: React.FC = () => {
     void toast.promise(
       axios
         .post('/api/accounts/token/', params, {
-          baseURL: process.env.REACT_APP_API_URL
+          baseURL: import.meta.env.VITE_API_URL
         })
         .then((response) => {
           dispatch(setToken(response.data));

@@ -53,6 +53,7 @@ const CountriesRating: FC = () => {
     });
     tableHeader.push(<th key='rating'>Rating</th>);
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const countriesOptionsNormalizedNames = countriesOptions.map(
       (option) => option.normalized_name
     );

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { countriesActions, type Country, type RootState } from 'store';
-import type { Option } from 'store';
+import { countriesActions, type Country, type RootState } from '@/store';
+import type { Option } from '@/store';
 import {
   CategoryScale,
   Chart as ChartJS,
@@ -13,7 +13,7 @@ import {
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
 import { useSelector } from 'react-redux';
-import { useAppDispatch } from 'store/hooks';
+import { useAppDispatch } from '@/store/hooks';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
