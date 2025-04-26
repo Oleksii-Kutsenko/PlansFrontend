@@ -25,8 +25,8 @@ ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, T
 const Portfolios: FC = () => {
   const dispatch = useAppDispatch();
   const {
-    portfolios,
-    portfoliosLoadingStatus,
+    backtestResults,
+    backtestResultsLoadingStatus,
     personalMaxDrawdownLoadingStatus,
     ageMaxDrawdownDependence,
     ageMaxDrawdownDependenceLoadingStatus
@@ -46,7 +46,7 @@ const Portfolios: FC = () => {
       }
     };
 
-    fetchIfNeeded(portfoliosLoadingStatus, portfoliosActions.fetchPortfolios);
+    fetchIfNeeded(backtestResultsLoadingStatus, portfoliosActions.fetchPortfolioBacktestResults);
     fetchIfNeeded(
       ageMaxDrawdownDependenceLoadingStatus,
       portfoliosActions.fetchAgeMaxDrawdownDependence,
@@ -55,19 +55,19 @@ const Portfolios: FC = () => {
     fetchIfNeeded(personalMaxDrawdownLoadingStatus, portfoliosActions.fetchPersonalMaxDrawdown);
   }, [
     dispatch,
-    portfoliosLoadingStatus,
+    backtestResultsLoadingStatus,
     ageMaxDrawdownDependenceLoadingStatus,
     personalMaxDrawdownLoadingStatus
   ]);
 
   if (
-    portfoliosLoadingStatus === LoadStatus.LOADING ||
+    backtestResultsLoadingStatus === LoadStatus.LOADING ||
     personalMaxDrawdownLoadingStatus === LoadStatus.LOADING ||
     ageMaxDrawdownDependenceLoadingStatus === LoadStatus.LOADING
   ) {
     return <p>Loading...</p>;
   } else if (
-    portfoliosLoadingStatus === LoadStatus.SUCCEEDED &&
+    backtestResultsLoadingStatus === LoadStatus.SUCCEEDED &&
     personalMaxDrawdownLoadingStatus === LoadStatus.SUCCEEDED &&
     ageMaxDrawdownDependenceLoadingStatus === LoadStatus.SUCCEEDED
   ) {
@@ -84,7 +84,7 @@ const Portfolios: FC = () => {
             <AgeMaxDrawdownDependenceGraph graphData={ageMaxDrawdownDependence} />
           </Col>
         </Row>
-        <PortfolioList portfolios={portfolios} />
+        <PortfolioList backtestResults={backtestResults} />
       </Container>
     );
   } else {

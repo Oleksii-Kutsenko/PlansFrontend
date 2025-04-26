@@ -1,55 +1,58 @@
 import { FC, useEffect, useState } from 'react';
-import { LoadStatus, Portfolio, RootState } from '../../store';
+import { LoadStatus, BacktestResults, RootState } from '../../store';
 import { Card, Col, Container, Row, Table } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import { type Portfolio as PortfolioType, type Ticker as TickerType } from '../../store';
 
 const PortfolioList: FC<{
-  portfolios: Portfolio[];
-}> = ({ portfolios }) => {
-  const { personalMaxDrawdown, portfoliosLoadingStatus, backtestStartDate } = useSelector(
-    (state: RootState) => state.portfolios
-  );
-  const [toBeRenderedPortfolios, setToBeRenderedPortfolios] = useState<PortfolioType[]>([]);
+  backtestResults: BacktestResults[];
+}> = ({ backtestResults: backtestResults }) => {
+  const {
+    personalMaxDrawdown,
+    backtestResultsLoadingStatus: backtestResultsLoadingStatus,
+    backtestStartDate
+  } = useSelector((state: RootState) => state.portfolios);
+  const [toBeRenderedPortfolios, setToBeRenderedPortfolios] = useState<BacktestResults[]>([]);
 
   useEffect(() => {
     if (personalMaxDrawdown !== null) {
-      const filteredPortfolios = portfolios.filter((portfolio: PortfolioType) => {
+      const filteredPortfolios = backtestResults.filter((backtestResults: BacktestResults) => {
         return (
-          portfolio.backtestData &&
-          portfolio.backtestData.maxDrawdown >= personalMaxDrawdown &&
-          new Date(portfolio.backtestData.startDate) <= new Date(backtestStartDate)
+          backtestResults.maxDrawdown >= personalMaxDrawdown &&
+          new Date(backtestResults.startDate) <= new Date(backtestStartDate)
         );
       });
       setToBeRenderedPortfolios(filteredPortfolios.slice(0, 10));
     }
-  }, [portfolios, personalMaxDrawdown, backtestStartDate]);
+  }, [backtestResults, personalMaxDrawdown, backtestStartDate]);
 
-  if (portfoliosLoadingStatus === LoadStatus.LOADING) {
+  if (backtestResultsLoadingStatus === LoadStatus.LOADING) {
     return <p>Loading...</p>;
   } else if (
-    portfoliosLoadingStatus === LoadStatus.SUCCEEDED &&
+    backtestResultsLoadingStatus === LoadStatus.SUCCEEDED &&
     toBeRenderedPortfolios.length > 0
   ) {
     return (
       <Row>
         <Col xs={12}>
-          {toBeRenderedPortfolios.map((portfolio: PortfolioType) => {
+          {toBeRenderedPortfolios.map((backtestResults: BacktestResults) => {
             return (
-              <Card key={portfolio.name} className='m-3'>
+              <Card key={backtestResults.portfolio.name} className='m-3'>
                 <Card.Header style={{ backgroundColor: 'pink' }}>
-                  <h4>{portfolio.name}</h4>
+                  <h4>
+                    {backtestResults.portfolio.name} / {backtestResults.strategy}
+                  </h4>
                 </Card.Header>
                 <Card.Body>
                   <Container>
                     <Row>
                       <Col xs={6}>
                         <h5>Backtest Data</h5>
-                        <p>CAGR: {portfolio.backtestData.cagr}%</p>
-                        <p>Max Drawdown: {portfolio.backtestData.maxDrawdown}%</p>
-                        <p>Sharpe: {portfolio.backtestData.sharpe}</p>
-                        <p>Standard Deviation: {portfolio.backtestData.standardDeviation}</p>
-                        <p>Start Date: {portfolio.backtestData.startDate}</p>
+                        <p>CAGR: {backtestResults.cagr}%</p>
+                        <p>Max Drawdown: {backtestResults.maxDrawdown}%</p>
+                        <p>Sharpe: {backtestResults.sharpe}</p>
+                        <p>Standard Deviation: {backtestResults.standardDeviation}</p>
+                        <p>Start Date: {backtestResults.startDate}</p>
                       </Col>
                       <Col xs={6}>
                         <h5>Constituents</h5>
@@ -62,7 +65,7 @@ const PortfolioList: FC<{
                             </tr>
                           </thead>
                           <tbody>
-                            {portfolio.tickers.map((ticker: TickerType) => (
+                            {backtestResults.portfolio.tickers.map((ticker: TickerType) => (
                               <tr key={ticker.symbol}>
                                 <td>{ticker.symbol}</td>
                                 <td>{ticker.name}</td>

@@ -25,7 +25,7 @@ export const PersonalMaxDrawdownForm: FC = () => {
   } = useForm<PortfolioFilterFormInputs>();
 
   const setInitialFormValues = (): void => {
-    setValue('personalMaxDrawdown', personalMaxDrawdown);
+    setValue('personalMaxDrawdown', personalMaxDrawdown?.toFixed(2));
     setValue('backtestStartDate', backtestStartDate.toISOString().split('T')[0]);
   };
 
