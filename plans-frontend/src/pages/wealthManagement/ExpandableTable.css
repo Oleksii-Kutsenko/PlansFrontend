@@ -9,7 +9,7 @@ td {
 /* Containers */
 .table-container {
   background-color: white;
-  width: 75%;
+  /* width: 75%; */
   margin: 0 auto;
 }
 

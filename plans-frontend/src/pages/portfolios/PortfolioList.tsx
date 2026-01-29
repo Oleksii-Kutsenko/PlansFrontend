@@ -16,6 +16,7 @@ const PortfolioList: FC<{
     if (personalMaxDrawdown !== null) {
       const filteredPortfolios = portfolios.filter((portfolio: PortfolioType) => {
         return (
+          portfolio.backtestData &&
           portfolio.backtestData.maxDrawdown >= personalMaxDrawdown &&
           new Date(portfolio.backtestData.startDate) <= new Date(backtestStartDate)
         );
@@ -80,6 +81,8 @@ const PortfolioList: FC<{
         </Col>
       </Row>
     );
+  } else if (portfoliosLoadingStatus === LoadStatus.SUCCEEDED){
+    return <p>Portfolios did not pass the filters.</p>;
   } else {
     return <p>Something went wrong.</p>;
   }
