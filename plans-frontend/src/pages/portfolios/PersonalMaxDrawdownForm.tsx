@@ -1,4 +1,4 @@
-import { useEffect, type FC, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 import { Button, Form } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import { useSelector } from 'react-redux';
@@ -8,56 +8,75 @@ import { useAppDispatch } from '../../store/hooks';
 
 interface PortfolioFilterFormInputs {
   personalMaxDrawdown: number | null;
-  backtestStartDate: string;
+  backtestStartDate: Date;
 }
 
-export const PersonalMaxDrawdownForm: FC = () => {
+type Props = {
+  onApply: (values: PortfolioFilterFormInputs) => void;
+};
+
+export const PersonalMaxDrawdownForm = ({ onApply }: Props) => {
   const dispatch = useAppDispatch();
   const { personalMaxDrawdown, personalMaxDrawdownLoadingStatus } = useSelector(
     (state: RootState) => state.portfolios
   );
 
+  const defaultBacktestStartDateStr = useMemo(() => {
+    const d = new Date();
+    d.setFullYear(d.getFullYear() - 15);
+    return d.toISOString().slice(0, 10);
+  }, []);
+
   const {
     register,
-    setValue,
     handleSubmit,
+    reset,
     formState: { errors }
-  } = useForm<PortfolioFilterFormInputs>();
+  } = useForm<PortfolioFilterFormInputs>({
+    defaultValues: {
+      personalMaxDrawdown: personalMaxDrawdown ?? null,
+      backtestStartDate: defaultBacktestStartDateStr
+    }
+  });
 
-  const setInitialFormValues = (): void => {
-    setValue('personalMaxDrawdown', personalMaxDrawdown);
-    setValue('backtestStartDate', backtestStartDate.toISOString().split('T')[0]);
-  };
+  useEffect(() => {
+    if (personalMaxDrawdownLoadingStatus !== LoadStatus.LOADING && personalMaxDrawdown === null) {
+      dispatch(portfoliosActions.fetchPersonalMaxDrawdown()).catch((err) => {
+        toast.error('Error fetching personal max drawdown: ' + String(err?.message ?? err));
+      });
+    }
+  }, [dispatch, personalMaxDrawdown, personalMaxDrawdownLoadingStatus]);
 
-  const defaultBacktestStartDate = new Date();
-  defaultBacktestStartDate.setFullYear(defaultBacktestStartDate.getFullYear() - 15);
-  const [backtestStartDate, setBacktestStartDate] = useState<Date>(defaultBacktestStartDate);
+  useEffect(() => {
+    reset({
+      personalMaxDrawdown: personalMaxDrawdown ?? null,
+      backtestStartDate: defaultBacktestStartDateStr
+    });
+  }, [personalMaxDrawdown, reset, defaultBacktestStartDateStr]);
 
   const handleFormSubmit = (formData: PortfolioFilterFormInputs): void => {
-    setBacktestStartDate(new Date(formData.backtestStartDate));
-    if (formData.personalMaxDrawdown != null) {
-      dispatch(portfoliosActions.setPersonalMaxDrawdown(formData.personalMaxDrawdown));
+    onApply(formData);
+
+    const md = formData.personalMaxDrawdown;
+    if (md != null && Number.isFinite(md)) {
+      const rounded = Number(md.toFixed(2));
+      dispatch(portfoliosActions.setPersonalMaxDrawdown(rounded));
     }
   };
 
   const handleFormReset = (): void => {
-    setBacktestStartDate(defaultBacktestStartDate);
+    const resetValues: PortfolioFilterFormInputs = {
+      personalMaxDrawdown: personalMaxDrawdown ?? null,
+      backtestStartDate: defaultBacktestStartDateStr
+    };
+
+    reset(resetValues);
+    onApply(resetValues);
+
     dispatch(portfoliosActions.fetchPersonalMaxDrawdown()).catch((err) => {
-      const errorMessage = err.message.toString() as string;
-      toast.error('Error fetching personal max drawdown: ' + errorMessage);
+      toast.error('Error fetching personal max drawdown: ' + String(err?.message ?? err));
     });
   };
-
-  useEffect(() => {
-    if (!personalMaxDrawdownLoadingStatus && personalMaxDrawdown === null) {
-      dispatch(portfoliosActions.fetchPersonalMaxDrawdown()).catch((err) => {
-        const errorMessage = err.message.toString() as string;
-        toast.error('Error fetching personal max drawdown: ' + errorMessage);
-      });
-    }
-
-    setInitialFormValues();
-  }, [personalMaxDrawdown]);
 
   if (personalMaxDrawdownLoadingStatus === LoadStatus.LOADING) {
     return <div>Loading...</div>;
@@ -74,20 +93,24 @@ export const PersonalMaxDrawdownForm: FC = () => {
           <Form.Group>
             <Form.Label htmlFor='personalMaxDrawdown'>Personal Max Drawdown</Form.Label>
             <Form.Control
-              type='text'
+              type='number'
               id='personalMaxDrawdown'
-              {...register('personalMaxDrawdown')}
+              step='0.01'
+              inputMode='decimal'
+              {...register('personalMaxDrawdown', { valueAsNumber: true })}
+              isInvalid={errors.personalMaxDrawdown != null}
             />
-            {errors.personalMaxDrawdown != null && (
-              <Form.Control.Feedback type='invalid'>This field has an error.</Form.Control.Feedback>
-            )}
+            <Form.Control.Feedback type='invalid'>This field has an error.</Form.Control.Feedback>
           </Form.Group>
           <Form.Group>
-            <Form.Label>Backtest Start Date</Form.Label>
-            <Form.Control type='date' id='backtestStartDate' {...register('backtestStartDate')} />
-            {errors.backtestStartDate != null && (
-              <Form.Control.Feedback type='invalid'>This field has an error.</Form.Control.Feedback>
-            )}
+            <Form.Label htmlFor='backtestStartDate'>Backtest Start Date</Form.Label>
+            <Form.Control
+              type='date'
+              id='backtestStartDate'
+              {...register('backtestStartDate', { required: true, valueAsDate: true })}
+              isInvalid={errors.backtestStartDate != null}
+            />
+            <Form.Control.Feedback type='invalid'>This field has an error.</Form.Control.Feedback>
           </Form.Group>
           <Form.Group className='d-flex justify-content-between'>
             <Button type='submit' className='mt-3 mr-auto'>

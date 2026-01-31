@@ -7,6 +7,7 @@ import { Col, Container, Form, Row } from 'react-bootstrap';
 import { portfoliosActions, AgeMaxDrawdownDependency } from '../../../store';
 import { useAppDispatch } from '../../../store/hooks';
 import './styles.css';
+
 const AGE_MIN = 18;
 type AgeMaxDrawdownDependenceGraphProps = {
   graphData: AgeMaxDrawdownDependency[];

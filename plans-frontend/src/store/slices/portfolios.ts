@@ -8,12 +8,14 @@ export enum LoadStatus {
   FAILED = 'failed'
 }
 
-interface BacktestData {
+export interface BacktestResults {
   cagr: number;
   maxDrawdown: number;
   sharpe: number;
   standardDeviation: number;
   startDate: string;
+  portfolio: Portfolio;
+  strategy: string;
 }
 
 export interface Ticker {
@@ -24,7 +26,6 @@ export interface Ticker {
 
 export interface Portfolio {
   name: string;
-  backtestData: BacktestData;
   tickers: Ticker[];
 }
 
@@ -36,6 +37,8 @@ export interface AgeMaxDrawdownDependency {
 interface State {
   portfolios: Portfolio[];
   portfoliosLoadingStatus: LoadStatus;
+  backtestResults: BacktestResults[];
+  backtestResultsLoadingStatus: LoadStatus;
   personalMaxDrawdown: number | null;
   personalMaxDrawdownLoadingStatus: LoadStatus;
   backtestStartDate: string;
@@ -50,6 +53,14 @@ export const fetchPortfolios = createAsyncThunk<Portfolio[]>(
   `${name}/fetchPortfolios`,
   async () => {
     const response = await fetcher.get('/api/investments/portfolios/');
+    return response.data;
+  }
+);
+
+export const fetchPortfolioBacktestResults = createAsyncThunk<BacktestResults[]>(
+  `${name}/fetchPortfolioBacktestResults`,
+  async () => {
+    const response = await fetcher.get('/api/investments/portfolio-backtest-results/');
     return response.data;
   }
 );
@@ -85,6 +96,8 @@ function createInitialState(): State {
   return {
     portfolios: [],
     portfoliosLoadingStatus: LoadStatus.IDLE,
+    backtestResults: [],
+    backtestResultsLoadingStatus: LoadStatus.IDLE,
     personalMaxDrawdown: null,
     personalMaxDrawdownLoadingStatus: LoadStatus.IDLE,
     backtestStartDate: fifteenYearsAgo.toISOString(),
@@ -115,6 +128,16 @@ const portfoliosSlice = createSlice({
       .addCase(fetchPortfolios.rejected, (state) => {
         state.portfoliosLoadingStatus = LoadStatus.FAILED;
       })
+      .addCase(fetchPortfolioBacktestResults.pending, (state) => {
+        state.backtestResultsLoadingStatus = LoadStatus.LOADING;
+      })
+      .addCase(fetchPortfolioBacktestResults.fulfilled, (state, action) => {
+        state.backtestResults = action.payload;
+        state.backtestResultsLoadingStatus = LoadStatus.SUCCEEDED;
+      })
+      .addCase(fetchPortfolioBacktestResults.rejected, (state) => {
+        state.backtestResultsLoadingStatus = LoadStatus.FAILED;
+      })
       .addCase(fetchPersonalMaxDrawdown.pending, (state) => {
         state.personalMaxDrawdownLoadingStatus = LoadStatus.LOADING;
       })
@@ -144,6 +167,7 @@ export const portfoliosReducer = portfoliosSlice.reducer;
 export const portfoliosActions = {
   ...portfoliosSlice.actions,
   fetchPortfolios,
+  fetchPortfolioBacktestResults,
   fetchPersonalMaxDrawdown,
   fetchAgeMaxDrawdownDependence
 };

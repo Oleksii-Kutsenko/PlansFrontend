@@ -1,3 +1,4 @@
+import importPlugin from 'eslint-plugin-import';
 import react from 'eslint-plugin-react';
 import reactHooks from 'eslint-plugin-react-hooks';
 import typescriptEslint from '@typescript-eslint/eslint-plugin';
@@ -34,7 +35,8 @@ export default [
       react,
       'react-hooks': fixupPluginRules(reactHooks),
       '@typescript-eslint': typescriptEslint,
-      prettier
+      prettier,
+      import: importPlugin
     },
 
     languageOptions: {
@@ -48,8 +50,7 @@ export default [
 
       parserOptions: {
         project: true,
-        tsconfigRootDir: '__dirname',
-
+        tsconfigRootDir: __dirname,
         ecmaFeatures: {
           jsx: true
         }
@@ -79,8 +80,8 @@ export default [
         {
           allowTemplateLiterals: true
         }
-      ]
+      ],
+      'import/newline-after-import': ['error', { count: 1 }]
     }
   }
 ];
-

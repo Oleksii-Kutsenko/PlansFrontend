@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Col, Container, Row } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import { type RootState, LoadStatus, portfoliosActions } from '../../store';
@@ -22,15 +22,21 @@ import PortfolioList from './PortfolioList';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
+export type FilterValues = {
+  personalMaxDrawdown: number | null;
+  backtestStartDate: string;
+};
+
 const Portfolios: FC = () => {
   const dispatch = useAppDispatch();
   const {
-    portfolios,
-    portfoliosLoadingStatus,
+    backtestResults,
+    backtestResultsLoadingStatus,
     personalMaxDrawdownLoadingStatus,
     ageMaxDrawdownDependence,
     ageMaxDrawdownDependenceLoadingStatus
   } = useSelector((state: RootState) => state.portfolios);
+  const [filters, setFilters] = useState<FilterValues | null>(null);
 
   useEffect(() => {
     const fetchIfNeeded = (
@@ -46,7 +52,7 @@ const Portfolios: FC = () => {
       }
     };
 
-    fetchIfNeeded(portfoliosLoadingStatus, portfoliosActions.fetchPortfolios);
+    fetchIfNeeded(backtestResultsLoadingStatus, portfoliosActions.fetchPortfolioBacktestResults);
     fetchIfNeeded(
       ageMaxDrawdownDependenceLoadingStatus,
       portfoliosActions.fetchAgeMaxDrawdownDependence,
@@ -55,19 +61,19 @@ const Portfolios: FC = () => {
     fetchIfNeeded(personalMaxDrawdownLoadingStatus, portfoliosActions.fetchPersonalMaxDrawdown);
   }, [
     dispatch,
-    portfoliosLoadingStatus,
+    backtestResultsLoadingStatus,
     ageMaxDrawdownDependenceLoadingStatus,
     personalMaxDrawdownLoadingStatus
   ]);
 
   if (
-    portfoliosLoadingStatus === LoadStatus.LOADING ||
+    backtestResultsLoadingStatus === LoadStatus.LOADING ||
     personalMaxDrawdownLoadingStatus === LoadStatus.LOADING ||
     ageMaxDrawdownDependenceLoadingStatus === LoadStatus.LOADING
   ) {
     return <p>Loading...</p>;
   } else if (
-    portfoliosLoadingStatus === LoadStatus.SUCCEEDED &&
+    backtestResultsLoadingStatus === LoadStatus.SUCCEEDED &&
     personalMaxDrawdownLoadingStatus === LoadStatus.SUCCEEDED &&
     ageMaxDrawdownDependenceLoadingStatus === LoadStatus.SUCCEEDED
   ) {
@@ -78,13 +84,13 @@ const Portfolios: FC = () => {
         </Row>
         <Row>
           <Col xs={3} className='d-flex'>
-            <PersonalMaxDrawdownForm />
+            <PersonalMaxDrawdownForm onApply={setFilters} />
           </Col>
           <Col xs={9}>
             <AgeMaxDrawdownDependenceGraph graphData={ageMaxDrawdownDependence} />
           </Col>
         </Row>
-        <PortfolioList portfolios={portfolios} />
+        <PortfolioList backtestResults={backtestResults} filters={filters} />
       </Container>
     );
   } else {
