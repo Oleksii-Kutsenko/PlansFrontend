@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Col, Container, Row } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import { type RootState, LoadStatus, portfoliosActions } from '../../store';
@@ -22,6 +22,11 @@ import PortfolioList from './PortfolioList';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
+export type FilterValues = {
+  personalMaxDrawdown: number | null;
+  backtestStartDate: string;
+};
+
 const Portfolios: FC = () => {
   const dispatch = useAppDispatch();
   const {
@@ -31,6 +36,7 @@ const Portfolios: FC = () => {
     ageMaxDrawdownDependence,
     ageMaxDrawdownDependenceLoadingStatus
   } = useSelector((state: RootState) => state.portfolios);
+  const [filters, setFilters] = useState<FilterValues | null>(null);
 
   useEffect(() => {
     const fetchIfNeeded = (
@@ -78,13 +84,13 @@ const Portfolios: FC = () => {
         </Row>
         <Row>
           <Col xs={3} className='d-flex'>
-            <PersonalMaxDrawdownForm />
+            <PersonalMaxDrawdownForm onApply={setFilters} />
           </Col>
           <Col xs={9}>
             <AgeMaxDrawdownDependenceGraph graphData={ageMaxDrawdownDependence} />
           </Col>
         </Row>
-        <PortfolioList backtestResults={backtestResults} />
+        <PortfolioList backtestResults={backtestResults} filters={filters} />
       </Container>
     );
   } else {
