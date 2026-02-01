@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { type RootState } from '..';
 import { fetcher } from '../../utils/axios';
 
@@ -20,7 +20,7 @@ export interface Country {
 interface State {
   countries: Country[];
   status: CountriesStatus;
-  countriesRatingHistory: Array<[number, Country[]]>;
+  countriesRatingHistory: [number, Country[]][];
 }
 
 const initialState: State = {
@@ -31,14 +31,14 @@ const initialState: State = {
 
 // Thunk
 export const fetchCountries = createAsyncThunk('countries/fetchCountries', async () => {
-  const { data } = await fetcher.get('/api/countries/rating/');
+  const { data } = await fetcher.get<Country[]>('/api/countries/rating/');
   return data;
 });
 
 export const fetchCountryRatingHistory = createAsyncThunk<Country[], number>(
   'countries/fetchCountryRatingHistory',
-  async (country_id: number) => {
-    const { data } = await fetcher.get(`/api/countries/${country_id}/rating-history/`);
+  async (countryId: number) => {
+    const { data } = await fetcher.get<Country[]>(`/api/countries/${countryId}/rating-history/`);
     return data;
   }
 );
@@ -50,7 +50,7 @@ const countriesSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(fetchCountries.fulfilled, (state, action) => {
+      .addCase(fetchCountries.fulfilled, (state, action: PayloadAction<Country[]>) => {
         state.countries = action.payload;
         state.status = CountriesStatus.SUCCEEDED;
       })
@@ -61,7 +61,7 @@ const countriesSlice = createSlice({
         state.status = CountriesStatus.FAILED;
       })
       .addCase(fetchCountryRatingHistory.fulfilled, (state, action) => {
-        const history: Map<number, Country[]> = new Map(state.countriesRatingHistory);
+        const history = new Map<number, Country[]>(state.countriesRatingHistory);
         history.set(action.meta.arg, action.payload);
         state.countriesRatingHistory = Array.from(history);
       })

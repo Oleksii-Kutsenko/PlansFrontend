@@ -18,22 +18,23 @@ export const AssetAllocationRow = ({
   const dispatch = useAppDispatch();
   const [expanded, setExpanded] = useState(false);
 
-  const handleSubmit = (
-    fieldName: string,
-    assetAllocationId: number
-  ): ((value: number) => Promise<void>) => {
-    return async (value: number): Promise<void> => {
+  const handleSubmit =
+    (fieldName: string, assetAllocationId: number) =>
+    async (value: number): Promise<void> => {
       try {
         await fetcher.patch(`/api/assets/asset-allocation/${assetAllocationId}/`, {
           [fieldName]: value
         });
-        dispatch(wealthManagementActions.fetchWealthManagement(wealthManagementID));
-      } catch (err) {
+        await dispatch(wealthManagementActions.fetchWealthManagement(wealthManagementID)).unwrap();
+      } catch (err: unknown) {
         console.log(err);
-        return Promise.reject(err);
+
+        if (err instanceof Error) {
+          throw err;
+        }
+        throw new Error(String(err));
       }
     };
-  };
 
   return (
     <>

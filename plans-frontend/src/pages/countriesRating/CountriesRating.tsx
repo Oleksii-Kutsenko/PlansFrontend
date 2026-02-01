@@ -57,9 +57,7 @@ const CountriesRating: FC = () => {
     const countriesOptionsNormalizedNames = countriesOptions.map(
       (option) => option.normalized_name
     );
-    type ExactCountry = {
-      [K in (typeof countriesOptionsNormalizedNames)[number]]: number;
-    } & Country;
+    type ExactCountry = Record<(typeof countriesOptionsNormalizedNames)[number], number> & Country;
     const exactCountries = countries as ExactCountry[];
 
     const tableContent = exactCountries.map((country: ExactCountry) => {

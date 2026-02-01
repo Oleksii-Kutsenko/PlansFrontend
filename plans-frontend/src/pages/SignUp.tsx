@@ -15,6 +15,24 @@ interface FormValues {
   password2: string;
 }
 
+interface CountryResponse {
+  id: number;
+  name: string;
+}
+
+interface NewOptions {
+  label: string;
+  value: number;
+}
+
+type DRFErrorPayload<Field extends string> = Partial<Record<Field, string[]>> & {
+  non_field_errors?: string[];
+  detail?: string;
+};
+
+type FormKey = Extract<keyof FormValues, string>;
+type SignUpFormDRFError = DRFErrorPayload<FormKey>;
+
 const SignUp: FC = () => {
   const navigate = useNavigate();
   const {
@@ -33,9 +51,10 @@ const SignUp: FC = () => {
       password2: ''
     }
   });
-  const [options, setOptions] = useState([]);
+  const [options, setOptions] = useState<NewOptions[]>([]);
   const onSubmit = (data: FormValues): void => {
     const params = {
+      // eslint-disable-next-line camelcase
       birth_date: data.birthDate,
       country: data.country.value,
       username: data.username,
@@ -47,13 +66,26 @@ const SignUp: FC = () => {
       axios
         .post('http://127.0.0.1:8000/api/accounts/register/', params)
         .then(() => {
-          navigate('/login');
+          void navigate('/login');
         })
-        .catch((error) => {
-          const errors = error.response.data;
-          for (const key in errors) {
-            setError(key as keyof FormValues, { message: errors[key] });
+        .catch((error: unknown) => {
+          if (!axios.isAxiosError<SignUpFormDRFError>(error) || !error.response) {
+            throw error;
           }
+
+          const errors = error.response.data;
+
+          for (const [key, value] of Object.entries(errors)) {
+            const message = Array.isArray(value) ? value.join(' ') : String(value);
+
+            if (key === 'non_field_errors' || key === 'detail') {
+              setError('root', { message });
+              continue;
+            }
+
+            setError(key as FormKey, { message });
+          }
+
           throw error;
         }),
       {
@@ -67,7 +99,7 @@ const SignUp: FC = () => {
   useEffect(() => {
     const fetchData = async (): Promise<void> => {
       try {
-        const response = await axios.get('http://127.0.0.1:8000/api/countries/');
+        const response = await axios.get<CountryResponse[]>('http://127.0.0.1:8000/api/countries/');
         const newOptions = response.data.map((country: { name: string; id: number }) => {
           return { label: country.name, value: country.id };
         });
@@ -86,7 +118,7 @@ const SignUp: FC = () => {
           <Card className='mb-3 mt-3 rounded'>
             <Card.Body>
               <h3 className='card-title text-center text-secondary mt-3 mb-3'>Sign Up Form</h3>
-              <Form autoComplete='off' onSubmit={handleSubmit(onSubmit)}>
+              <Form autoComplete='off' onSubmit={(e) => void handleSubmit(onSubmit)(e)}>
                 <Form.Group>
                   <Form.Label>Birth Date</Form.Label>
                   <Form.Control

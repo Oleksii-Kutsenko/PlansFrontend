@@ -9,7 +9,7 @@ export const fetcher = axios.create({
   }
 });
 
-fetcher.interceptors.request.use(async (config: InternalAxiosRequestConfig) => {
+fetcher.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   config.headers.Authorization = authHeader();
   console.debug(
     '[Request]',
@@ -27,14 +27,14 @@ function authHeader(): string {
 }
 
 fetcher.interceptors.response.use(
-  async (res: AxiosResponse<InternalAxiosRequestConfig, AxiosError>) => {
+  (res: AxiosResponse<InternalAxiosRequestConfig, AxiosError>) => {
     if (res.config.baseURL && res.config.url) {
       console.debug('[Response]', res.config.baseURL + res.config.url, res.status, res.data);
     }
     return res;
   },
   async (err: AxiosError) => {
-    if (err && err.config) {
+    if (err?.config) {
       console.debug(
         '[Response]',
         err.config.baseURL,
