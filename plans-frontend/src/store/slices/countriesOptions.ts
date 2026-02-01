@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { fetcher } from '../../utils/axios';
 
 export enum CountriesOptionsStatus {
@@ -25,7 +25,7 @@ const initialState: State = { options: [], status: CountriesOptionsStatus.IDLE }
 export const fetchCountriesOptions = createAsyncThunk(
   'countries/fetchCountriesOptions',
   async () => {
-    const response = await fetcher.options('/api/countries/rating/');
+    const response = await fetcher.options<Option[]>('/api/countries/rating/');
     const data = response.data;
     return data;
   }
@@ -40,7 +40,7 @@ const countriesOptionsSlice = createSlice({
       .addCase(fetchCountriesOptions.pending, (state) => {
         state.status = CountriesOptionsStatus.LOADING;
       })
-      .addCase(fetchCountriesOptions.fulfilled, (state, action) => {
+      .addCase(fetchCountriesOptions.fulfilled, (state, action: PayloadAction<Option[]>) => {
         state.options = action.payload;
         state.status = CountriesOptionsStatus.SUCCEEDED;
       })

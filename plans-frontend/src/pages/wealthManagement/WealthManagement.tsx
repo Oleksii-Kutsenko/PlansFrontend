@@ -31,7 +31,7 @@ const WealthManagement: FC = () => {
       });
     }
 
-    if (user && user.wealthManagementID && wealthManagementStatus === WealthManagementStatus.IDLE) {
+    if (user?.wealthManagementID && wealthManagementStatus === WealthManagementStatus.IDLE) {
       dispatch(wealthManagementActions.fetchWealthManagement(user.wealthManagementID)).catch(
         (err) => {
           console.log(err);
@@ -43,7 +43,7 @@ const WealthManagement: FC = () => {
   useEffect(() => {
     if (wealthManagementChanged) {
       dispatch(wealthManagementActions.setWealthManagementChanged(false));
-      if (user && user.wealthManagementID) {
+      if (user?.wealthManagementID) {
         dispatch(wealthManagementActions.fetchWealthManagement(user.wealthManagementID)).catch(
           (err) => {
             console.log(err);

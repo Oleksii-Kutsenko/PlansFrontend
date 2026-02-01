@@ -8,7 +8,12 @@ export enum LoadStatus {
   FAILED = 'failed'
 }
 
+interface BacktestResultsPaginatedResponse {
+  results: BacktestResults[];
+}
+
 export interface BacktestResults {
+  id: number;
   twr_annual: number;
   maxDrawdown: number;
   sharpe: number;
@@ -34,6 +39,10 @@ export interface AgeMaxDrawdownDependency {
   maxDrawdown: number;
 }
 
+interface PersonalMaxDrawdownResponse {
+  personalMaxDrawdown: number;
+}
+
 interface State {
   portfolios: Portfolio[];
   portfoliosLoadingStatus: LoadStatus;
@@ -52,7 +61,7 @@ const name = 'portfolios';
 export const fetchPortfolios = createAsyncThunk<Portfolio[]>(
   `${name}/fetchPortfolios`,
   async () => {
-    const response = await fetcher.get('/api/investments/portfolios/');
+    const response = await fetcher.get<Portfolio[]>('/api/investments/portfolios/');
     return response.data;
   }
 );
@@ -60,15 +69,19 @@ export const fetchPortfolios = createAsyncThunk<Portfolio[]>(
 export const fetchPortfolioBacktestResults = createAsyncThunk<BacktestResults[]>(
   `${name}/fetchPortfolioBacktestResults`,
   async () => {
-    const response = await fetcher.get('/api/investments/portfolio-backtest-results/');
-    return response.data;
+    const response = await fetcher.get<BacktestResultsPaginatedResponse>(
+      '/api/investments/portfolio-backtest-results/'
+    );
+    return response.data.results;
   }
 );
 
 export const fetchPersonalMaxDrawdown = createAsyncThunk<number>(
   `${name}/fetchPersonalMaxDrawdown`,
   async () => {
-    const response = await fetcher.get('/api/investments/portfolios/personal-max-drawdown/');
+    const response = await fetcher.get<PersonalMaxDrawdownResponse>(
+      '/api/investments/portfolios/personal-max-drawdown/'
+    );
     return response.data.personalMaxDrawdown;
   }
 );
@@ -79,9 +92,11 @@ export const fetchAgeMaxDrawdownDependence = createAsyncThunk<
 >(`${name}/fetchAgeMaxDrawdownDependence`, async (age: number | void) => {
   let response;
   if (!age) {
-    response = await fetcher.get('/api/investments/portfolios/age-max-drawdown-dependence/');
+    response = await fetcher.get<AgeMaxDrawdownDependency[]>(
+      '/api/investments/portfolios/age-max-drawdown-dependence/'
+    );
   } else {
-    response = await fetcher.get(
+    response = await fetcher.get<AgeMaxDrawdownDependency[]>(
       `/api/investments/portfolios/age-max-drawdown-dependence/?age=${age}`
     );
   }

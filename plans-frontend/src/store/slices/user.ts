@@ -20,7 +20,7 @@ const name = 'user';
 export const fetchCurrentUser = createAsyncThunk(
   `${name}/fetchCurrentUser`,
   async (): Promise<User> => {
-    const response = await fetcher.get('/api/accounts/user/');
+    const response = await fetcher.get<User>('/api/accounts/user/');
     return response.data;
   }
 );

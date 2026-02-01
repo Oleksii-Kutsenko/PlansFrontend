@@ -4,13 +4,17 @@ import { Button, Card, Col, Container, Form, Row } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { setToken } from '../store/slices/auth';
+import { AuthTokens, setToken } from '../store/slices/auth';
 import { userActions } from '../store';
 import { useAppDispatch } from '../store/hooks';
 
 interface LoginFormInputs {
   username: string;
   password: string;
+}
+
+interface TokenResponse {
+  data: AuthTokens;
 }
 
 const Login: React.FC = () => {
@@ -33,10 +37,10 @@ const Login: React.FC = () => {
         .post('/api/accounts/token/', params, {
           baseURL: import.meta.env.VITE_API_URL
         })
-        .then((response) => {
+        .then((response: TokenResponse) => {
           dispatch(setToken(response.data));
-          dispatch(userActions.fetchCurrentUser());
-          navigate('/');
+          void dispatch(userActions.fetchCurrentUser());
+          void navigate('/');
         }),
       {
         pending: 'Logging in...',
@@ -53,7 +57,7 @@ const Login: React.FC = () => {
           <Card>
             <Card.Body>
               <h3 className='card-title text-center text-secondary mt-3'>Login Form</h3>
-              <Form onSubmit={handleSubmit(onSubmit)}>
+              <Form onSubmit={(e) => void handleSubmit(onSubmit)(e)}>
                 <Form.Group className='mb-3' controlId='username'>
                   <Form.Label>Username</Form.Label>
                   <Form.Control

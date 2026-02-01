@@ -11,11 +11,11 @@ interface Props {
 export const CurrencyInput: FC<Props> = ({ symbol, value, onSubmit }) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const [isInputDisabled, setIsInputDisabled] = useState<boolean>(true);
-  const [currentValue, updateCurrentValue] = useState<number>(value ? value : 0);
-  let previousValue = value ? value : 0;
+  const [currentValue, updateCurrentValue] = useState<number>(value ?? 0);
+  let previousValue = value ?? 0;
 
   useEffect(() => {
-    updateCurrentValue(value ? value : 0);
+    updateCurrentValue(value ?? 0);
   }, [value]);
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>): void => {
@@ -51,8 +51,9 @@ export const CurrencyInput: FC<Props> = ({ symbol, value, onSubmit }) => {
   const handleSubmit = (): void => {
     setIsInputDisabled(true);
     if (onSubmit) {
-      onSubmit(currentValue).catch((err) => {
-        console.log(err.message);
+      onSubmit(currentValue).catch((err: unknown) => {
+        const msg = err instanceof Error ? err.message : String(err);
+        console.log(msg);
         toast.error('Failed to update value');
         updateCurrentValue(previousValue);
       });

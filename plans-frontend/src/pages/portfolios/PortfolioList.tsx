@@ -3,36 +3,36 @@ import { LoadStatus, BacktestResults, RootState } from '../../store';
 import { Card, Col, Container, Row, Table } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import { type Ticker as TickerType } from '../../store';
+import { PortfolioFilterFormInputs } from './shared_interfaces';
 
 const PortfolioList: FC<{
   backtestResults: BacktestResults[];
-  filters: PortfolioFilterFormInputs;
+  filters: PortfolioFilterFormInputs | null;
 }> = ({ backtestResults, filters }) => {
-  const { backtestResultsLoadingStatus: backtestResultsLoadingStatus } = useSelector(
-    (state: RootState) => state.portfolios
-  );
+  const { backtestResultsLoadingStatus } = useSelector((state: RootState) => state.portfolios);
   const [toBeRenderedPortfolios, setToBeRenderedPortfolios] = useState<BacktestResults[]>([]);
 
   useEffect(() => {
-    if (filters && filters.personalMaxDrawdown !== null) {
-      const filteredPortfolios = backtestResults.results.filter(
-        (backtestResult: BacktestResults) => {
-          return (
-            backtestResult.maxDrawdown >= filters.personalMaxDrawdown &&
-            new Date(backtestResult.startDate) <= filters.backtestStartDate
-          );
-        }
-      );
-      setToBeRenderedPortfolios(filteredPortfolios.slice(0, 10));
+    const md = filters?.personalMaxDrawdown;
+    const start = filters?.backtestStartDate;
+
+    if (md == null || start == null) {
+      setToBeRenderedPortfolios(backtestResults.slice(0, 10));
+      return;
     }
+
+    const startDate = new Date(start);
+
+    const filteredPortfolios = backtestResults.filter((r) => {
+      return r.maxDrawdown >= md && new Date(r.startDate) <= startDate;
+    });
+
+    setToBeRenderedPortfolios(filteredPortfolios.slice(0, 10));
   }, [backtestResults, filters]);
 
-  if (backtestResultsLoadingStatus === LoadStatus.LOADING) {
-    return <p>Loading...</p>;
-  } else if (
-    backtestResultsLoadingStatus === LoadStatus.SUCCEEDED &&
-    toBeRenderedPortfolios.length > 0
-  ) {
+  if (backtestResultsLoadingStatus === LoadStatus.LOADING) return <p>Loading...</p>;
+
+  if (backtestResultsLoadingStatus === LoadStatus.SUCCEEDED && toBeRenderedPortfolios.length > 0) {
     return (
       <Row>
         <Col xs={12}>
@@ -85,11 +85,11 @@ const PortfolioList: FC<{
         </Col>
       </Row>
     );
-  } else if (backtestResultsLoadingStatus === LoadStatus.SUCCEEDED) {
-    return <p>Portfolios did not pass the filters.</p>;
-  } else {
-    return <p>Something went wrong.</p>;
   }
+  if (backtestResultsLoadingStatus === LoadStatus.SUCCEEDED) {
+    return <p>Portfolios did not pass the filters.</p>;
+  }
+  return <p>Something went wrong.</p>;
 };
 
 export default PortfolioList;
