@@ -9,7 +9,7 @@ export enum LoadStatus {
 }
 
 export interface BacktestResults {
-  cagr: number;
+  twr_annual: number;
   maxDrawdown: number;
   sharpe: number;
   standardDeviation: number;
