@@ -1,3 +1,0 @@
-## 2024-05-15 - Context-Aware Interactive Buttons
-**Learning:** Having persistent inline "Edit" and "Submit" buttons for every form or table row increases cognitive load, especially in data-heavy views like Asset Allocation. Users found it unintuitive to see a "Submit" checkmark when the field wasn't actively being edited.
-**Action:** Always map interactive button states exactly to their corresponding field states. If a field is disabled, show only "Edit". Once active, swap it for "Cancel" and "Submit" to provide a clear escape hatch and save option. Contextual actions feel significantly lighter and reduce erroneous clicks.
