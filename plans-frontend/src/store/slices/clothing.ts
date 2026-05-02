@@ -12,8 +12,11 @@ export interface Clothing {
   outfit: number | null;
 }
 
-interface Outfit {
-
+export interface Outfit {
+  id: number;
+  name: string;
+  description: string;
+  clothing_items: number[];
 }
 
 export interface ClothingCreate {
@@ -66,6 +69,11 @@ export const deleteClothing = createAsyncThunk('clothing/deleteClothing', async 
   return id;
 });
 
+export const deleteOutfit = createAsyncThunk('clothing/deleteOutfit', async (id: number) => {
+  await fetcher.delete(`/api/clothing/outfit/${id}`);
+  return id;
+});
+
 const clothingSlice = createSlice({
   name: 'clothing',
   initialState: initialState,
@@ -75,6 +83,9 @@ const clothingSlice = createSlice({
       .addCase(fetchClothing.fulfilled, (state, action) => {
         state.clothing = action.payload;
       })
+      .addCase(fetchOutfits.fulfilled, (state, action) => {
+        state.outfit = action.payload;
+      })
       .addCase(createClothing.fulfilled, (state, action) => {
         state.clothing.push(action.payload);
       })
@@ -83,6 +94,9 @@ const clothingSlice = createSlice({
       })
       .addCase(deleteClothing.fulfilled, (state, action) => {
         state.clothing = state.clothing.filter((item: Clothing) => item.id !== action.payload);
+      })
+      .addCase(deleteOutfit.fulfilled, (state, action) => {
+        state.outfit = state.outfit.filter((item: Outfit) => item.id !== action.payload);
       });
   }
 });
@@ -90,7 +104,9 @@ const clothingSlice = createSlice({
 export const clothingActions = {
   ...clothingSlice.actions,
   fetchClothing,
+  fetchOutfits,
   createClothing,
-  deleteClothing
+  deleteClothing,
+  deleteOutfit
 };
 export const clothingReducer = clothingSlice.reducer;

@@ -39,10 +39,10 @@ const WealthManagement = React.lazy(async () => {
   return { default: module.default };
 });
 
-//const ListClothing = React.lazy(async () => {
+// const ListClothing = React.lazy(async () => {
 //  const module = await import('./pages/clothing/ListClothing');
 //  return { default: module.default };
-//});
+// });
 const ListOutfit = React.lazy(async () => {
   const module = await import('./pages/clothing/ListOutfit');
   return { default: module.default };
