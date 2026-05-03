@@ -1,8 +1,9 @@
+/* eslint-disable @typescript-eslint/no-floating-promises */
 import { FC, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store';
 import { clothingActions } from '../../store/slices/clothing';
-import { useAppDispatch } from 'store/hooks';
+import { useAppDispatch } from '../../store/hooks';
 import { useNavigate } from 'react-router-dom';
 
 const ClothingList: FC = () => {
@@ -11,7 +12,7 @@ const ClothingList: FC = () => {
   const clothingItems = useSelector((state: RootState) => state.clothing.clothing);
 
   useEffect(() => {
-    dispatch(clothingActions.fetchClothing());
+    void dispatch(clothingActions.fetchClothing());
   }, [dispatch]);
 
   const handleDelete = (id: number) => {
@@ -51,12 +52,19 @@ const ClothingList: FC = () => {
               <td>{item.clothing_type}</td>
               <td>
                 <button
-                  onClick={() => navigate(`/clothing/edit/${item.id}`)}
+                  onClick={() => {
+                    void navigate(`/clothing/edit/${item.id}`);
+                  }}
                   className='btn btn-primary m-1'
                 >
                   Edit
                 </button>
-                <button onClick={() => handleDelete(item.id)} className='btn btn-danger'>
+                <button
+                  onClick={() => {
+                    void handleDelete(item.id);
+                  }}
+                  className='btn btn-danger'
+                >
                   Delete
                 </button>
               </td>
@@ -64,7 +72,12 @@ const ClothingList: FC = () => {
           ))}
         </tbody>
       </table>
-      <button onClick={navigateToAddClothing} className='btn btn-success mt-3'>
+      <button
+        onClick={() => {
+          void navigateToAddClothing();
+        }}
+        className='btn btn-success mt-3'
+      >
         Add Clothing
       </button>
     </div>

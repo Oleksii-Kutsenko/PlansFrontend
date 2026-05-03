@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-floating-promises */
+/* eslint-disable @typescript-eslint/no-misused-promises */
 import { FC, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store';
@@ -11,7 +13,7 @@ const ListOutfit: FC = () => {
   const outfitItems = useSelector((state: RootState) => state.clothing.outfit);
 
   useEffect(() => {
-    dispatch(clothingActions.fetchOutfits());
+    void dispatch(clothingActions.fetchOutfits());
   }, [dispatch]);
 
   const handleDelete = (id: number) => {
@@ -65,7 +67,9 @@ const ListOutfit: FC = () => {
                     Edit
                   </button>
                   <button
-                    onClick={() => handleDelete(item.id)}
+                    onClick={() => {
+                      void handleDelete(item.id);
+                    }}
                     className='btn btn-danger m-1'
                     aria-label={`Delete outfit ${item.outfit_name}`}
                   >
@@ -79,7 +83,12 @@ const ListOutfit: FC = () => {
       )}
 
       <div className='mt-3 d-flex gap-2'>
-        <button onClick={navigateToAddOutfit} className='btn btn-primary'>
+        <button
+          onClick={() => {
+            void navigateToAddOutfit();
+          }}
+          className='btn btn-primary'
+        >
           Add Outfit
         </button>
         <button onClick={navigateToAddClothing} className='btn btn-success'>
