@@ -51,7 +51,7 @@ const ListOutfit: FC = () => {
                 <td>{item.outfit_name}</td>
                 <td>
                   <ul>
-                    {item.clothings.map((clothingId) => (
+                    {item.clothings?.map((clothingId: number) => (
                       <li key={clothingId}>Clothing ID: {clothingId}</li>
                     ))}
                   </ul>
