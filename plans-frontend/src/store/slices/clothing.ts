@@ -6,17 +6,22 @@ import { AxiosError } from 'axios';
 export interface Clothing {
   id: number;
   name: string;
-  clothingType: string;
+  clothing_type: string;
   season: string;
   image_path: string;
   outfit: number | null;
 }
 
+export interface Occasion {
+  id: number;
+  occasion_name: string;
+}
+
 export interface Outfit {
   id: number;
-  name: string;
-  description: string;
-  clothing_items: number[];
+  outfit_name: string;
+  occasion: number;
+  clothings: number[];
 }
 
 export interface ClothingCreate {
@@ -39,12 +44,12 @@ const initialState: State = {
 };
 
 export const fetchClothing = createAsyncThunk('clothing/fetchClothing', async () => {
-  const { data } = await fetcher.get('/api/clothing/clothing');
+  const { data } = await fetcher.get('/api/clothing/clothing/');
   return data;
 });
 
 export const fetchOutfits = createAsyncThunk('clothing/fetchOutfit', async () => {
-  const { data } = await fetcher.get('/api/clothing/outfit');
+  const { data } = await fetcher.get('/api/clothing/outfit/');
   return data;
 });
 
@@ -65,12 +70,12 @@ export const createClothing = createAsyncThunk(
 );
 
 export const deleteClothing = createAsyncThunk('clothing/deleteClothing', async (id: number) => {
-  await fetcher.delete(`/clothing/${id}`);
+  await fetcher.delete(`/api/clothing/clothing/${id}/`);
   return id;
 });
 
 export const deleteOutfit = createAsyncThunk('clothing/deleteOutfit', async (id: number) => {
-  await fetcher.delete(`/api/clothing/outfit/${id}`);
+  await fetcher.delete(`/api/clothing/outfit/${id}/`);
   return id;
 });
 

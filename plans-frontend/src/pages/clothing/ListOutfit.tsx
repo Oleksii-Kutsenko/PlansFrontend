@@ -43,8 +43,8 @@ const ListOutfit: FC = () => {
           <thead>
             <tr>
               <th>ID</th>
-              <th>Name</th>
-              <th>Description</th>
+              <th>Outfit Name</th>
+              <th>Occasion ID</th>
               <th>Items Count</th>
               <th>Actions</th>
             </tr>
@@ -53,21 +53,21 @@ const ListOutfit: FC = () => {
             {outfitItems.map((item) => (
               <tr key={item.id}>
                 <td>{item.id}</td>
-                <td>{item.name}</td>
-                <td>{item.description}</td>
-                <td>{item.clothing_items?.length || 0}</td>
+                <td>{item.outfit_name}</td>
+                <td>{item.occasion}</td>
+                <td>{item.clothings?.length || 0}</td>
                 <td>
                   <button
                     onClick={() => navigate(`/clothing/outfit/edit/${item.id}`)}
                     className='btn btn-primary m-1'
-                    aria-label={`Edit outfit ${item.name}`}
+                    aria-label={`Edit outfit ${item.outfit_name}`}
                   >
                     Edit
                   </button>
                   <button
                     onClick={() => handleDelete(item.id)}
                     className='btn btn-danger m-1'
-                    aria-label={`Delete outfit ${item.name}`}
+                    aria-label={`Delete outfit ${item.outfit_name}`}
                   >
                     Delete
                   </button>

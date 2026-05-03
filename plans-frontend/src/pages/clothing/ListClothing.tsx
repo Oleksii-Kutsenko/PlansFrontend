@@ -48,7 +48,7 @@ const ClothingList: FC = () => {
                 />
               </td>
               <td>{item.name}</td>
-              <td>{item.clothingType}</td>
+              <td>{item.clothing_type}</td>
               <td>
                 <button
                   onClick={() => navigate(`/clothing/edit/${item.id}`)}
