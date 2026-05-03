@@ -7,6 +7,7 @@ export enum CountriesOptionsStatus {
   SUCCEEDED = 'succeeded',
   FAILED = 'failed'
 }
+
 export interface Option {
   name: string;
   value_name: string;
@@ -20,6 +21,7 @@ export interface State {
 }
 
 const initialState: State = { options: [], status: CountriesOptionsStatus.IDLE };
+
 export const fetchCountriesOptions = createAsyncThunk(
   'countries/fetchCountriesOptions',
   async () => {

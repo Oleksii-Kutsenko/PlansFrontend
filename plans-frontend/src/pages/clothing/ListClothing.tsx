@@ -12,7 +12,7 @@ const ClothingList: FC = () => {
   const clothingItems = useSelector((state: RootState) => state.clothing.clothing);
 
   useEffect(() => {
-    void dispatch(clothingActions.fetchClothing());
+    void void dispatch(clothingActions.fetchClothing());
   }, [dispatch]);
 
   const handleDelete = (id: number) => {

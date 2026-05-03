@@ -35,6 +35,7 @@ export const AssetAllocationRow = ({
         throw new Error(String(err));
       }
     };
+
   return (
     <>
       <tr

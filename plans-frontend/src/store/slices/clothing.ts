@@ -43,21 +43,15 @@ const initialState: State = {
   status: LoadingStatus.IDLE
 };
 
-export const fetchClothing = createAsyncThunk(
-  'clothing/fetchClothing',
-  async (): Promise<Clothing[]> => {
-    const { data } = await fetcher.get<Clothing[]>('/api/clothing/clothing/');
-    return data;
-  }
-);
+export const fetchClothing = createAsyncThunk('clothing/fetchClothing', async () => {
+  const { data } = await fetcher.get<Clothing[]>('/api/clothing/clothing/');
+  return data;
+});
 
-export const fetchOutfits = createAsyncThunk(
-  'clothing/fetchOutfit',
-  async (): Promise<Clothing[]> => {
-    const { data } = await fetcher.get<Clothing[]>('/api/clothing/outfit/');
-    return data;
-  }
-);
+export const fetchOutfits = createAsyncThunk('clothing/fetchOutfit', async () => {
+  const { data } = await fetcher.get<Outfit[]>('/api/clothing/outfit/');
+  return data;
+});
 
 export const createClothing = createAsyncThunk(
   'clothing/createClothing',
@@ -95,7 +89,7 @@ const clothingSlice = createSlice({
         state.clothing = action.payload;
       })
       .addCase(fetchOutfits.fulfilled, (state, action) => {
-        state.outfit = action.payload as unknown as Outfit[];
+        state.outfit = action.payload;
       })
       .addCase(createClothing.fulfilled, (state, action) => {
         state.clothing.push(action.payload);

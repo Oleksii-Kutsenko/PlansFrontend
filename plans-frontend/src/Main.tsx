@@ -38,20 +38,6 @@ const WealthManagement = React.lazy(async () => {
   return { default: module.default };
 });
 
-const ListClothing = React.lazy(async () => {
-  const module = await import('./pages/clothing/ListClothing');
-  return { default: module.default };
-});
-
-const CreateClothing = React.lazy(async () => {
-  const module = await import('./pages/clothing/CreateClothing');
-  return { default: module.default };
-});
-const ListOutfit = React.lazy(async () => {
-  const module = await import('./pages/clothing/ListOutfit');
-  return { default: module.default };
-});
-
 const Loading: FC = () => <p>Loading ...</p>;
 
 const Main: FC = () => {
@@ -65,9 +51,6 @@ const Main: FC = () => {
           <Route path='/portfolios' element={<Portfolios />} />
           <Route path='/profile' element={<Profile />} />
           <Route path='/wealth-management' element={<WealthManagement />} />
-          <Route path='/clothing/all' element={<ListClothing />} />
-          <Route path='/clothing' element={<ListOutfit />} />
-          <Route path='/clothing/create' element={<CreateClothing />} />
         </Route>
 
         {/** Public Routes */}

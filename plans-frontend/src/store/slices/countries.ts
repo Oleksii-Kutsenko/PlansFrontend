@@ -8,6 +8,7 @@ export enum CountriesStatus {
   SUCCEEDED = 'succeeded',
   FAILED = 'failed'
 }
+
 export interface Country {
   id: number;
   name: string;

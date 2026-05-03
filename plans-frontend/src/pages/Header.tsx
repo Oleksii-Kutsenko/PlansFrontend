@@ -40,11 +40,6 @@ const Header: FC = () => {
                 Wealth Management
               </NavLink>
             </Nav.Item>
-            <Nav.Item>
-              <NavLink to='/clothing' className='nav-link'>
-                Clothing
-              </NavLink>
-            </Nav.Item>
           </Nav>
           <Nav>
             <Nav.Item>

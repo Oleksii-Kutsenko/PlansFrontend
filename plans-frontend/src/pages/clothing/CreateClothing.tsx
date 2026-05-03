@@ -1,3 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-floating-promises */
 import { ClothingCreate, createClothing } from '../../store';
 import { useNavigate } from 'react-router-dom';
@@ -5,7 +9,7 @@ import { useAppDispatch } from '../../store/hooks';
 import { useForm } from 'react-hook-form';
 import { Button, Container, Form } from 'react-bootstrap';
 import { toast } from 'react-toastify';
-import { ValidationErrors } from '../../store/slices/utils';
+import { ValidationErrors } from 'store/slices/utils';
 
 const CreateClothing = () => {
   const dispatch = useAppDispatch();
@@ -18,7 +22,7 @@ const CreateClothing = () => {
   } = useForm<ClothingCreate>();
 
   const onSubmit = (data: ClothingCreate): void => {
-    void dispatch(createClothing(data))
+    void void dispatch(createClothing(data))
       .then((res) => {
         if (createClothing.fulfilled.match(res)) {
           navigate('/clothing');

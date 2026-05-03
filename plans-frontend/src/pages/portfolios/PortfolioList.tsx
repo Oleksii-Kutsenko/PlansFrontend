@@ -42,7 +42,7 @@ const PortfolioList: FC<{
                 <Card.Header style={{ backgroundColor: 'pink' }}>
                   <h4>
                     {backtestResults.portfolio.name} / {backtestResults.strategy}
-                  </h4>{' '}
+                  </h4>
                 </Card.Header>
                 <Card.Body>
                   <Container>
@@ -53,7 +53,7 @@ const PortfolioList: FC<{
                         <p>Max Drawdown: {backtestResults.maxDrawdown}%</p>
                         <p>Sharpe: {backtestResults.sharpe}</p>
                         <p>Standard Deviation: {backtestResults.standardDeviation}</p>
-                        <p>Start Date: {backtestResults.startDate}</p>{' '}
+                        <p>Start Date: {backtestResults.startDate}</p>
                       </Col>
                       <Col xs={6}>
                         <h5>Constituents</h5>

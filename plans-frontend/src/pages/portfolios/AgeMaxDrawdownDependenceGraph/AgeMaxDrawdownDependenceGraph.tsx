@@ -18,6 +18,7 @@ const AGE_MIN = 18;
 interface AgeMaxDrawdownDependenceGraphProps {
   graphData: AgeMaxDrawdownDependency[];
 }
+
 const AgeMaxDrawdownDependenceGraph: FC<AgeMaxDrawdownDependenceGraphProps> = ({ graphData }) => {
   const dispatch = useAppDispatch();
   const { ageMaxDrawdownDependenceLoadingStatus } = useSelector(

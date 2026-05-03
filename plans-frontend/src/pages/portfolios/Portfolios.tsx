@@ -6,6 +6,7 @@ import { toast } from 'react-toastify';
 
 import { type RootState, LoadStatus, portfoliosActions } from '../../store';
 import { useAppDispatch } from '../../store/hooks';
+
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -79,7 +80,7 @@ const Portfolios: FC = () => {
         </Row>
         <Row>
           <Col xs={3} className='d-flex'>
-            <PersonalMaxDrawdownForm onApply={(v) => setFilters(v)} />{' '}
+            <PersonalMaxDrawdownForm onApply={(v) => setFilters(v)} />
           </Col>
           <Col xs={9}>
             <AgeMaxDrawdownDependenceGraph graphData={ageMaxDrawdownDependence} />

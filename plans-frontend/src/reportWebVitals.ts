@@ -13,6 +13,7 @@ const reportWebVitals = (onPerfEntry?: ReportHandler): void => {
 
     onINP(onPerfEntry);
     onFID(onPerfEntry);
-  });};
+  });
+};
 
 export default reportWebVitals;
