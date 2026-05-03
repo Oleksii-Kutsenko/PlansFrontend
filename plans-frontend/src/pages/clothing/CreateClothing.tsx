@@ -1,18 +1,11 @@
-/* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
-
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-floating-promises */
-/* eslint-disable @typescript-eslint/no-misused-promises */
 import { ClothingCreate, createClothing } from '../../store';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch } from '../../store/hooks';
 import { useForm } from 'react-hook-form';
 import { Button, Container, Form } from 'react-bootstrap';
 import { toast } from 'react-toastify';
-import { ValidationErrors } from 'store/slices/utils';
+import { ValidationErrors } from '../../store/slices/utils';
 
 const CreateClothing = () => {
   const dispatch = useAppDispatch();
@@ -25,13 +18,13 @@ const CreateClothing = () => {
   } = useForm<ClothingCreate>();
 
   const onSubmit = (data: ClothingCreate): void => {
-    dispatch(createClothing(data))
+    void dispatch(createClothing(data))
       .then((res) => {
         if (createClothing.fulfilled.match(res)) {
           navigate('/clothing');
         } else if (createClothing.rejected.match(res)) {
           const error = res.payload as ValidationErrors;
-          const errorMessage = error?.errorMessage || 'Error adding clothing item.';
+          const errorMessage = error?.errorMessage ?? 'Error adding clothing item.';
           toast.error(errorMessage);
 
           Object.keys(error).forEach((field: string) => {
@@ -52,7 +45,7 @@ const CreateClothing = () => {
   return (
     <Container>
       <h1>Create Clothing</h1>
-      <Form onSubmit={handleSubmit(onSubmit)}>
+      <Form onSubmit={(e) => void handleSubmit(onSubmit)(e)}>
         <Form.Group className='mb-3' controlId='name'>
           <Form.Label>Name</Form.Label>
           <Form.Control

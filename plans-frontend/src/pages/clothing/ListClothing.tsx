@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-floating-promises */
-/* eslint-disable @typescript-eslint/no-misused-promises */
 import { FC, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store';
@@ -53,12 +52,19 @@ const ClothingList: FC = () => {
               <td>{item.clothing_type}</td>
               <td>
                 <button
-                  onClick={() => navigate(`/clothing/edit/${item.id}`)}
+                  onClick={() => {
+                    void navigate(`/clothing/edit/${item.id}`);
+                  }}
                   className='btn btn-primary m-1'
                 >
                   Edit
                 </button>
-                <button onClick={() => handleDelete(item.id)} className='btn btn-danger'>
+                <button
+                  onClick={() => {
+                    void handleDelete(item.id);
+                  }}
+                  className='btn btn-danger'
+                >
                   Delete
                 </button>
               </td>
@@ -66,7 +72,12 @@ const ClothingList: FC = () => {
           ))}
         </tbody>
       </table>
-      <button onClick={navigateToAddClothing} className='btn btn-success mt-3'>
+      <button
+        onClick={() => {
+          void navigateToAddClothing();
+        }}
+        className='btn btn-success mt-3'
+      >
         Add Clothing
       </button>
     </div>
