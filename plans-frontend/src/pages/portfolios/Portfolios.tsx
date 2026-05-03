@@ -1,10 +1,11 @@
 import type { FC } from 'react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Col, Container, Row } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
-import { type RootState, portfoliosActions } from '../../store';
-import { useAppDispatch } from '../../store/hooks';
 import { toast } from 'react-toastify';
+
+import { type RootState, LoadStatus, portfoliosActions } from '../../store';
+import { useAppDispatch } from '../../store/hooks';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -16,61 +17,60 @@ import {
   Legend
 } from 'chart.js';
 import { PersonalMaxDrawdownForm } from './PersonalMaxDrawdownForm';
-import type { AsyncThunk } from '@reduxjs/toolkit';
 import AgeMaxDrawdownDependenceGraph from './AgeMaxDrawdownDependenceGraph/AgeMaxDrawdownDependenceGraph';
 import PortfolioList from './PortfolioList';
-import { LoadingStatus } from 'store/slices/utils';
+import { PortfolioFilterFormInputs } from './shared_interfaces';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
 const Portfolios: FC = () => {
   const dispatch = useAppDispatch();
   const {
-    portfolios,
-    portfoliosLoadingStatus,
+    backtestResults,
+    backtestResultsLoadingStatus,
     personalMaxDrawdownLoadingStatus,
     ageMaxDrawdownDependence,
     ageMaxDrawdownDependenceLoadingStatus
   } = useSelector((state: RootState) => state.portfolios);
 
+  const [filters, setFilters] = useState<PortfolioFilterFormInputs | null>(null);
+
   useEffect(() => {
-    const fetchIfNeeded = (
-      status: LoadingStatus,
-      action: AsyncThunk<any, any, any>,
-      args: any | null = null
-    ) => {
-      if (status === LoadingStatus.IDLE) {
-        dispatch(action(args)).catch((err: { message: string }) => {
-          const errorMessage = err.message.toString() as string;
-          toast.error(`Error fetching data: ${errorMessage}`);
-        });
-      }
+    const showError = (err: unknown) => {
+      const msg = err instanceof Error ? err.message : String(err);
+      toast.error(`Error fetching data: ${msg}`);
     };
 
-    fetchIfNeeded(portfoliosLoadingStatus, portfoliosActions.fetchPortfolios);
-    fetchIfNeeded(
-      ageMaxDrawdownDependenceLoadingStatus,
-      portfoliosActions.fetchAgeMaxDrawdownDependence,
-      80
-    );
-    fetchIfNeeded(personalMaxDrawdownLoadingStatus, portfoliosActions.fetchPersonalMaxDrawdown);
+    if (backtestResultsLoadingStatus === LoadStatus.IDLE) {
+      void dispatch(portfoliosActions.fetchPortfolioBacktestResults()).unwrap().catch(showError);
+    }
+
+    if (ageMaxDrawdownDependenceLoadingStatus === LoadStatus.IDLE) {
+      void dispatch(portfoliosActions.fetchAgeMaxDrawdownDependence(80)).unwrap().catch(showError);
+    }
+
+    if (personalMaxDrawdownLoadingStatus === LoadStatus.IDLE) {
+      void dispatch(portfoliosActions.fetchPersonalMaxDrawdown()).unwrap().catch(showError);
+    }
   }, [
     dispatch,
-    portfoliosLoadingStatus,
+    backtestResultsLoadingStatus,
     ageMaxDrawdownDependenceLoadingStatus,
     personalMaxDrawdownLoadingStatus
   ]);
 
   if (
-    portfoliosLoadingStatus === LoadingStatus.LOADING ||
-    personalMaxDrawdownLoadingStatus === LoadingStatus.LOADING ||
-    ageMaxDrawdownDependenceLoadingStatus === LoadingStatus.LOADING
+    backtestResultsLoadingStatus === LoadStatus.LOADING ||
+    personalMaxDrawdownLoadingStatus === LoadStatus.LOADING ||
+    ageMaxDrawdownDependenceLoadingStatus === LoadStatus.LOADING
   ) {
     return <p>Loading...</p>;
-  } else if (
-    portfoliosLoadingStatus === LoadingStatus.SUCCEEDED &&
-    personalMaxDrawdownLoadingStatus === LoadingStatus.SUCCEEDED &&
-    ageMaxDrawdownDependenceLoadingStatus === LoadingStatus.SUCCEEDED
+  }
+
+  if (
+    backtestResultsLoadingStatus === LoadStatus.SUCCEEDED &&
+    personalMaxDrawdownLoadingStatus === LoadStatus.SUCCEEDED &&
+    ageMaxDrawdownDependenceLoadingStatus === LoadStatus.SUCCEEDED
   ) {
     return (
       <Container>
@@ -79,18 +79,18 @@ const Portfolios: FC = () => {
         </Row>
         <Row>
           <Col xs={3} className='d-flex'>
-            <PersonalMaxDrawdownForm />
+            <PersonalMaxDrawdownForm onApply={(v) => setFilters(v)} />{' '}
           </Col>
           <Col xs={9}>
             <AgeMaxDrawdownDependenceGraph graphData={ageMaxDrawdownDependence} />
           </Col>
         </Row>
-        <PortfolioList portfolios={portfolios} />
+        <PortfolioList backtestResults={backtestResults} filters={filters} />
       </Container>
     );
-  } else {
-    return <p>Something went wrong.</p>;
   }
+
+  return <p>Something went wrong.</p>;
 };
 
 export default Portfolios;

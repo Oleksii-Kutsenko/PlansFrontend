@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { countriesActions, type Country, type RootState } from 'store';
-import type { Option } from 'store';
+import { countriesActions, type Country, type RootState } from '@/store';
+import type { Option } from '@/store';
 import {
   CategoryScale,
   Chart as ChartJS,
@@ -13,7 +13,7 @@ import {
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
 import { useSelector } from 'react-redux';
-import { useAppDispatch } from 'store/hooks';
+import { useAppDispatch } from '@/store/hooks';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
@@ -28,22 +28,36 @@ export const CountriesRatingHistory = ({
   const [expanded, setExpanded] = useState(false);
   const { countriesRatingHistory } = useSelector((state: RootState) => state.countries);
 
+  type RGB = readonly [number, number, number];
+
+  const minColor: RGB = [203, 52, 66];
+  const maxColor: RGB = [125, 177, 69];
+  const zeroColor: RGB = [255, 255, 0];
+
+  const lerp = (a: number, b: number, t: number) => Math.round(a + t * (b - a));
+
   function mapValueToColor(value: number | string): string {
-    const numValue = isNaN(Number(value)) ? 0 : Number(value);
+    const numValue = Number.isFinite(Number(value)) ? Number(value) : 0;
+
     const min = -100;
     const max = 100;
-    const minColor = [203, 52, 66]; // RGB color for minimum value (red)
-    const maxColor = [125, 177, 69]; // RGB color for maximum value (green)
-    const zeroColor = [255, 255, 0]; // RGB color for zero (yellow)
 
-    let color: number[] = [];
+    let color: RGB;
 
     if (numValue < 0) {
-      const ratio = (numValue - min) / -min;
-      color = minColor.map((c, i) => Math.round(c + ratio * (zeroColor[i] - c)));
+      const t = (numValue - min) / -min;
+      color = [
+        lerp(minColor[0], zeroColor[0], t),
+        lerp(minColor[1], zeroColor[1], t),
+        lerp(minColor[2], zeroColor[2], t)
+      ];
     } else if (numValue > 0) {
-      const ratio = numValue / max;
-      color = zeroColor.map((c, i) => Math.round(c + ratio * (maxColor[i] - c)));
+      const t = numValue / max;
+      color = [
+        lerp(zeroColor[0], maxColor[0], t),
+        lerp(zeroColor[1], maxColor[1], t),
+        lerp(zeroColor[2], maxColor[2], t)
+      ];
     } else {
       color = zeroColor;
     }
@@ -55,7 +69,11 @@ export const CountriesRatingHistory = ({
 
   useEffect(() => {
     if (expanded && !countriesRatingHistoryMap.has(country.id)) {
-      dispatch(countriesActions.fetchCountryRatingHistory(country.id));
+      void dispatch(countriesActions.fetchCountryRatingHistory(country.id))
+        .unwrap()
+        .catch((e) => {
+          console.error('Failed to fetch rating history', e);
+        });
     }
   }, [expanded, countriesRatingHistory, country.id, dispatch]);
 
@@ -93,7 +111,7 @@ export const CountriesRatingHistory = ({
           return (
             <td
               key={j}
-              style={{ backgroundColor: mapValueToColor(country[option.normalized_name]) }}
+              style={{ backgroundColor: mapValueToColor(country[option.normalized_name] ?? 0) }}
             >
               {country[option.normalized_name]}
             </td>

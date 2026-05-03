@@ -21,10 +21,7 @@ export interface AssetAllocation {
   targetPercentage: number | null;
 }
 
-export interface UpdateAssetAllocation {
-  [fieldName: string]: number | null;
-}
-
+export type UpdateAssetAllocation = Record<string, number | null>;
 export interface Allocation {
   id: number;
   allocatedPercentage: number;

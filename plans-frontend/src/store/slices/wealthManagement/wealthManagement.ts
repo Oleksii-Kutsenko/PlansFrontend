@@ -1,28 +1,37 @@
+import type { PayloadAction } from '@reduxjs/toolkit';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { fetcher } from '../../../utils/axios';
 import { WealthManagementModel, UpdateAssetAllocation } from './interfaces';
 import { computeDelta } from './compute';
-import { LoadingStatus } from '../utils';
 
 const name = 'wealthManagement';
+
+export enum WealthManagementStatus {
+  IDLE = 'idle',
+  LOADING = 'loading',
+  SUCCEEDED = 'succeeded',
+  FAILED = 'failed'
+}
 
 interface State {
   wealthManagement: WealthManagementModel | undefined;
   wealthManagementChanged: boolean;
-  status: LoadingStatus;
+  status: WealthManagementStatus;
 }
 
 const initialState: State = {
   wealthManagement: undefined,
   wealthManagementChanged: false,
-  status: LoadingStatus.IDLE
+  status: WealthManagementStatus.IDLE
 };
 
 // Thunk
 export const fetchWealthManagement = createAsyncThunk(
   `${name}/fetchWealthManagement`,
   async (wealthManagementId: number) => {
-    const { data } = await fetcher.get(`/api/assets/wealth-management/${wealthManagementId}`);
+    const { data } = await fetcher.get<WealthManagementModel>(
+      `/api/assets/wealth-management/${wealthManagementId}`
+    );
     return data;
   }
 );
@@ -33,7 +42,7 @@ export const updateAssetAllocation = createAsyncThunk<
 >(
   `${name}/updateAssetAllocation`,
   async ({ assetAllocationId, assetAllocation: assetAllocation }) => {
-    const { data } = await fetcher.patch(
+    const { data } = await fetcher.patch<UpdateAssetAllocation>(
       `/api/assets/asset-allocation/${assetAllocationId}/`,
       assetAllocation
     );
@@ -46,24 +55,27 @@ const wealthManagementSlice = createSlice({
   name: name,
   initialState,
   reducers: {
-    setWealthManagement: (state, action) => {
+    setWealthManagement: (state, action: PayloadAction<WealthManagementModel>) => {
       state.wealthManagement = action.payload;
     },
-    setWealthManagementChanged: (state, action) => {
+    setWealthManagementChanged: (state, action: PayloadAction<boolean>) => {
       state.wealthManagementChanged = action.payload;
     }
   },
   extraReducers: (builder) => {
     builder
-      .addCase(fetchWealthManagement.fulfilled, (state, action) => {
-        state.wealthManagement = computeDelta(action.payload);
-        state.status = LoadingStatus.SUCCEEDED;
-      })
+      .addCase(
+        fetchWealthManagement.fulfilled,
+        (state, action: PayloadAction<WealthManagementModel>) => {
+          state.wealthManagement = computeDelta(action.payload);
+          state.status = WealthManagementStatus.SUCCEEDED;
+        }
+      )
       .addCase(fetchWealthManagement.pending, (state) => {
-        state.status = LoadingStatus.LOADING;
+        state.status = WealthManagementStatus.LOADING;
       })
       .addCase(fetchWealthManagement.rejected, (state) => {
-        state.status = LoadingStatus.FAILED;
+        state.status = WealthManagementStatus.FAILED;
       })
       .addCase(updateAssetAllocation.fulfilled, (state) => {
         state.wealthManagementChanged = true;

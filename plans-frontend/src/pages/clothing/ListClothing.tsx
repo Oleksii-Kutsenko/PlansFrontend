@@ -1,8 +1,10 @@
+/* eslint-disable @typescript-eslint/no-floating-promises */
+/* eslint-disable @typescript-eslint/no-misused-promises */
 import { FC, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store';
 import { clothingActions } from '../../store/slices/clothing';
-import { useAppDispatch } from 'store/hooks';
+import { useAppDispatch } from '../../store/hooks';
 import { useNavigate } from 'react-router-dom';
 
 const ClothingList: FC = () => {
@@ -11,7 +13,7 @@ const ClothingList: FC = () => {
   const clothingItems = useSelector((state: RootState) => state.clothing.clothing);
 
   useEffect(() => {
-    dispatch(clothingActions.fetchClothing());
+    void dispatch(clothingActions.fetchClothing());
   }, [dispatch]);
 
   const handleDelete = (id: number) => {

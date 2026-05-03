@@ -5,6 +5,4 @@ export enum LoadingStatus {
   FAILED = 'failed'
 }
 
-export interface ValidationErrors {
-  [key: string]: string[];
-}
+export type ValidationErrors = Record<string, string[]>;

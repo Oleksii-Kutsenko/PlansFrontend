@@ -43,21 +43,27 @@ const initialState: State = {
   status: LoadingStatus.IDLE
 };
 
-export const fetchClothing = createAsyncThunk('clothing/fetchClothing', async () => {
-  const { data } = await fetcher.get('/api/clothing/clothing/');
-  return data;
-});
+export const fetchClothing = createAsyncThunk(
+  'clothing/fetchClothing',
+  async (): Promise<Clothing[]> => {
+    const { data } = await fetcher.get<Clothing[]>('/api/clothing/clothing/');
+    return data;
+  }
+);
 
-export const fetchOutfits = createAsyncThunk('clothing/fetchOutfit', async () => {
-  const { data } = await fetcher.get('/api/clothing/outfit/');
-  return data;
-});
+export const fetchOutfits = createAsyncThunk(
+  'clothing/fetchOutfit',
+  async (): Promise<Clothing[]> => {
+    const { data } = await fetcher.get<Clothing[]>('/api/clothing/outfit/');
+    return data;
+  }
+);
 
 export const createClothing = createAsyncThunk(
   'clothing/createClothing',
   async (clothing: ClothingCreate, { rejectWithValue }) => {
     try {
-      const { data } = await fetcher.post('/api/clothing/clothing/', clothing);
+      const { data } = await fetcher.post<Clothing>('/api/clothing/clothing/', clothing);
       return data;
     } catch (err) {
       const error = err as AxiosError<ValidationErrors>;
@@ -89,12 +95,12 @@ const clothingSlice = createSlice({
         state.clothing = action.payload;
       })
       .addCase(fetchOutfits.fulfilled, (state, action) => {
-        state.outfit = action.payload;
+        state.outfit = action.payload as unknown as Outfit[];
       })
       .addCase(createClothing.fulfilled, (state, action) => {
         state.clothing.push(action.payload);
       })
-      .addCase(createClothing.rejected, (state, _action) => {
+      .addCase(createClothing.rejected, (state) => {
         state.status = LoadingStatus.FAILED;
       })
       .addCase(deleteClothing.fulfilled, (state, action) => {

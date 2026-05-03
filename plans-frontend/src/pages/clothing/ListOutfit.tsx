@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-floating-promises */
+/* eslint-disable @typescript-eslint/no-misused-promises */
 import { FC, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store';
@@ -11,7 +13,7 @@ const ListOutfit: FC = () => {
   const outfitItems = useSelector((state: RootState) => state.clothing.outfit);
 
   useEffect(() => {
-    dispatch(clothingActions.fetchOutfits());
+    void dispatch(clothingActions.fetchOutfits());
   }, [dispatch]);
 
   const handleDelete = (id: number) => {

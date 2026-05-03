@@ -3,13 +3,13 @@ import axios from 'axios';
 import store, { setToken, logout } from '../store';
 
 export const fetcher = axios.create({
-  baseURL: process.env.REACT_APP_API_URL,
+  baseURL: import.meta.env.VITE_API_URL,
   headers: {
     'Content-Type': 'application/json'
   }
 });
 
-fetcher.interceptors.request.use(async (config: InternalAxiosRequestConfig) => {
+fetcher.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   config.headers.Authorization = authHeader();
   console.debug(
     '[Request]',
@@ -27,14 +27,14 @@ function authHeader(): string {
 }
 
 fetcher.interceptors.response.use(
-  async (res: AxiosResponse<InternalAxiosRequestConfig, any>) => {
+  (res: AxiosResponse<InternalAxiosRequestConfig, AxiosError>) => {
     if (res.config.baseURL && res.config.url) {
       console.debug('[Response]', res.config.baseURL + res.config.url, res.status, res.data);
     }
     return res;
   },
   async (err: AxiosError) => {
-    if (err && err.config) {
+    if (err?.config) {
       console.debug(
         '[Response]',
         err.config.baseURL,
@@ -61,8 +61,8 @@ const refreshAuthLogic = async (error: AxiosError) => {
       console.log('Refreshed token:', access, refresh);
       error.response.config.headers.Authorization = `Bearer ${access}`;
       store.dispatch(setToken({ access, refresh }));
-    } catch (error: any) {
-      if (error.response?.status === 401) {
+    } catch (err: unknown) {
+      if (axios.isAxiosError(err) && err.response?.status === 401) {
         store.dispatch(logout());
       }
     }

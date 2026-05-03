@@ -3,10 +3,14 @@ import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import type { RootState, Country } from '../../store';
 import { useAppDispatch } from '../../store/hooks';
-import { fetchCountriesOptions, countriesActions } from '../../store';
+import {
+  fetchCountriesOptions,
+  CountriesOptionsStatus,
+  CountriesStatus,
+  countriesActions
+} from '../../store';
 import { Container, Table } from 'react-bootstrap';
 import { CountriesRatingHistory } from './CountriesRatingRow';
-import { LoadingStatus } from 'store/slices/utils';
 
 const CountriesRating: FC = () => {
   const dispatch = useAppDispatch();
@@ -18,12 +22,12 @@ const CountriesRating: FC = () => {
   const { countries, status: countriesStatus } = useSelector((state: RootState) => state.countries);
 
   useEffect(() => {
-    if (countriesOptionsStatus === LoadingStatus.IDLE) {
+    if (countriesOptionsStatus === CountriesOptionsStatus.IDLE) {
       dispatch(fetchCountriesOptions()).catch((err) => {
         console.log(err);
       });
     }
-    if (countriesStatus === LoadingStatus.IDLE) {
+    if (countriesStatus === CountriesStatus.IDLE) {
       dispatch(countriesActions.fetchCountries()).catch((err) => {
         console.log(err);
       });
@@ -33,13 +37,13 @@ const CountriesRating: FC = () => {
   let content;
 
   if (
-    countriesOptionsStatus === LoadingStatus.LOADING ||
-    countriesStatus === LoadingStatus.LOADING
+    countriesOptionsStatus === CountriesOptionsStatus.LOADING ||
+    countriesStatus === CountriesStatus.LOADING
   ) {
     content = <div>Loading...</div>;
   } else if (
-    countriesOptionsStatus === LoadingStatus.SUCCEEDED &&
-    countriesStatus === LoadingStatus.SUCCEEDED
+    countriesOptionsStatus === CountriesOptionsStatus.SUCCEEDED &&
+    countriesStatus === CountriesStatus.SUCCEEDED
   ) {
     const tableHeader = [];
     tableHeader.push(<th key='chevron'></th>);
@@ -49,12 +53,11 @@ const CountriesRating: FC = () => {
     });
     tableHeader.push(<th key='rating'>Rating</th>);
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const countriesOptionsNormalizedNames = countriesOptions.map(
       (option) => option.normalized_name
     );
-    type ExactCountry = {
-      [K in (typeof countriesOptionsNormalizedNames)[number]]: number;
-    } & Country;
+    type ExactCountry = Record<(typeof countriesOptionsNormalizedNames)[number], number> & Country;
     const exactCountries = countries as ExactCountry[];
 
     const tableContent = exactCountries.map((country: ExactCountry) => {
@@ -78,8 +81,8 @@ const CountriesRating: FC = () => {
       </Container>
     );
   } else if (
-    countriesOptionsStatus === LoadingStatus.FAILED ||
-    countriesStatus === LoadingStatus.FAILED
+    countriesOptionsStatus === CountriesOptionsStatus.FAILED ||
+    countriesStatus === CountriesStatus.FAILED
   ) {
     content = <div>Failed to load countries options</div>;
   }

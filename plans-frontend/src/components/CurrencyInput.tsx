@@ -11,22 +11,23 @@ interface Props {
 export const CurrencyInput: FC<Props> = ({ symbol, value, onSubmit }) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const [isInputDisabled, setIsInputDisabled] = useState<boolean>(true);
-  const [currentValue, updateCurrentValue] = useState<number>(value ? value : 0);
+  const [currentValue, updateCurrentValue] = useState<number>(value ?? 0);
+  let previousValue = value ?? 0;
 
   useEffect(() => {
-    updateCurrentValue(value ? value : 0);
+    updateCurrentValue(value ?? 0);
   }, [value]);
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>): void => {
     const {
-      target: { value: targetValue }
+      target: { value }
     } = event;
 
     let money;
-    if (targetValue === '') {
+    if (value === '') {
       money = 0;
     } else {
-      money = parseFloat(targetValue);
+      money = parseFloat(value);
     }
 
     if (money < 0) {
@@ -34,11 +35,12 @@ export const CurrencyInput: FC<Props> = ({ symbol, value, onSubmit }) => {
       money = 0;
     }
 
+    previousValue = money;
     updateCurrentValue(money);
   };
 
   const handleEdit = (): void => {
-    setIsInputDisabled(false);
+    setIsInputDisabled(!isInputDisabled);
     // This is needed to focus on the input field after it is enabled
     // We need to wait for the input field to be rendered before we can focus on it
     setTimeout(() => {
@@ -46,18 +48,14 @@ export const CurrencyInput: FC<Props> = ({ symbol, value, onSubmit }) => {
     }, 0);
   };
 
-  const handleCancel = (): void => {
-    setIsInputDisabled(true);
-    updateCurrentValue(value ? value : 0);
-  };
-
   const handleSubmit = (): void => {
     setIsInputDisabled(true);
     if (onSubmit) {
-      onSubmit(currentValue).catch((err) => {
-        console.log(err.message);
+      onSubmit(currentValue).catch((err: unknown) => {
+        const msg = err instanceof Error ? err.message : String(err);
+        console.log(msg);
         toast.error('Failed to update value');
-        updateCurrentValue(value ? value : 0);
+        updateCurrentValue(previousValue);
       });
     }
   };
@@ -65,8 +63,6 @@ export const CurrencyInput: FC<Props> = ({ symbol, value, onSubmit }) => {
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>): void => {
     if (event.key === 'Enter') {
       handleSubmit();
-    } else if (event.key === 'Escape') {
-      handleCancel();
     }
   };
 
@@ -84,38 +80,12 @@ export const CurrencyInput: FC<Props> = ({ symbol, value, onSubmit }) => {
         min='0'
         onKeyDown={handleKeyDown}
       />
-      {isInputDisabled ? (
-        <Button
-          variant='outline-secondary'
-          id='edit-button'
-          onClick={handleEdit}
-          aria-label='Edit amount'
-          title='Edit amount'
-        >
-          <i className='bi bi-pencil' aria-hidden='true'></i>
-        </Button>
-      ) : (
-        <>
-          <Button
-            variant='outline-danger'
-            id='cancel-button'
-            onClick={handleCancel}
-            aria-label='Cancel edit'
-            title='Cancel edit'
-          >
-            <i className='bi bi-x' aria-hidden='true'></i>
-          </Button>
-          <Button
-            variant='outline-success'
-            id='submit-button'
-            onClick={handleSubmit}
-            aria-label='Submit amount'
-            title='Submit amount'
-          >
-            <i className='bi bi-check' aria-hidden='true'></i>
-          </Button>
-        </>
-      )}
+      <Button variant='outline-secondary' id='edit-button' onClick={handleEdit}>
+        <i className='bi bi-pencil'></i>
+      </Button>
+      <Button variant='outline-secondary' id='submit-button' onClick={handleSubmit}>
+        <i className='bi bi-check'></i>
+      </Button>
     </InputGroup>
   );
 };

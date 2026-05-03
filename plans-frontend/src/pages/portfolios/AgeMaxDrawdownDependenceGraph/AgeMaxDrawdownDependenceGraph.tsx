@@ -1,18 +1,23 @@
-import type { FC } from 'react';
+import type { FC, ChangeEvent } from 'react';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { RootState } from '../../../store';
 import { Line } from 'react-chartjs-2';
 import { Col, Container, Form, Row } from 'react-bootstrap';
-import { portfoliosActions, AgeMaxDrawdownDependency } from '../../../store';
+
+import {
+  LoadStatus,
+  RootState,
+  portfoliosActions,
+  type AgeMaxDrawdownDependency
+} from '../../../store';
 import { useAppDispatch } from '../../../store/hooks';
 import './styles.css';
-import { LoadingStatus } from 'store/slices/utils';
-const AGE_MIN = 18;
-type AgeMaxDrawdownDependenceGraphProps = {
-  graphData: AgeMaxDrawdownDependency[];
-};
 
+const AGE_MIN = 18;
+
+interface AgeMaxDrawdownDependenceGraphProps {
+  graphData: AgeMaxDrawdownDependency[];
+}
 const AgeMaxDrawdownDependenceGraph: FC<AgeMaxDrawdownDependenceGraphProps> = ({ graphData }) => {
   const dispatch = useAppDispatch();
   const { ageMaxDrawdownDependenceLoadingStatus } = useSelector(
@@ -28,38 +33,38 @@ const AgeMaxDrawdownDependenceGraph: FC<AgeMaxDrawdownDependenceGraphProps> = ({
   );
 
   useEffect(() => {
-    syncRangeWithAge(age);
+    setPointBackgroundColor(
+      graphData.map((_, index) => (index === 0 ? selectedColor : defaultColor))
+    );
+    setAge(AGE_MIN);
   }, [graphData]);
 
-  function syncRangeWithAge(selectedAge: number) {
-    const dataAge = selectedAge - AGE_MIN;
-    dispatch(portfoliosActions.setPersonalMaxDrawdown(graphData[dataAge].maxDrawdown));
-    setAge(selectedAge);
-    setPointBackgroundColor(
-      pointBackgroundColor.map((_color, index) =>
-        index + AGE_MIN === selectedAge ? selectedColor : defaultColor
-      )
-    );
-  }
+  const syncRangeWithAge = (selectedAge: number) => {
+    const idx = selectedAge - AGE_MIN;
+    const point = graphData[idx];
+    if (!point) return;
 
-  const handleAgeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedAge = Number(event.target.value);
-    syncRangeWithAge(selectedAge);
+    dispatch(portfoliosActions.setPersonalMaxDrawdown(point.maxDrawdown));
+    setAge(selectedAge);
+
+    setPointBackgroundColor((prev) =>
+      prev.map((_c, i) => (i + AGE_MIN === selectedAge ? selectedColor : defaultColor))
+    );
   };
 
-  const chartLabels = graphData.map((data) => data.age);
-  const chartDataPoints = graphData.map((data) => data.maxDrawdown);
+  const handleAgeChange = (event: ChangeEvent<HTMLInputElement>) => {
+    syncRangeWithAge(Number(event.target.value));
+  };
 
   const chartData = {
-    labels: chartLabels,
+    labels: graphData.map((d) => d.age),
     datasets: [
       {
         label: 'Max Drawdown',
-        data: chartDataPoints,
+        data: graphData.map((d) => d.maxDrawdown),
         fill: false,
-        backgroundColor: 'rgb(255, 99, 132)',
         borderColor: defaultColor,
-        pointBackgroundColor: pointBackgroundColor
+        pointBackgroundColor
       }
     ]
   };
@@ -68,9 +73,9 @@ const AgeMaxDrawdownDependenceGraph: FC<AgeMaxDrawdownDependenceGraphProps> = ({
     <Container>
       <Row>
         <Col>
-          {ageMaxDrawdownDependenceLoadingStatus === LoadingStatus.LOADING ? (
+          {ageMaxDrawdownDependenceLoadingStatus === LoadStatus.LOADING ? (
             <p>Loading...</p>
-          ) : ageMaxDrawdownDependenceLoadingStatus === LoadingStatus.FAILED ? (
+          ) : ageMaxDrawdownDependenceLoadingStatus === LoadStatus.FAILED ? (
             <p>Failed to load age max drawdown dependence data.</p>
           ) : (
             <Line data={chartData} height={'100%'} />

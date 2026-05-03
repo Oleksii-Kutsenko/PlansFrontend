@@ -1,8 +1,13 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { type RootState } from '..';
 import { fetcher } from '../../utils/axios';
-import { LoadingStatus } from './utils';
 
+export enum CountriesStatus {
+  IDLE = 'idle',
+  LOADING = 'loading',
+  SUCCEEDED = 'succeeded',
+  FAILED = 'failed'
+}
 export interface Country {
   id: number;
   name: string;
@@ -13,26 +18,26 @@ export interface Country {
 
 interface State {
   countries: Country[];
-  status: LoadingStatus;
-  countriesRatingHistory: Array<[number, Country[]]>;
+  status: CountriesStatus;
+  countriesRatingHistory: [number, Country[]][];
 }
 
 const initialState: State = {
   countries: [],
-  status: LoadingStatus.IDLE,
+  status: CountriesStatus.IDLE,
   countriesRatingHistory: []
 };
 
 // Thunk
 export const fetchCountries = createAsyncThunk('countries/fetchCountries', async () => {
-  const { data } = await fetcher.get('/api/countries/rating/');
+  const { data } = await fetcher.get<Country[]>('/api/countries/rating/');
   return data;
 });
 
 export const fetchCountryRatingHistory = createAsyncThunk<Country[], number>(
   'countries/fetchCountryRatingHistory',
   async (countryId: number) => {
-    const { data } = await fetcher.get(`/api/countries/${countryId}/rating-history/`);
+    const { data } = await fetcher.get<Country[]>(`/api/countries/${countryId}/rating-history/`);
     return data;
   }
 );
@@ -44,18 +49,18 @@ const countriesSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(fetchCountries.fulfilled, (state, action) => {
+      .addCase(fetchCountries.fulfilled, (state, action: PayloadAction<Country[]>) => {
         state.countries = action.payload;
-        state.status = LoadingStatus.SUCCEEDED;
+        state.status = CountriesStatus.SUCCEEDED;
       })
       .addCase(fetchCountries.pending, (state) => {
-        state.status = LoadingStatus.LOADING;
+        state.status = CountriesStatus.LOADING;
       })
       .addCase(fetchCountries.rejected, (state) => {
-        state.status = LoadingStatus.FAILED;
+        state.status = CountriesStatus.FAILED;
       })
       .addCase(fetchCountryRatingHistory.fulfilled, (state, action) => {
-        const history: Map<number, Country[]> = new Map(state.countriesRatingHistory);
+        const history = new Map<number, Country[]>(state.countriesRatingHistory);
         history.set(action.meta.arg, action.payload);
         state.countriesRatingHistory = Array.from(history);
       })

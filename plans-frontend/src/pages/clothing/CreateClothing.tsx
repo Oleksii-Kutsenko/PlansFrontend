@@ -1,6 +1,14 @@
+/* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
+
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-floating-promises */
+/* eslint-disable @typescript-eslint/no-misused-promises */
 import { ClothingCreate, createClothing } from '../../store';
 import { useNavigate } from 'react-router-dom';
-import { useAppDispatch } from 'store/hooks';
+import { useAppDispatch } from '../../store/hooks';
 import { useForm } from 'react-hook-form';
 import { Button, Container, Form } from 'react-bootstrap';
 import { toast } from 'react-toastify';

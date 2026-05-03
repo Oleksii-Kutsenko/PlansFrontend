@@ -2,7 +2,6 @@ import { Route, Routes } from 'react-router-dom';
 import type { FC } from 'react';
 import React from 'react';
 import ProtectedRoutes from './routes/ProtectedRoutes';
-import CreateClothing from 'pages/clothing/CreateClothing';
 
 const Login = React.lazy(async () => {
   const module = await import('./pages/Login');
@@ -44,6 +43,10 @@ const ListClothing = React.lazy(async () => {
   return { default: module.default };
 });
 
+const CreateClothing = React.lazy(async () => {
+  const module = await import('./pages/clothing/CreateClothing');
+  return { default: module.default };
+});
 const ListOutfit = React.lazy(async () => {
   const module = await import('./pages/clothing/ListOutfit');
   return { default: module.default };
