@@ -12,7 +12,6 @@ export const CurrencyInput: FC<Props> = ({ symbol, value, onSubmit }) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const [isInputDisabled, setIsInputDisabled] = useState<boolean>(true);
   const [currentValue, updateCurrentValue] = useState<number>(value ? value : 0);
-  let previousValue = value ? value : 0;
 
   useEffect(() => {
     updateCurrentValue(value ? value : 0);
@@ -20,14 +19,14 @@ export const CurrencyInput: FC<Props> = ({ symbol, value, onSubmit }) => {
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>): void => {
     const {
-      target: { value }
+      target: { value: targetValue }
     } = event;
 
     let money;
-    if (value === '') {
+    if (targetValue === '') {
       money = 0;
     } else {
-      money = parseFloat(value);
+      money = parseFloat(targetValue);
     }
 
     if (money < 0) {
@@ -35,17 +34,21 @@ export const CurrencyInput: FC<Props> = ({ symbol, value, onSubmit }) => {
       money = 0;
     }
 
-    previousValue = money;
     updateCurrentValue(money);
   };
 
   const handleEdit = (): void => {
-    setIsInputDisabled(!isInputDisabled);
+    setIsInputDisabled(false);
     // This is needed to focus on the input field after it is enabled
     // We need to wait for the input field to be rendered before we can focus on it
     setTimeout(() => {
       inputRef.current?.focus();
     }, 0);
+  };
+
+  const handleCancel = (): void => {
+    setIsInputDisabled(true);
+    updateCurrentValue(value ? value : 0);
   };
 
   const handleSubmit = (): void => {
@@ -54,7 +57,7 @@ export const CurrencyInput: FC<Props> = ({ symbol, value, onSubmit }) => {
       onSubmit(currentValue).catch((err) => {
         console.log(err.message);
         toast.error('Failed to update value');
-        updateCurrentValue(previousValue);
+        updateCurrentValue(value ? value : 0);
       });
     }
   };
@@ -62,6 +65,8 @@ export const CurrencyInput: FC<Props> = ({ symbol, value, onSubmit }) => {
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>): void => {
     if (event.key === 'Enter') {
       handleSubmit();
+    } else if (event.key === 'Escape') {
+      handleCancel();
     }
   };
 
@@ -79,12 +84,38 @@ export const CurrencyInput: FC<Props> = ({ symbol, value, onSubmit }) => {
         min='0'
         onKeyDown={handleKeyDown}
       />
-      <Button variant='outline-secondary' id='edit-button' onClick={handleEdit}>
-        <i className='bi bi-pencil'></i>
-      </Button>
-      <Button variant='outline-secondary' id='submit-button' onClick={handleSubmit}>
-        <i className='bi bi-check'></i>
-      </Button>
+      {isInputDisabled ? (
+        <Button
+          variant='outline-secondary'
+          id='edit-button'
+          onClick={handleEdit}
+          aria-label='Edit amount'
+          title='Edit amount'
+        >
+          <i className='bi bi-pencil' aria-hidden='true'></i>
+        </Button>
+      ) : (
+        <>
+          <Button
+            variant='outline-danger'
+            id='cancel-button'
+            onClick={handleCancel}
+            aria-label='Cancel edit'
+            title='Cancel edit'
+          >
+            <i className='bi bi-x' aria-hidden='true'></i>
+          </Button>
+          <Button
+            variant='outline-success'
+            id='submit-button'
+            onClick={handleSubmit}
+            aria-label='Submit amount'
+            title='Submit amount'
+          >
+            <i className='bi bi-check' aria-hidden='true'></i>
+          </Button>
+        </>
+      )}
     </InputGroup>
   );
 };

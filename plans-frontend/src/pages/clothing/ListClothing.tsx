@@ -1,6 +1,7 @@
 import { FC, useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import { fetchClothing, deleteClothing, RootState } from '../../store';
+import { RootState } from '../../store';
+import { clothingActions } from '../../store/slices/clothing';
 import { useAppDispatch } from 'store/hooks';
 import { useNavigate } from 'react-router-dom';
 
@@ -10,12 +11,12 @@ const ClothingList: FC = () => {
   const clothingItems = useSelector((state: RootState) => state.clothing.clothing);
 
   useEffect(() => {
-    dispatch(fetchClothing());
+    dispatch(clothingActions.fetchClothing());
   }, [dispatch]);
 
   const handleDelete = (id: number) => {
     if (window.confirm('Are you sure you want to delete this item?')) {
-      dispatch(deleteClothing(id));
+      dispatch(clothingActions.deleteClothing(id));
     }
   };
 
@@ -47,7 +48,7 @@ const ClothingList: FC = () => {
                 />
               </td>
               <td>{item.name}</td>
-              <td>{item.clothingType}</td>
+              <td>{item.clothing_type}</td>
               <td>
                 <button
                   onClick={() => navigate(`/clothing/edit/${item.id}`)}
