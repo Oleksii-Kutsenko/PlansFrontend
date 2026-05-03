@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-floating-promises */
-/* eslint-disable @typescript-eslint/no-misused-promises */
 import { FC, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store';
@@ -18,37 +16,32 @@ const ListOutfit: FC = () => {
 
   const handleDelete = (id: number) => {
     if (window.confirm('Are you sure you want to delete this outfit?')) {
-      dispatch(clothingActions.deleteOutfit(id));
+      void dispatch(clothingActions.deleteOutfit(id));
     }
   };
 
-  const navigateToAddClothing = () => {
-    navigate('/clothing/create');
+  const navigateToAddOutfit = () => {
+    navigate('/outfits/add');
   };
 
-  const navigateToAddOutfit = () => {
-    navigate('/clothing/outfit/create'); // Assuming this route will exist
+  const navigateToAddClothing = () => {
+    navigate('/clothing/add');
   };
 
   return (
-    <div className='container'>
-      <h1>Outfit List</h1>
+    <div className='container mt-5'>
+      <h2>Outfits</h2>
 
       {outfitItems.length === 0 ? (
-        <div className='text-center p-5 border rounded bg-light my-4'>
-          <i className='bi bi-inbox text-secondary' style={{ fontSize: '3rem' }}></i>
-          <h3 className='mt-3 text-secondary'>No outfits found</h3>
-          <p className='text-muted'>You have not created any outfits yet.</p>
-        </div>
+        <p>No outfits found. Create some!</p>
       ) : (
-        <table className='clothing-table table'>
-          <thead>
+        <table className='table table-striped table-bordered table-hover mt-3'>
+          <thead className='thead-dark'>
             <tr>
-              <th>ID</th>
-              <th>Outfit Name</th>
-              <th>Occasion ID</th>
-              <th>Items Count</th>
-              <th>Actions</th>
+              <th scope='col'>ID</th>
+              <th scope='col'>Outfit Name</th>
+              <th scope='col'>Clothing Items</th>
+              <th scope='col'>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -56,11 +49,18 @@ const ListOutfit: FC = () => {
               <tr key={item.id}>
                 <td>{item.id}</td>
                 <td>{item.outfit_name}</td>
-                <td>{item.occasion}</td>
-                <td>{item.clothings?.length || 0}</td>
+                <td>
+                  <ul>
+                    {item.clothings.map((clothingId) => (
+                      <li key={clothingId}>Clothing ID: {clothingId}</li>
+                    ))}
+                  </ul>
+                </td>
                 <td>
                   <button
-                    onClick={() => navigate(`/clothing/outfit/edit/${item.id}`)}
+                    onClick={() => {
+                      void navigate(`/outfits/edit/${item.id}`);
+                    }}
                     className='btn btn-primary m-1'
                     aria-label={`Edit outfit ${item.outfit_name}`}
                   >
@@ -91,7 +91,12 @@ const ListOutfit: FC = () => {
         >
           Add Outfit
         </button>
-        <button onClick={navigateToAddClothing} className='btn btn-success'>
+        <button
+          onClick={() => {
+            void navigateToAddClothing();
+          }}
+          className='btn btn-success'
+        >
           Add Clothing
         </button>
       </div>

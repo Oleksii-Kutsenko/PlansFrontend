@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-floating-promises */
 import { ClothingCreate, createClothing } from '../../store';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch } from '../../store/hooks';
@@ -45,46 +44,48 @@ const CreateClothing = () => {
   return (
     <Container>
       <h1>Create Clothing</h1>
-      <Form onSubmit={(e) => void handleSubmit(onSubmit)(e)}>
+      <Form
+        onSubmit={(e) => {
+          void handleSubmit(onSubmit)(e);
+        }}
+      >
         <Form.Group className='mb-3' controlId='name'>
           <Form.Label>Name</Form.Label>
           <Form.Control
             className={`${errors.name ? `is-invalid` : ``}`}
             type='text'
-            placeholder='Enter name'
+            placeholder='Enter clothing name'
             {...register('name')}
           />
           {errors.name !== null && (
             <Form.Control.Feedback type='invalid'>{errors.name?.message}</Form.Control.Feedback>
           )}
         </Form.Group>
-        <Form.Group className='mb-3' controlId='clothingType'>
-          <Form.Label>Clothing Type</Form.Label>
-          <Form.Control
-            className={`${errors.name ? `is-invalid` : ``}`}
-            type='select'
-            placeholder='Enter clothing type'
+        <Form.Group className='mb-3' controlId='clothing_type'>
+          <Form.Label>Type</Form.Label>
+          <Form.Select
+            className={`${errors.clothing_type ? `is-invalid` : ``}`}
+            aria-label='Default select example'
             {...register('clothing_type')}
-          />
+          >
+            <option>Outerwear</option>
+            <option>Tops</option>
+            <option>Bottoms</option>
+            <option>Dresses and Jumpsuits</option>
+            <option>Activewear</option>
+            <option>Swimwear</option>
+            <option>Sleepwear and Loungewear</option>
+            <option>Underwear and Lingerie</option>
+            <option>Footwear</option>
+            <option>Accessories</option>
+          </Form.Select>
           {errors.clothing_type !== null && (
             <Form.Control.Feedback type='invalid'>
               {errors.clothing_type?.message}
             </Form.Control.Feedback>
           )}
         </Form.Group>
-        <Form.Group className='mb-3' controlId='season'>
-          <Form.Label>Season</Form.Label>
-          <Form.Control
-            className={`${errors.name ? `is-invalid` : ``}`}
-            type='text'
-            placeholder='Enter season'
-            {...register('season')}
-          />
-          {errors.season !== null && (
-            <Form.Control.Feedback type='invalid'>{errors.season?.message}</Form.Control.Feedback>
-          )}
-        </Form.Group>
-        <Form.Group className='mb-3' controlId='image'>
+        <Form.Group controlId='image_path' className='mb-3'>
           <Form.Label>Image</Form.Label>
           <Form.Control
             className={`${errors.name ? `is-invalid` : ``}`}

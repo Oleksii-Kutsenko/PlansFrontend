@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-floating-promises */
 import { FC, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store';
@@ -17,37 +16,31 @@ const ClothingList: FC = () => {
 
   const handleDelete = (id: number) => {
     if (window.confirm('Are you sure you want to delete this item?')) {
-      dispatch(clothingActions.deleteClothing(id));
+      void dispatch(clothingActions.deleteClothing(id));
     }
   };
 
   const navigateToAddClothing = () => {
-    navigate('/clothing/create');
+    navigate('/clothing/add');
   };
 
   return (
-    <div className='container'>
-      <h1>Clothing List</h1>
-
-      <table className='clothing-table'>
-        <thead>
+    <div className='container mt-5'>
+      <h2>Clothing Items</h2>
+      {clothingItems.length === 0 && <p>No clothing items found. Add some!</p>}
+      <table className='table table-striped table-bordered table-hover mt-3'>
+        <thead className='thead-dark'>
           <tr>
-            <th>Image</th>
-            <th>Name</th>
-            <th>Type</th>
-            <th>Actions</th>
+            <th scope='col'>ID</th>
+            <th scope='col'>Name</th>
+            <th scope='col'>Type</th>
+            <th scope='col'>Actions</th>
           </tr>
         </thead>
         <tbody>
           {clothingItems.map((item) => (
             <tr key={item.id}>
-              <td className='image-cell'>
-                <img
-                  src={`http://localhost:8000/${item.image_path}`}
-                  alt='Clothing'
-                  className='clothing-image'
-                />
-              </td>
+              <td>{item.id}</td>
               <td>{item.name}</td>
               <td>{item.clothing_type}</td>
               <td>

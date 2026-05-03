@@ -11,10 +11,11 @@ interface Props {
 export const CurrencyInput: FC<Props> = ({ symbol, value, onSubmit }) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const [isInputDisabled, setIsInputDisabled] = useState<boolean>(true);
-  const [currentValue, updateCurrentValue] = useState<number>(value ? value : 0);
+  const [currentValue, updateCurrentValue] = useState<number>(value ?? 0);
+  const previousValueRef = useRef<number>(value ?? 0);
 
   useEffect(() => {
-    updateCurrentValue(value ? value : 0);
+    updateCurrentValue(value ?? 0);
   }, [value]);
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>): void => {
@@ -22,10 +23,8 @@ export const CurrencyInput: FC<Props> = ({ symbol, value, onSubmit }) => {
       target: { value: targetValue }
     } = event;
 
-    let money;
-    if (targetValue === '') {
-      money = 0;
-    } else {
+    let money = 0;
+    if (targetValue !== '') {
       money = parseFloat(targetValue);
     }
 
@@ -38,6 +37,7 @@ export const CurrencyInput: FC<Props> = ({ symbol, value, onSubmit }) => {
   };
 
   const handleEdit = (): void => {
+    previousValueRef.current = currentValue;
     setIsInputDisabled(false);
     // This is needed to focus on the input field after it is enabled
     // We need to wait for the input field to be rendered before we can focus on it
@@ -48,16 +48,17 @@ export const CurrencyInput: FC<Props> = ({ symbol, value, onSubmit }) => {
 
   const handleCancel = (): void => {
     setIsInputDisabled(true);
-    updateCurrentValue(value ? value : 0);
+    updateCurrentValue(previousValueRef.current);
   };
 
   const handleSubmit = (): void => {
     setIsInputDisabled(true);
     if (onSubmit) {
-      onSubmit(currentValue).catch((err) => {
-        console.log(err.message);
+      onSubmit(currentValue).catch((err: unknown) => {
+        const msg = err instanceof Error ? err.message : String(err);
+        console.log(msg);
         toast.error('Failed to update value');
-        updateCurrentValue(value ? value : 0);
+        updateCurrentValue(previousValueRef.current);
       });
     }
   };
