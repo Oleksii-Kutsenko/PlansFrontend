@@ -21,7 +21,7 @@ export interface Outfit {
   id: number;
   outfit_name: string;
   occasion: number;
-  clothings: number[];
+  clothings: number[] | Clothing[];
 }
 
 export interface ClothingCreate {
