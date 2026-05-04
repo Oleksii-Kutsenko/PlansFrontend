@@ -4,6 +4,8 @@ import { RootState } from '../../store';
 import { clothingActions } from '../../store/slices/clothing';
 import { useAppDispatch } from '../../store/hooks';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import { Table, Button } from 'react-bootstrap';
 
 const ListOutfit: FC = () => {
   const dispatch = useAppDispatch();
@@ -16,7 +18,15 @@ const ListOutfit: FC = () => {
 
   const handleDelete = (id: number) => {
     if (window.confirm('Are you sure you want to delete this outfit?')) {
-      void dispatch(clothingActions.deleteOutfit(id));
+      dispatch(clothingActions.deleteOutfit(id))
+        .unwrap()
+        .then(() => {
+          toast.success('Outfit deleted successfully');
+        })
+        .catch((error) => {
+          console.error('Failed to delete outfit:', error);
+          toast.error('Failed to delete outfit');
+        });
     }
   };
 
@@ -29,19 +39,19 @@ const ListOutfit: FC = () => {
   };
 
   return (
-    <div className='container mt-5'>
-      <h2>Outfits</h2>
+    <div className='container mt-5 mb-5'>
+      <h2 className='mb-4'>Outfits</h2>
 
       {outfitItems.length === 0 ? (
-        <p>No outfits found. Create some!</p>
+        <p className='text-muted'>No outfits found. Create some!</p>
       ) : (
-        <table className='table table-striped table-bordered table-hover mt-3'>
-          <thead className='thead-dark'>
+        <Table striped bordered hover responsive className='align-middle'>
+          <thead className='table-light'>
             <tr>
-              <th scope='col'>ID</th>
-              <th scope='col'>Outfit Name</th>
-              <th scope='col'>Clothing Items</th>
-              <th scope='col'>Actions</th>
+              <th>ID</th>
+              <th>Outfit Name</th>
+              <th>Clothing Items</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -50,7 +60,7 @@ const ListOutfit: FC = () => {
                 <td>{item.id}</td>
                 <td>{item.outfit_name}</td>
                 <td>
-                  <ul>
+                  <ul className='mb-0 text-start'>
                     {item.clothings?.map((clothing) => {
                       const clothingId = typeof clothing === 'number' ? clothing : clothing.id;
                       const display =
@@ -60,48 +70,52 @@ const ListOutfit: FC = () => {
                   </ul>
                 </td>
                 <td>
-                  <button
-                    onClick={() => {
-                      void navigate(`/outfits/edit/${item.id}`);
-                    }}
-                    className='btn btn-primary m-1'
-                    aria-label={`Edit outfit ${item.outfit_name}`}
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => {
-                      void handleDelete(item.id);
-                    }}
-                    className='btn btn-danger m-1'
-                    aria-label={`Delete outfit ${item.outfit_name}`}
-                  >
-                    Delete
-                  </button>
+                  <div className='d-flex gap-2 justify-content-center'>
+                    <Button
+                      variant='primary'
+                      size='sm'
+                      onClick={() => {
+                        void navigate(`/outfits/edit/${item.id}`);
+                      }}
+                      aria-label={`Edit outfit ${item.outfit_name}`}
+                    >
+                      Edit
+                    </Button>
+                    <Button
+                      variant='danger'
+                      size='sm'
+                      onClick={() => {
+                        void handleDelete(item.id);
+                      }}
+                      aria-label={`Delete outfit ${item.outfit_name}`}
+                    >
+                      Delete
+                    </Button>
+                  </div>
                 </td>
               </tr>
             ))}
           </tbody>
-        </table>
+        </Table>
       )}
 
-      <div className='mt-3 d-flex gap-2'>
-        <button
+      <div className='mt-4 d-flex gap-3'>
+        <Button
+          variant='primary'
           onClick={() => {
             void navigateToAddOutfit();
           }}
-          className='btn btn-primary'
         >
           Add Outfit
-        </button>
-        <button
+        </Button>
+        <Button
+          variant='success'
           onClick={() => {
             void navigateToAddClothing();
           }}
-          className='btn btn-success'
         >
           Add Clothing
-        </button>
+        </Button>
       </div>
     </div>
   );

@@ -4,6 +4,8 @@ import { RootState } from '../../store';
 import { clothingActions } from '../../store/slices/clothing';
 import { useAppDispatch } from '../../store/hooks';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import { Table, Button } from 'react-bootstrap';
 
 const ClothingList: FC = () => {
   const dispatch = useAppDispatch();
@@ -16,7 +18,15 @@ const ClothingList: FC = () => {
 
   const handleDelete = (id: number) => {
     if (window.confirm('Are you sure you want to delete this item?')) {
-      void dispatch(clothingActions.deleteClothing(id));
+      dispatch(clothingActions.deleteClothing(id))
+        .unwrap()
+        .then(() => {
+          toast.success('Clothing deleted successfully');
+        })
+        .catch((error) => {
+          console.error('Failed to delete clothing:', error);
+          toast.error('Failed to delete clothing');
+        });
     }
   };
 
@@ -25,54 +35,63 @@ const ClothingList: FC = () => {
   };
 
   return (
-    <div className='container mt-5'>
-      <h2>Clothing Items</h2>
-      {clothingItems.length === 0 && <p>No clothing items found. Add some!</p>}
-      <table className='table table-striped table-bordered table-hover mt-3'>
-        <thead className='thead-dark'>
-          <tr>
-            <th scope='col'>ID</th>
-            <th scope='col'>Name</th>
-            <th scope='col'>Type</th>
-            <th scope='col'>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {clothingItems.map((item) => (
-            <tr key={item.id}>
-              <td>{item.id}</td>
-              <td>{item.name}</td>
-              <td>{item.clothing_type}</td>
-              <td>
-                <button
-                  onClick={() => {
-                    void navigate(`/clothing/edit/${item.id}`);
-                  }}
-                  className='btn btn-primary m-1'
-                >
-                  Edit
-                </button>
-                <button
-                  onClick={() => {
-                    void handleDelete(item.id);
-                  }}
-                  className='btn btn-danger'
-                >
-                  Delete
-                </button>
-              </td>
+    <div className='container mt-5 mb-5'>
+      <h2 className='mb-4'>Clothing Items</h2>
+      {clothingItems.length === 0 ? (
+        <p className='text-muted'>No clothing items found. Add some!</p>
+      ) : (
+        <Table striped bordered hover responsive className='align-middle'>
+          <thead className='table-light'>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Type</th>
+              <th>Actions</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
-      <button
-        onClick={() => {
-          void navigateToAddClothing();
-        }}
-        className='btn btn-success mt-3'
-      >
-        Add Clothing
-      </button>
+          </thead>
+          <tbody>
+            {clothingItems.map((item) => (
+              <tr key={item.id}>
+                <td>{item.id}</td>
+                <td>{item.name}</td>
+                <td>{item.clothing_type}</td>
+                <td>
+                  <div className='d-flex gap-2 justify-content-center'>
+                    <Button
+                      variant='primary'
+                      size='sm'
+                      onClick={() => {
+                        void navigate(`/clothing/edit/${item.id}`);
+                      }}
+                    >
+                      Edit
+                    </Button>
+                    <Button
+                      variant='danger'
+                      size='sm'
+                      onClick={() => {
+                        void handleDelete(item.id);
+                      }}
+                    >
+                      Delete
+                    </Button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </Table>
+      )}
+      <div className='mt-4'>
+        <Button
+          variant='success'
+          onClick={() => {
+            void navigateToAddClothing();
+          }}
+        >
+          Add Clothing
+        </Button>
+      </div>
     </div>
   );
 };

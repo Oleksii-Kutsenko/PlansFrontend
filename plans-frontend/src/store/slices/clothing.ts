@@ -78,15 +78,31 @@ export const createClothing = createAsyncThunk(
   }
 );
 
-export const deleteClothing = createAsyncThunk('clothing/deleteClothing', async (id: number) => {
-  await fetcher.delete(`/api/clothing/clothing/${id}/`);
-  return id;
-});
+export const deleteClothing = createAsyncThunk(
+  'clothing/deleteClothing',
+  async (id: number, { rejectWithValue }) => {
+    try {
+      await fetcher.delete(`/api/clothing/clothing/${id}/`);
+      return id;
+    } catch (err) {
+      const error = err as AxiosError;
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
 
-export const deleteOutfit = createAsyncThunk('clothing/deleteOutfit', async (id: number) => {
-  await fetcher.delete(`/api/clothing/outfit/${id}/`);
-  return id;
-});
+export const deleteOutfit = createAsyncThunk(
+  'clothing/deleteOutfit',
+  async (id: number, { rejectWithValue }) => {
+    try {
+      await fetcher.delete(`/api/clothing/outfit/${id}/`);
+      return id;
+    } catch (err) {
+      const error = err as AxiosError;
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
 
 const clothingSlice = createSlice({
   name: 'clothing',
