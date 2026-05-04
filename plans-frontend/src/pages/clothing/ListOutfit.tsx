@@ -21,11 +21,11 @@ const ListOutfit: FC = () => {
   };
 
   const navigateToAddOutfit = () => {
-    void navigate('/outfits/add');
+    void navigate('/clothing/outfits/create');
   };
 
   const navigateToAddClothing = () => {
-    void navigate('/clothing/add');
+    void navigate('/clothing/create');
   };
 
   return (

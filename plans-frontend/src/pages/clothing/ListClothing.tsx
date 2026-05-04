@@ -21,7 +21,7 @@ const ClothingList: FC = () => {
   };
 
   const navigateToAddClothing = () => {
-    void navigate('/clothing/add');
+    void navigate('/clothing/create');
   };
 
   return (
