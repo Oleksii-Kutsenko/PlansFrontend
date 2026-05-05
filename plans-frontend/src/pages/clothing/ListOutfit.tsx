@@ -30,9 +30,11 @@ const ListOutfit: FC = () => {
     }
   };
 
+  /*
   const navigateToAddOutfit = () => {
     void navigate('/clothing/outfits/create');
   };
+  */
 
   const navigateToAddClothing = () => {
     void navigate('/clothing/create');
@@ -71,6 +73,8 @@ const ListOutfit: FC = () => {
                 </td>
                 <td>
                   <div className='d-flex gap-2 justify-content-center'>
+                    {/* Edit is hidden until Edit component exists */}
+                    {/*
                     <Button
                       variant='primary'
                       size='sm'
@@ -81,6 +85,7 @@ const ListOutfit: FC = () => {
                     >
                       Edit
                     </Button>
+                    */}
                     <Button
                       variant='danger'
                       size='sm'
@@ -100,6 +105,8 @@ const ListOutfit: FC = () => {
       )}
 
       <div className='mt-4 d-flex gap-3'>
+        {/* Add Outfit is hidden until component exists */}
+        {/*
         <Button
           variant='primary'
           onClick={() => {
@@ -108,6 +115,7 @@ const ListOutfit: FC = () => {
         >
           Add Outfit
         </Button>
+        */}
         <Button
           variant='success'
           onClick={() => {

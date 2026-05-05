@@ -89,6 +89,18 @@ const CreateClothing = () => {
             </Form.Control.Feedback>
           )}
         </Form.Group>
+        <Form.Group className='mb-3' controlId='season'>
+          <Form.Label>Season</Form.Label>
+          <Form.Control
+            className={`${errors.season ? `is-invalid` : ``}`}
+            type='text'
+            placeholder='Enter season'
+            {...register('season')}
+          />
+          {errors.season !== null && (
+            <Form.Control.Feedback type='invalid'>{errors.season?.message}</Form.Control.Feedback>
+          )}
+        </Form.Group>
         <Form.Group controlId='image_path' className='mb-3'>
           <Form.Label>Image</Form.Label>
           <Form.Control

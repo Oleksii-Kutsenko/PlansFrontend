@@ -57,6 +57,8 @@ const ClothingList: FC = () => {
                 <td>{item.clothing_type}</td>
                 <td>
                   <div className='d-flex gap-2 justify-content-center'>
+                    {/* Edit is hidden until Edit component exists */}
+                    {/*
                     <Button
                       variant='primary'
                       size='sm'
@@ -66,6 +68,7 @@ const ClothingList: FC = () => {
                     >
                       Edit
                     </Button>
+                    */}
                     <Button
                       variant='danger'
                       size='sm'
