@@ -63,11 +63,14 @@ const ListOutfit: FC = () => {
                 <td>{item.outfit_name}</td>
                 <td>
                   <ul className='mb-0 text-start'>
-                    {item.clothings?.map((clothing) => {
+                    {item.clothings?.map((clothing, index) => {
                       const clothingId = typeof clothing === 'number' ? clothing : clothing.id;
                       const display =
                         typeof clothing === 'number' ? `Clothing ID: ${clothing}` : clothing.name;
-                      return <li key={clothingId}>{display}</li>;
+                      // Use a combination of outfit id, clothing id, and index to ensure uniqueness
+                      // since an outfit might theoretically contain the same clothing item twice
+                      const uniqueKey = `outfit-${item.id}-clothing-${clothingId}-${index}`;
+                      return <li key={uniqueKey}>{display}</li>;
                     })}
                   </ul>
                 </td>

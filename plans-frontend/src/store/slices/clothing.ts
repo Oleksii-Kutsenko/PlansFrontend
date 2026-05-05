@@ -49,7 +49,7 @@ export const fetchClothing = createAsyncThunk('clothing/fetchClothing', async ()
 });
 
 export const fetchOutfits = createAsyncThunk('clothing/fetchOutfit', async () => {
-  const { data } = await fetcher.get<Outfit[]>('/api/clothing/outfits/');
+  const { data } = await fetcher.get<Outfit[]>('/api/clothing/outfit/');
   return data;
 });
 
@@ -95,7 +95,7 @@ export const deleteOutfit = createAsyncThunk(
   'clothing/deleteOutfit',
   async (id: number, { rejectWithValue }) => {
     try {
-      await fetcher.delete(`/api/clothing/outfits/${id}/`);
+      await fetcher.delete(`/api/clothing/outfit/${id}/`);
       return id;
     } catch (err) {
       const error = err as AxiosError;
