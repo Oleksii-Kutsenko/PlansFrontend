@@ -57,8 +57,8 @@ const ListOutfit: FC = () => {
             </tr>
           </thead>
           <tbody>
-            {outfitItems.map((item) => (
-              <tr key={item.id}>
+            {outfitItems.map((item, outfitIndex) => (
+              <tr key={`outfit-row-${item.id}-${outfitIndex}`}>
                 <td>{item.id}</td>
                 <td>{item.outfit_name}</td>
                 <td>

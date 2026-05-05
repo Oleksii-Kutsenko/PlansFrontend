@@ -50,8 +50,8 @@ const ClothingList: FC = () => {
             </tr>
           </thead>
           <tbody>
-            {clothingItems.map((item) => (
-              <tr key={item.id}>
+            {clothingItems.map((item, index) => (
+              <tr key={`clothing-row-${item.id}-${index}`}>
                 <td>{item.id}</td>
                 <td>{item.name}</td>
                 <td>{item.clothing_type}</td>
