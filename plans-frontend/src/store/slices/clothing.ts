@@ -63,12 +63,22 @@ export const fetchClothing = createAsyncThunk('clothing/fetchClothing', async ()
   const { data } = await fetcher.get<PaginatedClothingResponse | Clothing[]>(
     '/api/clothing/clothing/'
   );
-  return 'results' in data && data.results ? data.results : (data as Clothing[]);
+  if (data && 'results' in data && Array.isArray(data.results)) {
+    return data.results;
+  } else if (Array.isArray(data)) {
+    return data;
+  }
+  return [];
 });
 
 export const fetchOutfits = createAsyncThunk('clothing/fetchOutfit', async () => {
   const { data } = await fetcher.get<PaginatedOutfitResponse | Outfit[]>('/api/clothing/outfit/');
-  return 'results' in data && data.results ? data.results : (data as Outfit[]);
+  if (data && 'results' in data && Array.isArray(data.results)) {
+    return data.results;
+  } else if (Array.isArray(data)) {
+    return data;
+  }
+  return [];
 });
 export interface OptionsResponse {
   actions?: {
