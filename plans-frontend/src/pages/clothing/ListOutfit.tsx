@@ -62,8 +62,10 @@ const ListOutfit: FC = () => {
           </thead>
           <tbody>
             {outfitItems.map((item, outfitIndex) => (
-              <tr key={`outfit-row-${item.id || outfitIndex}-${outfitIndex}`}>
-                <td>{String(item.id ?? '')}</td>
+              <tr
+                key={`outfit-row-${item.id ?? item.outfit_id ?? item.uuid ?? outfitIndex}-${outfitIndex}`}
+              >
+                <td>{String(item.id ?? item.outfit_id ?? item.uuid ?? '')}</td>
                 <td>{String(item.outfit_name ?? '')}</td>
                 <td>
                   <ul className='mb-0 text-start'>
@@ -76,7 +78,7 @@ const ListOutfit: FC = () => {
                           : String(clothing.name || clothingId);
                       // Use a combination of outfit id, clothing id, and index to ensure uniqueness
                       // since an outfit might theoretically contain the same clothing item twice
-                      const uniqueKey = `outfit-${item.id || outfitIndex}-clothing-${clothingId || index}-${index}`;
+                      const uniqueKey = `outfit-${item.id ?? item.outfit_id ?? item.uuid ?? outfitIndex}-clothing-${clothingId || index}-${index}`;
                       return <li key={uniqueKey}>{display}</li>;
                     })}
                   </ul>
@@ -89,7 +91,7 @@ const ListOutfit: FC = () => {
                       variant='primary'
                       size='sm'
                       onClick={() => {
-                        void navigate(`/outfits/edit/${item.id}`);
+                        void navigate(`/outfits/edit/${(item.id ?? item.outfit_id ?? item.uuid)}`);
                       }}
                       aria-label={`Edit outfit ${item.outfit_name}`}
                     >
@@ -100,7 +102,7 @@ const ListOutfit: FC = () => {
                       variant='danger'
                       size='sm'
                       onClick={() => {
-                        void handleDelete(item.id);
+                        void handleDelete(item.id ?? item.outfit_id ?? item.uuid);
                       }}
                       aria-label={`Delete outfit ${item.outfit_name}`}
                     >

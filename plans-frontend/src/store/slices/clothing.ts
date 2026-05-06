@@ -18,7 +18,9 @@ export interface Occasion {
 }
 
 export interface Outfit {
-  id: number;
+  id?: number;
+  outfit_id?: number;
+  uuid?: string;
   outfit_name: string;
   occasion: number;
   clothings: number[] | Clothing[];
@@ -177,7 +179,9 @@ const clothingSlice = createSlice({
         state.clothing = state.clothing.filter((item: Clothing) => item.id !== action.payload);
       })
       .addCase(deleteOutfit.fulfilled, (state, action) => {
-        state.outfit = state.outfit.filter((item: Outfit) => item.id !== action.payload);
+        state.outfit = state.outfit.filter(
+          (item: Outfit) => (item.id ?? item.outfit_id ?? item.uuid) !== action.payload
+        );
       });
   }
 });
