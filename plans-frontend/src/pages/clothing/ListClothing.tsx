@@ -16,7 +16,11 @@ const ClothingList: FC = () => {
     void dispatch(clothingActions.fetchClothing());
   }, [dispatch]);
 
-  const handleDelete = (id: number) => {
+  const handleDelete = (id: number | undefined) => {
+    if (id === undefined) {
+      toast.error('Cannot delete: Clothing ID is missing');
+      return;
+    }
     if (window.confirm('Are you sure you want to delete this item?')) {
       dispatch(clothingActions.deleteClothing(id))
         .unwrap()
@@ -51,10 +55,10 @@ const ClothingList: FC = () => {
           </thead>
           <tbody>
             {clothingItems.map((item, index) => (
-              <tr key={`clothing-row-${item.id}-${index}`}>
-                <td>{item.id}</td>
-                <td>{item.name}</td>
-                <td>{item.clothing_type}</td>
+              <tr key={`clothing-row-${item.id || index}-${index}`}>
+                <td>{String(item.id ?? '')}</td>
+                <td>{String(item.name ?? '')}</td>
+                <td>{String(item.clothing_type ?? '')}</td>
                 <td>
                   <div className='d-flex gap-2 justify-content-center'>
                     {/* Edit is hidden until Edit component exists */}

@@ -34,23 +34,61 @@ export interface ClothingCreate {
 interface State {
   clothing: Clothing[];
   outfit: Outfit[];
+  options: any;
   status: LoadingStatus;
 }
 
 const initialState: State = {
   clothing: [],
   outfit: [],
+  options: null,
   status: LoadingStatus.IDLE
 };
 
+export interface PaginatedClothingResponse {
+  results?: Clothing[];
+  count?: number;
+  next?: string | null;
+  previous?: string | null;
+}
+
+export interface PaginatedOutfitResponse {
+  results?: Outfit[];
+  count?: number;
+  next?: string | null;
+  previous?: string | null;
+}
+
 export const fetchClothing = createAsyncThunk('clothing/fetchClothing', async () => {
-  const { data } = await fetcher.get<Clothing[]>('/api/clothing/clothing/');
-  return data;
+  const { data } = await fetcher.get<PaginatedClothingResponse | Clothing[]>(
+    '/api/clothing/clothing/'
+  );
+  return 'results' in data && data.results ? data.results : (data as Clothing[]);
 });
 
 export const fetchOutfits = createAsyncThunk('clothing/fetchOutfit', async () => {
-  const { data } = await fetcher.get<Outfit[]>('/api/clothing/outfit/');
-  return data;
+  const { data } = await fetcher.get<PaginatedOutfitResponse | Outfit[]>('/api/clothing/outfit/');
+  return 'results' in data && data.results ? data.results : (data as Outfit[]);
+});
+export interface OptionsResponse {
+  actions?: {
+    POST?: {
+      clothing_type?: { choices: { value: string; display_name: string }[] };
+      season?: { choices: { value: string; display_name: string }[] };
+    };
+  };
+}
+
+export const fetchClothingOptions = createAsyncThunk('clothing/fetchClothingOptions', async () => {
+  const response = await fetcher.options<OptionsResponse>('/api/clothing/outfit/');
+  const actions = response.data?.actions?.POST;
+  if (actions) {
+    return {
+      clothing_type: actions.clothing_type?.choices ?? [],
+      season: actions.season?.choices ?? []
+    };
+  }
+  return { clothing_type: [], season: [] };
 });
 
 export const createClothing = createAsyncThunk(
@@ -116,6 +154,9 @@ const clothingSlice = createSlice({
       .addCase(fetchOutfits.fulfilled, (state, action: { payload: Outfit[] }) => {
         state.outfit = action.payload;
       })
+      .addCase(fetchClothingOptions.fulfilled, (state, action) => {
+        state.options = action.payload;
+      })
       .addCase(createClothing.fulfilled, (state, action: { payload: Clothing }) => {
         state.clothing.push(action.payload);
       })
@@ -135,6 +176,7 @@ export const clothingActions = {
   ...clothingSlice.actions,
   fetchClothing,
   fetchOutfits,
+  fetchClothingOptions,
   createClothing,
   deleteClothing,
   deleteOutfit

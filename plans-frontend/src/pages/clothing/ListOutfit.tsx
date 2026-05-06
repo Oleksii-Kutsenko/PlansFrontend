@@ -16,7 +16,11 @@ const ListOutfit: FC = () => {
     void dispatch(clothingActions.fetchOutfits());
   }, [dispatch]);
 
-  const handleDelete = (id: number) => {
+  const handleDelete = (id: number | undefined) => {
+    if (id === undefined) {
+      toast.error('Cannot delete: Outfit ID is missing');
+      return;
+    }
     if (window.confirm('Are you sure you want to delete this outfit?')) {
       dispatch(clothingActions.deleteOutfit(id))
         .unwrap()
@@ -58,18 +62,21 @@ const ListOutfit: FC = () => {
           </thead>
           <tbody>
             {outfitItems.map((item, outfitIndex) => (
-              <tr key={`outfit-row-${item.id}-${outfitIndex}`}>
-                <td>{item.id}</td>
-                <td>{item.outfit_name}</td>
+              <tr key={`outfit-row-${item.id || outfitIndex}-${outfitIndex}`}>
+                <td>{String(item.id ?? '')}</td>
+                <td>{String(item.outfit_name ?? '')}</td>
                 <td>
                   <ul className='mb-0 text-start'>
                     {item.clothings?.map((clothing, index) => {
                       const clothingId = typeof clothing === 'number' ? clothing : clothing.id;
+                      // Explicitly convert to string to avoid rendering full object crashes if unexpected types appear
                       const display =
-                        typeof clothing === 'number' ? `Clothing ID: ${clothing}` : clothing.name;
+                        typeof clothing === 'number'
+                          ? `Clothing ID: ${clothing}`
+                          : String(clothing.name || clothingId);
                       // Use a combination of outfit id, clothing id, and index to ensure uniqueness
                       // since an outfit might theoretically contain the same clothing item twice
-                      const uniqueKey = `outfit-${item.id}-clothing-${clothingId}-${index}`;
+                      const uniqueKey = `outfit-${item.id || outfitIndex}-clothing-${clothingId || index}-${index}`;
                       return <li key={uniqueKey}>{display}</li>;
                     })}
                   </ul>

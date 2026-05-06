@@ -1,4 +1,8 @@
+import { useEffect } from 'react';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../store';
 import { ClothingCreate, createClothing } from '../../store';
+import { clothingActions } from '../../store/slices/clothing';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch } from '../../store/hooks';
 import { useForm } from 'react-hook-form';
@@ -9,6 +13,18 @@ import { ValidationErrors } from '../../store/slices/utils';
 const CreateClothing = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const options = useSelector(
+    (state: RootState) =>
+      state.clothing.options as {
+        clothing_type?: { value: string; display_name: string }[];
+        season?: { value: string; display_name: string }[];
+      } | null
+  );
+
+  useEffect(() => {
+    void dispatch(clothingActions.fetchClothingOptions());
+  }, [dispatch]);
+
   const {
     register,
     handleSubmit,
@@ -72,16 +88,12 @@ const CreateClothing = () => {
             aria-label='Default select example'
             {...register('clothing_type')}
           >
-            <option>Outerwear</option>
-            <option>Tops</option>
-            <option>Bottoms</option>
-            <option>Dresses and Jumpsuits</option>
-            <option>Activewear</option>
-            <option>Swimwear</option>
-            <option>Sleepwear and Loungewear</option>
-            <option>Underwear and Lingerie</option>
-            <option>Footwear</option>
-            <option>Accessories</option>
+            <option value=''>Select Type</option>
+            {(options?.clothing_type ?? []).map((opt: { value: string; display_name: string }) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.display_name}
+              </option>
+            ))}
           </Form.Select>
           {errors.clothing_type !== null && (
             <Form.Control.Feedback type='invalid'>
@@ -91,12 +103,18 @@ const CreateClothing = () => {
         </Form.Group>
         <Form.Group className='mb-3' controlId='season'>
           <Form.Label>Season</Form.Label>
-          <Form.Control
+          <Form.Select
             className={`${errors.season ? `is-invalid` : ``}`}
-            type='text'
-            placeholder='Enter season'
+            aria-label='Select season'
             {...register('season')}
-          />
+          >
+            <option value=''>Select Season</option>
+            {(options?.season ?? []).map((opt: { value: string; display_name: string }) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.display_name}
+              </option>
+            ))}
+          </Form.Select>
           {errors.season !== null && (
             <Form.Control.Feedback type='invalid'>{errors.season?.message}</Form.Control.Feedback>
           )}
