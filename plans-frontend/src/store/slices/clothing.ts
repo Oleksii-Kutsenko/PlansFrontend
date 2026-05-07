@@ -184,7 +184,8 @@ const clothingSlice = createSlice({
       })
       .addCase(deleteOutfit.fulfilled, (state, action) => {
         state.outfit = state.outfit.filter(
-          (item: Outfit) => (item.id ?? item.outfit_id ?? item.uuid) !== action.payload
+          (item: Outfit) =>
+            (item.id ?? item.outfit_id ?? item.uuid ?? item.outfit_name) !== action.payload
         );
       });
   }
