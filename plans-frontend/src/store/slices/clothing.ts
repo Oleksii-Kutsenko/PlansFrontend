@@ -75,7 +75,7 @@ export const fetchClothing = createAsyncThunk('clothing/fetchClothing', async ()
 
 export const fetchOutfits = createAsyncThunk('clothing/fetchOutfit', async () => {
   const { data } = await fetcher.get<PaginatedOutfitResponse | { outfits: Outfit[] } | Outfit[]>(
-    '/api/clothing/outfit/'
+    '/api/clothing/outfits/'
   );
   if (data && 'results' in data && Array.isArray(data.results)) {
     return data.results;
@@ -96,7 +96,7 @@ export interface OptionsResponse {
 }
 
 export const fetchClothingOptions = createAsyncThunk('clothing/fetchClothingOptions', async () => {
-  const response = await fetcher.options<OptionsResponse>('/api/clothing/outfit/');
+  const response = await fetcher.options<OptionsResponse>('/api/clothing/outfits/');
   const actions = response.data?.actions?.POST;
   if (actions) {
     return {
@@ -149,7 +149,7 @@ export const deleteOutfit = createAsyncThunk(
   'clothing/deleteOutfit',
   async (id: number, { rejectWithValue }) => {
     try {
-      await fetcher.delete(`/api/clothing/outfit/${id}/`);
+      await fetcher.delete(`/api/clothing/outfits/${id}/`);
       return id;
     } catch (err) {
       const error = err as AxiosError;
@@ -184,8 +184,7 @@ const clothingSlice = createSlice({
       })
       .addCase(deleteOutfit.fulfilled, (state, action) => {
         state.outfit = state.outfit.filter(
-          (item: Outfit) =>
-            (item.id ?? item.outfit_id ?? item.uuid ?? item.outfit_name) !== action.payload
+          (item: Outfit) => (item.id ?? item.outfit_id ?? item.uuid) !== action.payload
         );
       });
   }

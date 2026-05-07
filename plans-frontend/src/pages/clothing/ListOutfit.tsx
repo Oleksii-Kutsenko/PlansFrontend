@@ -100,9 +100,7 @@ const ListOutfit: FC = () => {
                       variant='danger'
                       size='sm'
                       onClick={() => {
-                        void handleDelete(
-                          item.id ?? item.outfit_id ?? item.uuid ?? item.outfit_name
-                        );
+                        void handleDelete(item.id ?? item.outfit_id ?? item.uuid);
                       }}
                       aria-label={`Delete outfit ${item.outfit_name}`}
                     >
