@@ -74,17 +74,11 @@ export const fetchClothing = createAsyncThunk('clothing/fetchClothing', async ()
 });
 
 export const fetchOutfits = createAsyncThunk('clothing/fetchOutfit', async () => {
-  const { data } = await fetcher.get<PaginatedOutfitResponse | { outfits: Outfit[] } | Outfit[]>(
-    '/api/clothing/outfits/'
-  );
+  const { data } = await fetcher.get<PaginatedOutfitResponse | Outfit[]>('/api/clothing/outfit/');
   if (data && 'results' in data && Array.isArray(data.results)) {
     return data.results;
-  } else if (data && 'outfits' in data && Array.isArray(data.outfits)) {
-    return data.outfits;
-  } else if (Array.isArray(data)) {
-    return data;
   }
-  return (Object.values(data as Record<string, unknown>).find(Array.isArray) as Outfit[]) ?? [];
+  return Array.isArray(data) ? data : [];
 });
 export interface OptionsResponse {
   actions?: {
@@ -96,7 +90,7 @@ export interface OptionsResponse {
 }
 
 export const fetchClothingOptions = createAsyncThunk('clothing/fetchClothingOptions', async () => {
-  const response = await fetcher.options<OptionsResponse>('/api/clothing/outfits/');
+  const response = await fetcher.options<OptionsResponse>('/api/clothing/outfit/');
   const actions = response.data?.actions?.POST;
   if (actions) {
     return {
@@ -149,7 +143,7 @@ export const deleteOutfit = createAsyncThunk(
   'clothing/deleteOutfit',
   async (id: number, { rejectWithValue }) => {
     try {
-      await fetcher.delete(`/api/clothing/outfits/${id}/`);
+      await fetcher.delete(`/api/clothing/outfit/${id}/`);
       return id;
     } catch (err) {
       const error = err as AxiosError;
@@ -183,9 +177,7 @@ const clothingSlice = createSlice({
         state.clothing = state.clothing.filter((item: Clothing) => item.id !== action.payload);
       })
       .addCase(deleteOutfit.fulfilled, (state, action) => {
-        state.outfit = state.outfit.filter(
-          (item: Outfit) => (item.id ?? item.outfit_id ?? item.uuid) !== action.payload
-        );
+        state.outfit = state.outfit.filter((item: Outfit) => item.id !== action.payload);
       });
   }
 });

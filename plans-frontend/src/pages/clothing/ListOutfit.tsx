@@ -16,13 +16,13 @@ const ListOutfit: FC = () => {
     void dispatch(clothingActions.fetchOutfits());
   }, [dispatch]);
 
-  const handleDelete = (id: number | string | undefined) => {
+  const handleDelete = (id: number | undefined) => {
     if (id === undefined) {
       toast.error('Cannot delete: Outfit ID is missing');
       return;
     }
     if (window.confirm('Are you sure you want to delete this outfit?')) {
-      dispatch(clothingActions.deleteOutfit(id as number))
+      dispatch(clothingActions.deleteOutfit(id))
         .unwrap()
         .then(() => {
           toast.success('Outfit deleted successfully');
@@ -100,7 +100,7 @@ const ListOutfit: FC = () => {
                       variant='danger'
                       size='sm'
                       onClick={() => {
-                        void handleDelete(item.id ?? item.outfit_id ?? item.uuid);
+                        void handleDelete(item.id);
                       }}
                       aria-label={`Delete outfit ${item.outfit_name}`}
                     >
