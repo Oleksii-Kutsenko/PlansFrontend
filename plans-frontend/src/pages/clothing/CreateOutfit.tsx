@@ -14,18 +14,13 @@ const CreateOutfit: FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const clothingItems = useSelector((state: RootState) => state.clothing.clothing);
-  const outfitOptions = useSelector(
-    (state: RootState) =>
-      state.clothing.outfitOptions as {
-        occasion?: { value: string; display_name: string }[];
-      } | null
-  );
+  const occasions = useSelector((state: RootState) => state.clothing.occasions);
 
   const [selectedClothings, setSelectedClothings] = useState<number[]>([]);
 
   useEffect(() => {
     void dispatch(clothingActions.fetchClothing());
-    void dispatch(clothingActions.fetchOutfitOptions());
+    void dispatch(clothingActions.fetchOccasions());
   }, [dispatch]);
 
   const {
@@ -101,9 +96,9 @@ const CreateOutfit: FC = () => {
             {...register('occasion')}
           >
             <option value=''>Select Occasion</option>
-            {(outfitOptions?.occasion ?? []).map((opt) => (
-              <option key={opt.value} value={opt.value}>
-                {opt.display_name}
+            {occasions.map((opt) => (
+              <option key={opt.id} value={opt.id}>
+                {opt.occasion_name}
               </option>
             ))}
           </Form.Select>

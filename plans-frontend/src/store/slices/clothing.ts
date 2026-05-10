@@ -43,7 +43,7 @@ interface State {
   clothing: Clothing[];
   outfit: Outfit[];
   options: any;
-  outfitOptions: any;
+  occasions: Occasion[];
   status: LoadingStatus;
 }
 
@@ -51,7 +51,7 @@ const initialState: State = {
   clothing: [],
   outfit: [],
   options: null,
-  outfitOptions: null,
+  occasions: [],
   status: LoadingStatus.IDLE
 };
 
@@ -107,17 +107,14 @@ export const fetchClothingOptions = createAsyncThunk('clothing/fetchClothingOpti
   return { clothing_type: [], season: [] };
 });
 
-export const fetchOutfitOptions = createAsyncThunk('clothing/fetchOutfitOptions', async () => {
-  const response = await fetcher.options<OptionsResponse>('/api/clothing/outfit/');
-  const actions = response.data?.actions?.POST;
-  if (actions) {
-    return {
-      occasion:
-        (actions as { occasion?: { choices: { value: string; display_name: string }[] } }).occasion
-          ?.choices ?? []
-    };
+export const fetchOccasions = createAsyncThunk('clothing/fetchOccasions', async () => {
+  const { data } = await fetcher.get<{ results?: Occasion[] } | Occasion[]>(
+    '/api/clothing/occasion/'
+  );
+  if (data && 'results' in data && Array.isArray(data.results)) {
+    return data.results;
   }
-  return { occasion: [] };
+  return Array.isArray(data) ? data : [];
 });
 
 export const createClothing = createAsyncThunk(
@@ -202,8 +199,8 @@ const clothingSlice = createSlice({
       .addCase(fetchClothingOptions.fulfilled, (state, action) => {
         state.options = action.payload;
       })
-      .addCase(fetchOutfitOptions.fulfilled, (state, action) => {
-        state.outfitOptions = action.payload;
+      .addCase(fetchOccasions.fulfilled, (state, action) => {
+        state.occasions = action.payload;
       })
       .addCase(createClothing.fulfilled, (state, action: { payload: Clothing }) => {
         state.clothing.push(action.payload);
@@ -232,7 +229,7 @@ export const clothingActions = {
   fetchClothing,
   fetchOutfits,
   fetchClothingOptions,
-  fetchOutfitOptions,
+  fetchOccasions,
   createClothing,
   createOutfit,
   deleteClothing,
