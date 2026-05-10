@@ -88,7 +88,7 @@ export interface OptionsResponse {
 }
 
 export const fetchClothingOptions = createAsyncThunk('clothing/fetchClothingOptions', async () => {
-  const response = await fetcher.options<OptionsResponse>('/api/clothing/outfit/');
+  const response = await fetcher.options<OptionsResponse>('/api/clothing/clothing/');
   const actions = response.data?.actions?.POST;
   if (actions) {
     return {
