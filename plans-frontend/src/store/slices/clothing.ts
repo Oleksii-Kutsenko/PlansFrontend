@@ -36,7 +36,7 @@ export interface ClothingCreate {
 export interface OutfitCreate {
   outfit_name: string;
   occasion: number;
-  clothings: number[];
+  clothings: number[] | { id: number }[];
 }
 
 interface State {

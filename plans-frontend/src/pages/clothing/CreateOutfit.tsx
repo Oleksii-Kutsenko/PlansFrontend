@@ -37,7 +37,11 @@ const CreateOutfit: FC = () => {
   };
 
   const onSubmit = (data: OutfitCreate): void => {
-    const payload = { ...data, clothings: selectedClothings };
+    const payload = {
+      ...data,
+      occasion: Number(data.occasion),
+      clothings: selectedClothings.map((id) => ({ id }))
+    };
 
     if (selectedClothings.length === 0) {
       toast.error('Please select at least one clothing item for the outfit.');
