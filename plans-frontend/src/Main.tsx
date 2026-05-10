@@ -8,6 +8,11 @@ const CreateClothing = React.lazy(async () => {
   return { default: module.default };
 });
 
+const CreateOutfit = React.lazy(async () => {
+  const module = await import('./pages/clothing/CreateOutfit');
+  return { default: module.default };
+});
+
 const Login = React.lazy(async () => {
   const module = await import('./pages/Login');
   return { default: module.default };
@@ -69,6 +74,7 @@ const Main: FC = () => {
           <Route path='/clothing/all' element={<ListClothing />} />
           <Route path='/clothing' element={<ListOutfit />} />
           <Route path='/clothing/create' element={<CreateClothing />} />
+          <Route path='/clothing/outfit/create' element={<CreateOutfit />} />
         </Route>
 
         {/** Public Routes */}
