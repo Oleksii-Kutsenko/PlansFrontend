@@ -96,8 +96,8 @@ const CreateOutfit: FC = () => {
             {...register('occasion')}
           >
             <option value=''>Select Occasion</option>
-            {occasions.map((opt) => (
-              <option key={opt.id} value={opt.id}>
+            {occasions.map((opt, index) => (
+              <option key={opt.id ?? index} value={opt.id}>
                 {opt.occasion_name}
               </option>
             ))}
@@ -113,10 +113,12 @@ const CreateOutfit: FC = () => {
             <p className='text-muted'>No clothing items available. Please create some first.</p>
           ) : (
             <ListGroup>
-              {clothingItems.map((item) => (
+              {clothingItems.map((item, index) => (
                 <ListGroup.Item
-                  key={item.id}
+                  key={item.id ?? index}
                   action
+                  as='button'
+                  type='button'
                   active={selectedClothings.includes(item.id)}
                   onClick={() => {
                     void toggleClothing(item.id);
