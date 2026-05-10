@@ -67,10 +67,8 @@ export const fetchClothing = createAsyncThunk('clothing/fetchClothing', async ()
   );
   if (data && 'results' in data && Array.isArray(data.results)) {
     return data.results;
-  } else if (Array.isArray(data)) {
-    return data;
   }
-  return [];
+  return Array.isArray(data) ? data : [];
 });
 
 export const fetchOutfits = createAsyncThunk('clothing/fetchOutfit', async () => {

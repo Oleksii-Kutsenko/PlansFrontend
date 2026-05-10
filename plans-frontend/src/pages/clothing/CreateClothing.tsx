@@ -44,6 +44,7 @@ const CreateClothing = () => {
     void dispatch(createClothing(payload))
       .then((res) => {
         if (createClothing.fulfilled.match(res)) {
+          void dispatch(clothingActions.fetchClothing());
           void navigate('/clothing');
         } else if (createClothing.rejected.match(res)) {
           const error = res.payload as ValidationErrors;
