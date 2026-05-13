@@ -6,43 +6,58 @@ import { AxiosError } from 'axios';
 export interface Clothing {
   id: number;
   name: string;
-  clothing_type: string;
-  season: string;
-  image_path: string;
+  clothingType: string;
+  color: string;
+  imagePath: string;
   outfit: number | null;
 }
 
 export interface Occasion {
   id: number;
-  occasion_name: string;
+  occasionName: string;
 }
 
 export interface Outfit {
   id?: number;
-  outfit_id?: number;
-  uuid?: string;
-  outfit_name: string;
+  outfitName: string;
   occasion: number;
+  occasionName?: string;
+  season: string;
+  previewImage?: string | null;
   clothings: number[] | Clothing[];
+  clothingCount?: number;
 }
 
 export interface ClothingCreate {
   name: string;
-  clothing_type: string;
+  clothingType: string;
   season: string;
-  image_path?: File | null | undefined;
+  imagePath?: File | null | undefined;
 }
 
 export interface OutfitCreate {
-  outfit_name: string;
+  outfitName: string;
   occasion: number;
-  clothings: number[] | { id: number }[];
+  season: string;
+  previewImage?: File | null;
+  clothingIds: number[];
+}
+
+export interface OutfitUpdate {
+  id: number;
+  outfitName?: string;
+  occasion?: number;
+  season?: string;
+  previewImage?: File | null;
+  clothingIds?: number[];
 }
 
 interface State {
   clothing: Clothing[];
   outfit: Outfit[];
+  currentOutfit: Outfit | null;
   options: any;
+  outfitOptions: any;
   occasions: Occasion[];
   status: LoadingStatus;
 }
@@ -50,7 +65,9 @@ interface State {
 const initialState: State = {
   clothing: [],
   outfit: [],
+  currentOutfit: null,
   options: null,
+  outfitOptions: null,
   occasions: [],
   status: LoadingStatus.IDLE
 };
@@ -123,10 +140,10 @@ export const createClothing = createAsyncThunk(
     try {
       const formData = new FormData();
       formData.append('name', clothing.name);
-      formData.append('clothing_type', clothing.clothing_type);
+      formData.append('clothing_type', clothing.clothingType);
       formData.append('season', clothing.season);
-      if (clothing.image_path) {
-        formData.append('image_path', clothing.image_path);
+      if (clothing.imagePath) {
+        formData.append('image_path', clothing.imagePath);
       }
       const { data } = await fetcher.post<Clothing>('/api/clothing/clothing/', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
@@ -184,6 +201,47 @@ export const deleteOutfit = createAsyncThunk(
   }
 );
 
+export const fetchOutfit = createAsyncThunk(
+  'clothing/fetchOutfit',
+  async (id: number, { rejectWithValue }) => {
+    try {
+      const { data } = await fetcher.get<Outfit>(`/api/clothing/outfit/${id}/`);
+      return data;
+    } catch (err) {
+      const error = err as AxiosError;
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+
+export const updateOutfit = createAsyncThunk(
+  'clothing/updateOutfit',
+  async (outfit: OutfitUpdate, { rejectWithValue }) => {
+    try {
+      const { id, ...payload } = outfit;
+      const { data } = await fetcher.patch<Outfit>(`/api/clothing/outfit/${id}/`, payload);
+      return data;
+    } catch (err) {
+      const error = err as AxiosError<ValidationErrors>;
+      if (!error.response) {
+        throw error;
+      }
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+
+export const fetchOutfitOptions = createAsyncThunk('clothing/fetchOutfitOptions', async () => {
+  const response = await fetcher.options<OptionsResponse>('/api/clothing/outfit/');
+  const actions = response.data?.actions?.POST;
+  if (actions) {
+    return {
+      season: actions.season?.choices ?? []
+    };
+  }
+  return { season: [] };
+});
+
 const clothingSlice = createSlice({
   name: 'clothing',
   initialState: initialState,
@@ -220,6 +278,25 @@ const clothingSlice = createSlice({
       })
       .addCase(deleteOutfit.fulfilled, (state, action) => {
         state.outfit = state.outfit.filter((item: Outfit) => item.id !== action.payload);
+      })
+      .addCase(fetchOutfit.fulfilled, (state, action: { payload: Outfit }) => {
+        state.currentOutfit = action.payload;
+      })
+      .addCase(fetchOutfit.rejected, (state) => {
+        state.currentOutfit = null;
+      })
+      .addCase(updateOutfit.fulfilled, (state, action: { payload: Outfit }) => {
+        state.currentOutfit = action.payload;
+        const index = state.outfit.findIndex((o) => o.id === action.payload.id);
+        if (index !== -1) {
+          state.outfit[index] = action.payload;
+        }
+      })
+      .addCase(updateOutfit.rejected, (state) => {
+        state.status = LoadingStatus.FAILED;
+      })
+      .addCase(fetchOutfitOptions.fulfilled, (state, action) => {
+        state.outfitOptions = action.payload;
       });
   }
 });
@@ -230,9 +307,12 @@ export const clothingActions = {
   fetchOutfits,
   fetchClothingOptions,
   fetchOccasions,
+  fetchOutfitOptions,
   createClothing,
   createOutfit,
   deleteClothing,
-  deleteOutfit
+  deleteOutfit,
+  fetchOutfit,
+  updateOutfit
 };
 export const clothingReducer = clothingSlice.reducer;

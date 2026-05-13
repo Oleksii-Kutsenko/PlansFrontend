@@ -1,3 +1,5 @@
+import { keysToCamel, keysToSnake } from './caseUtils';
+
 import type { AxiosError, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
 import axios from 'axios';
 import store, { setToken, logout } from '../store';
@@ -7,6 +9,16 @@ export const fetcher = axios.create({
   headers: {
     'Content-Type': 'application/json'
   }
+});
+
+fetcher.interceptors.request.use((config: InternalAxiosRequestConfig) => {
+  if (config.data && !(config.data instanceof FormData)) {
+    config.data = keysToSnake(config.data);
+  }
+  if (config.params) {
+    config.params = keysToSnake(config.params);
+  }
+  return config;
 });
 
 fetcher.interceptors.request.use((config: InternalAxiosRequestConfig) => {
@@ -25,6 +37,13 @@ function authHeader(): string {
   const token = store.getState().auth?.token;
   return `Bearer ${token}`;
 }
+
+fetcher.interceptors.response.use((res) => {
+  if (res.data && typeof res.data === 'object') {
+    res.data = keysToCamel(res.data);
+  }
+  return res;
+});
 
 fetcher.interceptors.response.use(
   (res: AxiosResponse<InternalAxiosRequestConfig, AxiosError>) => {
