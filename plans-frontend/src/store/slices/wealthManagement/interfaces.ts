@@ -26,7 +26,7 @@ export type UpdateAssetAllocation = Record<string, number | null>;
 export interface Allocation {
   id: number;
   allocatedPercentage: number;
-  asset_allocations: AssetAllocation[];
+  assetAllocations: AssetAllocation[];
   asset_type: { name: string };
   current_amount: number;
   delta: number;

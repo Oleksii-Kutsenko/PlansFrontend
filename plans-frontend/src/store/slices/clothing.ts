@@ -18,7 +18,7 @@ export interface Occasion {
 }
 
 export interface Outfit {
-  id?: number;
+  id: number;
   outfitName: string;
   occasion: number;
   occasionName?: string;
@@ -31,7 +31,7 @@ export interface Outfit {
 export interface ClothingCreate {
   name: string;
   clothingType: string;
-  season: string;
+  color?: string;
   imagePath?: File | null | undefined;
 }
 
@@ -46,10 +46,9 @@ export interface OutfitCreate {
 export interface OutfitUpdate {
   id: number;
   outfitName?: string;
-  occasion?: number;
+  occasion: number;
   season?: string;
   previewImage?: File | null;
-  clothingIds?: number[];
 }
 
 interface State {
@@ -96,7 +95,7 @@ export const fetchClothing = createAsyncThunk('clothing/fetchClothing', async ()
   return Array.isArray(data) ? data : [];
 });
 
-export const fetchOutfits = createAsyncThunk('clothing/fetchOutfit', async () => {
+export const fetchOutfits = createAsyncThunk('clothing/fetchOutfits', async () => {
   const { data } = await fetcher.get<PaginatedOutfitResponse | Outfit[]>('/api/clothing/outfit/');
   if (data && 'results' in data && Array.isArray(data.results)) {
     return data.results;
@@ -106,8 +105,8 @@ export const fetchOutfits = createAsyncThunk('clothing/fetchOutfit', async () =>
 export interface OptionsResponse {
   actions?: {
     POST?: {
-      clothing_type?: { choices: { value: string; display_name: string }[] };
-      season?: { choices: { value: string; display_name: string }[] };
+      clothingType?: { choices: { value: string; displayName: string }[] };
+      season?: { choices: { value: string; displayName: string }[] };
     };
   };
 }
@@ -117,11 +116,11 @@ export const fetchClothingOptions = createAsyncThunk('clothing/fetchClothingOpti
   const actions = response.data?.actions?.POST;
   if (actions) {
     return {
-      clothing_type: actions.clothing_type?.choices ?? [],
+      clothingType: actions.clothingType?.choices ?? [],
       season: actions.season?.choices ?? []
     };
   }
-  return { clothing_type: [], season: [] };
+  return { clothingType: [], season: [] };
 });
 
 export const fetchOccasions = createAsyncThunk('clothing/fetchOccasions', async () => {
@@ -141,10 +140,15 @@ export const createClothing = createAsyncThunk(
       const formData = new FormData();
       formData.append('name', clothing.name);
       formData.append('clothing_type', clothing.clothingType);
-      formData.append('season', clothing.season);
+
+      if (clothing.color) {
+        formData.append('color', clothing.color);
+      }
+
       if (clothing.imagePath) {
         formData.append('image_path', clothing.imagePath);
       }
+
       const { data } = await fetcher.post<Clothing>('/api/clothing/clothing/', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
@@ -163,13 +167,27 @@ export const createOutfit = createAsyncThunk(
   'clothing/createOutfit',
   async (outfit: OutfitCreate, { rejectWithValue }) => {
     try {
-      const { data } = await fetcher.post<Outfit>('/api/clothing/outfit/', outfit);
+      let payload: FormData | OutfitCreate;
+      const headers: Record<string, string> = {};
+
+      if (outfit.previewImage) {
+        const formData = new FormData();
+        formData.append('outfit_name', outfit.outfitName);
+        formData.append('occasion', String(outfit.occasion));
+        formData.append('season', outfit.season);
+        formData.append('preview_image', outfit.previewImage);
+        outfit.clothingIds.forEach((id) => formData.append('clothing_ids', String(id)));
+        payload = formData;
+        headers['Content-Type'] = 'multipart/form-data';
+      } else {
+        payload = outfit;
+      }
+
+      const { data } = await fetcher.post<Outfit>('/api/clothing/outfit/', payload, { headers });
       return data;
     } catch (err) {
       const error = err as AxiosError<ValidationErrors>;
-      if (!error.response) {
-        throw error;
-      }
+      if (!error.response) throw error;
       return rejectWithValue(error.response.data);
     }
   }
@@ -242,6 +260,42 @@ export const fetchOutfitOptions = createAsyncThunk('clothing/fetchOutfitOptions'
   return { season: [] };
 });
 
+export const addItemToOutfit = createAsyncThunk(
+  'clothing/addItemToOutfit',
+  async (
+    { outfitId, clothingId }: { outfitId: number; clothingId: number },
+    { rejectWithValue }
+  ) => {
+    try {
+      const { data } = await fetcher.post<Outfit>(`/api/clothing/outfit/${outfitId}/clothings/`, {
+        clothingId
+      });
+      return data;
+    } catch (err) {
+      const error = err as AxiosError;
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+
+export const removeItemFromOutfit = createAsyncThunk(
+  'clothing/removeItemFromOutfit',
+  async (
+    { outfitId, clothingId }: { outfitId: number; clothingId: number },
+    { rejectWithValue }
+  ) => {
+    try {
+      const { data } = await fetcher.delete<Outfit>(
+        `/api/clothing/outfit/${outfitId}/clothings/${clothingId}/`
+      );
+      return data;
+    } catch (err) {
+      const error = err as AxiosError;
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+
 const clothingSlice = createSlice({
   name: 'clothing',
   initialState: initialState,
@@ -297,6 +351,12 @@ const clothingSlice = createSlice({
       })
       .addCase(fetchOutfitOptions.fulfilled, (state, action) => {
         state.outfitOptions = action.payload;
+      })
+      .addCase(addItemToOutfit.fulfilled, (state, action: { payload: Outfit }) => {
+        state.currentOutfit = action.payload;
+      })
+      .addCase(removeItemFromOutfit.fulfilled, (state, action: { payload: Outfit }) => {
+        state.currentOutfit = action.payload;
       });
   }
 });
@@ -313,6 +373,8 @@ export const clothingActions = {
   deleteClothing,
   deleteOutfit,
   fetchOutfit,
-  updateOutfit
+  updateOutfit,
+  addItemToOutfit,
+  removeItemFromOutfit
 };
 export const clothingReducer = clothingSlice.reducer;

@@ -1,14 +1,15 @@
 import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store';
-import { ClothingCreate, createClothing } from '../../store';
-import { clothingActions } from '../../store/slices/clothing';
+import { ClothingCreate } from '../../store/slices/clothing';
+import { clothingActions, createClothing } from '../../store/slices/clothing';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch } from '../../store/hooks';
 import { useForm } from 'react-hook-form';
-import { Button, Container, Form } from 'react-bootstrap';
+import { Button, Container, Form, Row, Col } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 import { ValidationErrors } from '../../store/slices/utils';
+import ImageColorPicker from '../../components/clothing/ImageColorPicker';
 
 const CreateClothing = () => {
   const dispatch = useAppDispatch();
@@ -16,8 +17,7 @@ const CreateClothing = () => {
   const options = useSelector(
     (state: RootState) =>
       state.clothing.options as {
-        clothing_type?: { value: string; display_name: string }[];
-        season?: { value: string; display_name: string }[];
+        clothingType?: { value: string; displayName: string }[];
       } | null
   );
 
@@ -28,24 +28,31 @@ const CreateClothing = () => {
   const {
     register,
     handleSubmit,
+    watch,
+    setValue,
     setError,
     formState: { errors }
   } = useForm<ClothingCreate>();
 
+  // Watch the image input so we can pass the file to the color picker
+  const imageFiles = watch('imagePath') as unknown as FileList;
+  const currentImageFile = imageFiles && imageFiles.length > 0 ? imageFiles[0] : null;
+
   const onSubmit = (data: ClothingCreate): void => {
-    // Convert FileList to File before dispatching if it exists
     const payload = { ...data };
-    if (payload.image_path && (payload.image_path as unknown as FileList).length > 0) {
-      payload.image_path = (payload.image_path as unknown as FileList)[0];
+
+    // Convert FileList to File before dispatching
+    if (payload.imagePath && (payload.imagePath as unknown as FileList).length > 0) {
+      payload.imagePath = (payload.imagePath as unknown as FileList)[0];
     } else {
-      delete payload.image_path;
+      delete payload.imagePath;
     }
 
     void dispatch(createClothing(payload))
       .then((res) => {
         if (createClothing.fulfilled.match(res)) {
           void dispatch(clothingActions.fetchClothing());
-          void navigate('/clothing');
+          void navigate('/clothing/all');
         } else if (createClothing.rejected.match(res)) {
           const error = res.payload as ValidationErrors;
           const errorMessage = error?.errorMessage ?? 'Error adding clothing item.';
@@ -67,77 +74,93 @@ const CreateClothing = () => {
   };
 
   return (
-    <Container>
-      <h1>Create Clothing</h1>
-      <Form onSubmit={(e) => void handleSubmit(onSubmit)(e)}>
-        <Form.Group className='mb-3' controlId='name'>
-          <Form.Label>Name</Form.Label>
-          <Form.Control
-            className={`${errors.name ? `is-invalid` : ``}`}
-            type='text'
-            placeholder='Enter clothing name'
-            {...register('name')}
-          />
-          {errors.name !== null && (
-            <Form.Control.Feedback type='invalid'>{errors.name?.message}</Form.Control.Feedback>
-          )}
-        </Form.Group>
-        <Form.Group className='mb-3' controlId='clothing_type'>
-          <Form.Label>Type</Form.Label>
-          <Form.Select
-            className={`${errors.clothing_type ? `is-invalid` : ``}`}
-            aria-label='Default select example'
-            {...register('clothing_type')}
-          >
-            <option value=''>Select Type</option>
-            {(options?.clothing_type ?? []).map((opt: { value: string; display_name: string }) => (
-              <option key={opt.value} value={opt.value}>
-                {opt.display_name}
-              </option>
-            ))}
-          </Form.Select>
-          {errors.clothing_type !== null && (
-            <Form.Control.Feedback type='invalid'>
-              {errors.clothing_type?.message}
-            </Form.Control.Feedback>
-          )}
-        </Form.Group>
-        <Form.Group className='mb-3' controlId='season'>
-          <Form.Label>Season</Form.Label>
-          <Form.Select
-            className={`${errors.season ? `is-invalid` : ``}`}
-            aria-label='Select season'
-            {...register('season')}
-          >
-            <option value=''>Select Season</option>
-            {(options?.season ?? []).map((opt: { value: string; display_name: string }) => (
-              <option key={opt.value} value={opt.value}>
-                {opt.display_name}
-              </option>
-            ))}
-          </Form.Select>
-          {errors.season !== null && (
-            <Form.Control.Feedback type='invalid'>{errors.season?.message}</Form.Control.Feedback>
-          )}
-        </Form.Group>
-        <Form.Group controlId='image_path' className='mb-3'>
-          <Form.Label>Image</Form.Label>
-          <Form.Control
-            className={`${errors.image_path ? `is-invalid` : ``}`}
-            type='file'
-            placeholder='Enter image'
-            {...register('image_path')}
-          />
-          {errors.image_path !== null && (
-            <Form.Control.Feedback type='invalid'>
-              {errors.image_path?.message}
-            </Form.Control.Feedback>
-          )}
-        </Form.Group>
-        <div className='text-center mt-4'>
-          <Button type='submit'>Submit</Button>
-        </div>
-      </Form>
+    <Container className='mt-5 mb-5' style={{ maxWidth: '600px' }}>
+      <div className='d-flex justify-content-between align-items-center mb-4'>
+        <h1 className='mb-0'>Add Clothing Item</h1>
+        <Button variant='outline-secondary' onClick={() => navigate('/clothing/all')}>
+          Cancel
+        </Button>
+      </div>
+
+      <div className='bg-light p-4 rounded border shadow-sm'>
+        <Form onSubmit={(e) => void handleSubmit(onSubmit)(e)}>
+          <Form.Group className='mb-3' controlId='name'>
+            <Form.Label className='fw-medium'>Name</Form.Label>
+            <Form.Control
+              className={`${errors.name ? 'is-invalid' : ''}`}
+              type='text'
+              placeholder='e.g. Favorite Blue Jeans'
+              {...register('name', { required: 'Name is required' })}
+            />
+            {errors.name && (
+              <Form.Control.Feedback type='invalid'>{errors.name.message}</Form.Control.Feedback>
+            )}
+          </Form.Group>
+
+          <Row>
+            <Form.Group className='mb-3 col-md-8' controlId='clothingType'>
+              <Form.Label className='fw-medium'>Type</Form.Label>
+              <Form.Select
+                className={`${errors.clothingType ? 'is-invalid' : ''}`}
+                {...register('clothingType', { required: 'Clothing type is required' })}
+              >
+                <option value=''>Select Type</option>
+                {(options?.clothingType ?? []).map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.displayName}
+                  </option>
+                ))}
+              </Form.Select>
+              {errors.clothingType && (
+                <Form.Control.Feedback type='invalid'>
+                  {errors.clothingType.message}
+                </Form.Control.Feedback>
+              )}
+            </Form.Group>
+
+            <Form.Group className='mb-3 col-md-4' controlId='color'>
+              <Form.Label className='fw-medium'>Main Color</Form.Label>
+              <Form.Control
+                type='color'
+                className='w-100 p-1'
+                title='Choose your color'
+                style={{ height: '38px', cursor: 'pointer' }}
+                {...register('color')}
+                defaultValue='#000000'
+              />
+            </Form.Group>
+          </Row>
+
+          <Form.Group controlId='imagePath' className='mb-4'>
+            <Form.Label className='fw-medium'>Image</Form.Label>
+            <Form.Control
+              className={`${errors.imagePath ? 'is-invalid' : ''}`}
+              type='file'
+              accept='image/*'
+              {...register('imagePath')}
+            />
+            {errors.imagePath && (
+              <Form.Control.Feedback type='invalid'>
+                {errors.imagePath.message}
+              </Form.Control.Feedback>
+            )}
+
+            {/* The Magic Color Picker preview component! */}
+            <ImageColorPicker
+              imageFile={currentImageFile}
+              onColorPick={(hex) =>
+                setValue('color', hex, { shouldValidate: true, shouldDirty: true })
+              }
+            />
+          </Form.Group>
+
+          <div className='d-grid mt-4'>
+            <Button variant='success' size='lg' type='submit'>
+              Save Clothing Item
+            </Button>
+          </div>
+        </Form>
+      </div>
     </Container>
   );
 };

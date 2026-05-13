@@ -29,7 +29,7 @@ export const computeDelta = (wealthManagement: WealthManagementModel): WealthMan
       allocation.delta = allocation.target_amount - allocation.current_amount;
     }
 
-    for (const assetAllocation of allocation.asset_allocations) {
+    for (const assetAllocation of allocation.assetAllocations) {
       if (assetAllocation.targetPercentage !== null) {
         assetAllocation.delta =
           assetAllocation.targetPercentage - assetAllocation.allocated_percentage;

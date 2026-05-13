@@ -1,26 +1,43 @@
 import { FC, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store';
-import { OutfitCreate, createOutfit } from '../../store';
-import { clothingActions } from '../../store/slices/clothing';
+import { OutfitCreate, createOutfit } from '../../store/slices/clothing';
+import { clothingActions, Outfit } from '../../store/slices/clothing';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch } from '../../store/hooks';
 import { useForm } from 'react-hook-form';
-import { Button, Container, Form, ListGroup } from 'react-bootstrap';
+import { Button, Container, Form } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 import { ValidationErrors } from '../../store/slices/utils';
+import ClothingPicker from '../../components/clothing/ClothingPicker';
 
 const CreateOutfit: FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+
+  // Redux state
   const clothingItems = useSelector((state: RootState) => state.clothing.clothing);
   const occasions = useSelector((state: RootState) => state.clothing.occasions);
+  const clothingOptions = useSelector(
+    (state: RootState) =>
+      state.clothing.options as {
+        clothingType?: { value: string; displayName: string }[];
+      } | null
+  );
+  const outfitOptions = useSelector(
+    (state: RootState) =>
+      state.clothing.outfitOptions as {
+        season?: { value: string; displayName: string }[];
+      } | null
+  );
 
   const [selectedClothings, setSelectedClothings] = useState<number[]>([]);
 
   useEffect(() => {
     void dispatch(clothingActions.fetchClothing());
     void dispatch(clothingActions.fetchOccasions());
+    void dispatch(clothingActions.fetchClothingOptions());
+    void dispatch(clothingActions.fetchOutfitOptions());
   }, [dispatch]);
 
   const {
@@ -30,32 +47,30 @@ const CreateOutfit: FC = () => {
     formState: { errors }
   } = useForm<OutfitCreate>();
 
-  const toggleClothing = (id: number) => {
-    setSelectedClothings((prev) =>
-      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
-    );
-  };
-
   const onSubmit = (data: OutfitCreate): void => {
-    const payload = {
+    // Prepare payload matching the OutfitCreate interface
+    const payload: OutfitCreate = {
       ...data,
       occasion: Number(data.occasion),
-      clothings: selectedClothings.map((id) => ({ id }))
+      clothingIds: selectedClothings
     };
 
-    if (selectedClothings.length === 0) {
-      toast.error('Please select at least one clothing item for the outfit.');
-      return;
+    // Extract file from FileList if it exists
+    if (payload.previewImage && (payload.previewImage as unknown as FileList).length > 0) {
+      payload.previewImage = (payload.previewImage as unknown as FileList)[0];
+    } else {
+      delete payload.previewImage;
     }
 
     void dispatch(createOutfit(payload))
       .then((res) => {
         if (createOutfit.fulfilled.match(res)) {
           void dispatch(clothingActions.fetchOutfits());
-          void navigate('/clothing');
+          const newOutfit = res.payload as Outfit;
+          void navigate(`/clothing/outfit/${newOutfit.id}`);
         } else if (createOutfit.rejected.match(res)) {
           const error = res.payload as ValidationErrors;
-          const errorMessage = error?.errorMessage ?? 'Error adding outfit item.';
+          const errorMessage = error?.errorMessage ?? 'Error creating outfit.';
           toast.error(errorMessage);
 
           Object.keys(error).forEach((field: string) => {
@@ -77,83 +92,107 @@ const CreateOutfit: FC = () => {
     <Container className='mt-5 mb-5'>
       <h1 className='mb-4'>Create Outfit</h1>
       <Form onSubmit={(e) => void handleSubmit(onSubmit)(e)}>
-        <Form.Group className='mb-3' controlId='outfit_name'>
-          <Form.Label>Outfit Name</Form.Label>
-          <Form.Control
-            className={`${errors.outfit_name ? `is-invalid` : ``}`}
-            type='text'
-            placeholder='Enter outfit name'
-            {...register('outfit_name')}
+        <div className='bg-light p-4 rounded border mb-4'>
+          <h4 className='mb-3'>Outfit Details</h4>
+
+          <Form.Group className='mb-3' controlId='outfitName'>
+            <Form.Label className='fw-medium'>Outfit Name</Form.Label>
+            <Form.Control
+              className={`${errors.outfitName ? 'is-invalid' : ''}`}
+              type='text'
+              placeholder='e.g. Summer Beach Party'
+              {...register('outfitName')}
+            />
+            {errors.outfitName && (
+              <Form.Control.Feedback type='invalid'>
+                {errors.outfitName.message}
+              </Form.Control.Feedback>
+            )}
+          </Form.Group>
+
+          <div className='row'>
+            <Form.Group className='mb-3 col-md-6' controlId='occasion'>
+              <Form.Label className='fw-medium'>Occasion</Form.Label>
+              <Form.Select
+                className={`${errors.occasion ? 'is-invalid' : ''}`}
+                {...register('occasion')}
+              >
+                <option value=''>Select Occasion</option>
+                {occasions.map((opt) => (
+                  <option key={opt.id} value={opt.id}>
+                    {opt.occasionName}
+                  </option>
+                ))}
+              </Form.Select>
+              {errors.occasion && (
+                <Form.Control.Feedback type='invalid'>
+                  {errors.occasion.message}
+                </Form.Control.Feedback>
+              )}
+            </Form.Group>
+
+            <Form.Group className='mb-3 col-md-6' controlId='season'>
+              <Form.Label className='fw-medium'>Season</Form.Label>
+              <Form.Select
+                className={`${errors.season ? 'is-invalid' : ''}`}
+                {...register('season')}
+              >
+                <option value=''>Select Season</option>
+                {(outfitOptions?.season ?? []).map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.displayName}
+                  </option>
+                ))}
+              </Form.Select>
+              {errors.season && (
+                <Form.Control.Feedback type='invalid'>
+                  {errors.season.message}
+                </Form.Control.Feedback>
+              )}
+            </Form.Group>
+          </div>
+
+          <Form.Group className='mb-3' controlId='previewImage'>
+            <Form.Label className='fw-medium'>Preview Image (Optional)</Form.Label>
+            <Form.Control
+              className={`${errors.previewImage ? 'is-invalid' : ''}`}
+              type='file'
+              accept='image/*'
+              {...register('previewImage')}
+            />
+            <Form.Text className='text-muted'>
+              Upload a picture of the complete outfit, or leave blank to use individual item images.
+            </Form.Text>
+            {errors.previewImage && (
+              <Form.Control.Feedback type='invalid'>
+                {errors.previewImage.message}
+              </Form.Control.Feedback>
+            )}
+          </Form.Group>
+        </div>
+
+        <Form.Group className='mb-4'>
+          <h4 className='mb-3'>Select Clothing Items</h4>
+          <ClothingPicker
+            allItems={clothingItems}
+            selectedIds={selectedClothings}
+            onSelectionChange={setSelectedClothings}
+            typeOptions={clothingOptions?.clothingType ?? []}
           />
-          {errors.outfit_name !== null && (
-            <Form.Control.Feedback type='invalid'>
-              {errors.outfit_name?.message}
-            </Form.Control.Feedback>
-          )}
         </Form.Group>
 
-        <Form.Group className='mb-3' controlId='occasion'>
-          <Form.Label>Occasion</Form.Label>
-          <Form.Select
-            className={`${errors.occasion ? `is-invalid` : ``}`}
-            aria-label='Select occasion'
-            {...register('occasion')}
-          >
-            <option value=''>Select Occasion</option>
-            {occasions.map((opt, index) => (
-              <option key={opt.id ?? index} value={opt.id}>
-                {opt.occasion_name}
-              </option>
-            ))}
-          </Form.Select>
-          {errors.occasion !== null && (
-            <Form.Control.Feedback type='invalid'>{errors.occasion?.message}</Form.Control.Feedback>
-          )}
-        </Form.Group>
-
-        <Form.Group className='mb-4' controlId='clothings'>
-          <Form.Label>Select Clothing Items</Form.Label>
-          {clothingItems.length === 0 ? (
-            <p className='text-muted'>No clothing items available. Please create some first.</p>
-          ) : (
-            <ListGroup>
-              {clothingItems.map((item, index) => (
-                <ListGroup.Item
-                  key={item.id ?? index}
-                  action
-                  as='button'
-                  type='button'
-                  active={selectedClothings.includes(item.id)}
-                  onClick={() => {
-                    void toggleClothing(item.id);
-                  }}
-                  className='d-flex justify-content-between align-items-center'
-                >
-                  <div>
-                    <strong>{item.name}</strong> -{' '}
-                    <span className='text-muted'>{item.clothing_type}</span>
-                  </div>
-                  {selectedClothings.includes(item.id) && (
-                    <i className='bi bi-check-circle-fill text-white'></i>
-                  )}
-                </ListGroup.Item>
-              ))}
-            </ListGroup>
-          )}
-        </Form.Group>
-
-        <div className='mt-4'>
-          <Button variant='primary' type='submit'>
-            Submit Outfit
-          </Button>
+        <div className='d-flex gap-2 justify-content-end mt-4'>
           <Button
             variant='secondary'
-            className='ms-2'
+            size='lg'
             onClick={() => {
               void navigate('/clothing');
             }}
           >
             Cancel
+          </Button>
+          <Button variant='primary' size='lg' type='submit'>
+            Create Outfit
           </Button>
         </div>
       </Form>

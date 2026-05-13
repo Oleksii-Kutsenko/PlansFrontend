@@ -1,3 +1,5 @@
+import OutfitDetail from './pages/clothing/OutfitDetail';
+
 import { Route, Routes } from 'react-router-dom';
 import type { FC } from 'react';
 import React from 'react';
@@ -67,14 +69,21 @@ const Main: FC = () => {
         {/** Protected Routes */}
         <Route path='/' element={<ProtectedRoutes />}>
           <Route path='/' element={<Home />} />
+
           <Route path='/countries' element={<CountriesRating />} />
+
           <Route path='/portfolios' element={<Portfolios />} />
+
           <Route path='/profile' element={<Profile />} />
+
           <Route path='/wealth-management' element={<WealthManagement />} />
+
           <Route path='/clothing/all' element={<ListClothing />} />
           <Route path='/clothing' element={<ListOutfit />} />
           <Route path='/clothing/create' element={<CreateClothing />} />
           <Route path='/clothing/outfit/create' element={<CreateOutfit />} />
+          <Route path='/clothing/outfit/create' element={<CreateOutfit />} />
+          <Route path='/clothing/outfit/:id' element={<OutfitDetail />} />
         </Route>
 
         {/** Public Routes */}

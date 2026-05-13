@@ -74,7 +74,7 @@ export const AssetAllocationRow = ({
                 </tr>
               </thead>
               <tbody>
-                {allocation.asset_allocations.map((assetAllocation, index) => {
+                {allocation.assetAllocations.map((assetAllocation, index) => {
                   return (
                     <tr key={index}>
                       <td>{assetAllocation.name}</td>

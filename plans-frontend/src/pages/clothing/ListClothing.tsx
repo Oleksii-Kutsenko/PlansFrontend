@@ -1,104 +1,122 @@
-import { FC, useEffect } from 'react';
+import { FC, useEffect, useState, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store';
 import { clothingActions } from '../../store/slices/clothing';
 import { useAppDispatch } from '../../store/hooks';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { Table, Button } from 'react-bootstrap';
+import { Button, Row, Col } from 'react-bootstrap';
+import ClothingFilters, { ClothingFilterState } from '../../components/clothing/ClothingFilters';
+import ConfirmModal from '../../components/ConfirmModal';
+import ClothingCard from '../../components/clothing/ClothingCard';
 
 const ClothingList: FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+
+  // Redux state
   const clothingItems = useSelector((state: RootState) => state.clothing.clothing);
+  const clothingOptions = useSelector(
+    (state: RootState) =>
+      state.clothing.options as {
+        clothingType?: { value: string; displayName: string }[];
+      } | null
+  );
+
+  // Local state
+  const [filters, setFilters] = useState<ClothingFilterState>({
+    searchQuery: '',
+    selectedType: ''
+  });
+
+  // Modal state
+  const [itemToDelete, setItemToDelete] = useState<{ id: number; name: string } | null>(null);
 
   useEffect(() => {
+    // Fetch clothing and options on mount
     void dispatch(clothingActions.fetchClothing());
+    void dispatch(clothingActions.fetchClothingOptions());
   }, [dispatch]);
 
-  const handleDelete = (id: number | undefined) => {
-    if (id === undefined) {
-      toast.error('Cannot delete: Clothing ID is missing');
-      return;
-    }
-    if (window.confirm('Are you sure you want to delete this item?')) {
-      dispatch(clothingActions.deleteClothing(id))
+  // Client-side filtering logic
+  const filteredClothing = useMemo(() => {
+    return clothingItems.filter((item) => {
+      const matchesSearch = item.name
+        ? item.name.toLowerCase().includes(filters.searchQuery.toLowerCase())
+        : false;
+      const matchesType = filters.selectedType ? item.clothingType === filters.selectedType : true;
+
+      return matchesSearch && matchesType;
+    });
+  }, [clothingItems, filters]);
+
+  const confirmDelete = () => {
+    if (itemToDelete) {
+      dispatch(clothingActions.deleteClothing(itemToDelete.id))
         .unwrap()
         .then(() => {
           toast.success('Clothing deleted successfully');
+          setItemToDelete(null);
         })
         .catch((error) => {
           console.error('Failed to delete clothing:', error);
           toast.error('Failed to delete clothing');
+          setItemToDelete(null);
         });
     }
   };
 
-  const navigateToAddClothing = () => {
-    void navigate('/clothing/create');
-  };
-
   return (
     <div className='container mt-5 mb-5'>
-      <h2 className='mb-4'>Clothing Items</h2>
-      {clothingItems.length === 0 ? (
-        <p className='text-muted'>No clothing items found. Add some!</p>
-      ) : (
-        <Table striped bordered hover responsive className='align-middle'>
-          <thead className='table-light'>
-            <tr>
-              <th>ID</th>
-              <th>Name</th>
-              <th>Type</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {clothingItems.map((item, index) => (
-              <tr key={`clothing-row-${item.id || index}-${index}`}>
-                <td>{String(item.id ?? '')}</td>
-                <td>{String(item.name ?? '')}</td>
-                <td>{String(item.clothing_type ?? '')}</td>
-                <td>
-                  <div className='d-flex gap-2 justify-content-center'>
-                    {/* Edit is hidden until Edit component exists */}
-                    {/*
-                    <Button
-                      variant='primary'
-                      size='sm'
-                      onClick={() => {
-                        void navigate(`/clothing/edit/${item.id}`);
-                      }}
-                    >
-                      Edit
-                    </Button>
-                    */}
-                    <Button
-                      variant='danger'
-                      size='sm'
-                      onClick={() => {
-                        void handleDelete(item.id);
-                      }}
-                    >
-                      Delete
-                    </Button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </Table>
-      )}
-      <div className='mt-4'>
-        <Button
-          variant='success'
-          onClick={() => {
-            void navigateToAddClothing();
-          }}
-        >
-          Add Clothing
-        </Button>
+      <div className='d-flex justify-content-between align-items-center mb-4'>
+        <h2>All Clothing Items</h2>
+        <div className='d-flex gap-2'>
+          <Button variant='outline-secondary' onClick={() => navigate('/clothing')}>
+            <i className='bi bi-arrow-left me-2'></i>Back to Outfits
+          </Button>
+          <Button variant='success' onClick={() => navigate('/clothing/create')}>
+            Add New Item
+          </Button>
+        </div>
       </div>
+
+      <ClothingFilters typeOptions={clothingOptions?.clothingType ?? []} onChange={setFilters} />
+
+      {clothingItems.length === 0 ? (
+        <div className='text-center py-5 bg-light rounded border'>
+          <h4 className='text-muted mb-3'>Your wardrobe is completely empty.</h4>
+          <Button variant='success' onClick={() => navigate('/clothing/create')}>
+            Add Your First Item
+          </Button>
+        </div>
+      ) : filteredClothing.length === 0 ? (
+        <div className='text-center py-5 bg-light rounded border'>
+          <p className='text-muted mb-0 fs-5'>No clothing items match your current filters.</p>
+        </div>
+      ) : (
+        <Row xs={2} sm={3} md={4} lg={5} className='g-4'>
+          {filteredClothing.map((item) => (
+            <Col key={item.id}>
+              <ClothingCard
+                item={item}
+                removable={true}
+                onRemove={() => setItemToDelete({ id: item.id, name: item.name })}
+              />
+            </Col>
+          ))}
+        </Row>
+      )}
+
+      {/* Reusable Confirmation Modal */}
+      <ConfirmModal
+        show={itemToDelete !== null}
+        title='Delete Clothing Item'
+        message={`Are you sure you want to completely delete "${itemToDelete?.name}"? It will be removed from all outfits it is currently part of. This cannot be undone.`}
+        confirmLabel='Delete Item'
+        variant='danger'
+        onConfirm={confirmDelete}
+        onCancel={() => setItemToDelete(null)}
+      />
     </div>
   );
 };
