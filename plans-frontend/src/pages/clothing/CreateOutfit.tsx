@@ -55,43 +55,41 @@ const CreateOutfit: FC = () => {
     formState: { errors }
   } = useForm<CreateOutfitFormValues>();
 
-  const onSubmit = (data: CreateOutfitFormValues): void => {
-    // Prepare payload matching the OutfitCreate interface
-    const payload: OutfitCreate = {
-      ...data,
-      occasion: data.occasion,
-      clothingIds: selectedClothings,
-      previewImage: null
-    };
+  const onSubmit = async (data: CreateOutfitFormValues): Promise<void> => {
+    const previewImage = data.previewImage[0] ?? null;
+    if (previewImage) {
+      const payload: OutfitCreate = {
+        ...data,
+        clothingIds: selectedClothings,
+        previewImage: previewImage
+      };
 
-    if (data.previewImage && data.previewImage.length > 0) {
-      payload.previewImage = data.previewImage[0] ?? null;
-    }
+      try {
+        const newOutfit = await dispatch(createOutfit(payload)).unwrap();
 
-    void dispatch(createOutfit(payload))
-      .then((res) => {
-        if (createOutfit.fulfilled.match(res)) {
-          void dispatch(clothingActions.fetchOutfits());
-          const newOutfit = res.payload;
-          void navigate(`/clothing/outfit/${newOutfit.id}`);
-        } else if (createOutfit.rejected.match(res)) {
-          const error = res.payload as ValidationErrors;
-          const errorMessage = error?.errorMessage ?? 'Error creating outfit.';
-          toast.error(errorMessage);
+        void dispatch(clothingActions.fetchOutfits());
+        void navigate(`/clothing/outfit/${newOutfit.id}`);
+      } catch (err: any) {
+        console.error('Failed to create outfit:', err);
+        const error = err as ValidationErrors;
 
-          Object.keys(error).forEach((field: string) => {
-            const key = field as keyof OutfitCreate;
+        const errorMessage = error?.errorMessage ?? 'Error creating outfit.';
+        toast.error(errorMessage);
+
+        if (error) {
+          Object.keys(error).forEach((field) => {
+            const key = field as keyof CreateOutfitFormValues;
             error[key]?.forEach((message: string) => {
               toast.error(`${key}: ${message}`);
               setError(key, { type: 'custom', message: message });
             });
           });
         }
-      })
-      .catch((err) => {
-        console.log(err);
-        toast.error('Unexpected error occured.');
-      });
+      }
+    } else {
+      toast.error('Please upload an image!');
+      throw Error('Image is null or undefined.');
+    }
   };
 
   return (
