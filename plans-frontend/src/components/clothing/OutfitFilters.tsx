@@ -1,6 +1,6 @@
 import { FC, useState, useEffect } from 'react';
 import { Row, Col, Form, InputGroup, Button } from 'react-bootstrap';
-import { Occasion } from '../store/slices/clothing';
+import { Occasion } from '../../store/slices/clothing';
 
 export interface FilterState {
   searchQuery: string;

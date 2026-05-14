@@ -45,8 +45,13 @@ const ImageColorPicker: FC<ImageColorPickerProps> = ({ imageFile, onColorPick })
     // Ignore if clicked on a fully transparent pixel
     if (pixel[3] === 0) return;
 
-    const hex = rgbToHex(pixel[0], pixel[1], pixel[2]);
-    onColorPick(hex);
+    if (pixel[0] === undefined || pixel[1] === undefined || pixel[2] === undefined) {
+      throw Error('Pixel data is incomplete');
+    } else {
+      const hex = rgbToHex(pixel[0], pixel[1], pixel[2]);
+      console.log(hex);
+      onColorPick(hex);
+    }
   };
 
   if (!imgSrc) return null;

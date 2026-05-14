@@ -71,10 +71,10 @@ const ClothingList: FC = () => {
       <div className='d-flex justify-content-between align-items-center mb-4'>
         <h2>All Clothing Items</h2>
         <div className='d-flex gap-2'>
-          <Button variant='outline-secondary' onClick={() => navigate('/clothing')}>
+          <Button variant='outline-secondary' onClick={() => void navigate('/clothing')}>
             <i className='bi bi-arrow-left me-2'></i>Back to Outfits
           </Button>
-          <Button variant='success' onClick={() => navigate('/clothing/create')}>
+          <Button variant='success' onClick={() => void navigate('/clothing/create')}>
             Add New Item
           </Button>
         </div>
@@ -85,7 +85,7 @@ const ClothingList: FC = () => {
       {clothingItems.length === 0 ? (
         <div className='text-center py-5 bg-light rounded border'>
           <h4 className='text-muted mb-3'>Your wardrobe is completely empty.</h4>
-          <Button variant='success' onClick={() => navigate('/clothing/create')}>
+          <Button variant='success' onClick={() => void navigate('/clothing/create')}>
             Add Your First Item
           </Button>
         </div>

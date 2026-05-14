@@ -90,6 +90,7 @@ const OutfitEdit: FC<OutfitEditProps> = ({ outfit, onEditComplete }) => {
         ).unwrap();
         successCount++;
       } catch (err) {
+        console.error(err);
         toast.error(`Failed to add item ID ${clothingId}`);
       }
     }
@@ -158,7 +159,7 @@ const OutfitEdit: FC<OutfitEditProps> = ({ outfit, onEditComplete }) => {
       <div className='bg-white p-4 rounded border shadow-sm mb-5'>
         <h3 className='mb-4'>Current Clothing Items</h3>
         <p className='text-muted mb-4'>
-          Click "Remove" to instantly take an item out of this outfit.
+          Click &quot;Remove&quot; to instantly take an item out of this outfit.
         </p>
         {Array.isArray(outfit.clothings) && outfit.clothings.length > 0 ? (
           <Row xs={2} md={3} lg={4} className='g-3'>
@@ -166,7 +167,7 @@ const OutfitEdit: FC<OutfitEditProps> = ({ outfit, onEditComplete }) => {
               if (typeof item === 'number') return null;
               return (
                 <Col key={item.id ?? index}>
-                  <ClothingCard item={item as any} removable={true} onRemove={handleRemoveItem} />
+                  <ClothingCard item={item} removable={true} onRemove={handleRemoveItem} />
                 </Col>
               );
             })}

@@ -60,7 +60,7 @@ const OutfitView: FC<OutfitViewProps> = ({ outfit }) => {
             if (typeof item === 'number') return null;
             return (
               <Col key={item.id ?? index}>
-                <ClothingCard item={item as any} />
+                <ClothingCard item={item} />
               </Col>
             );
           })}

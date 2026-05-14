@@ -76,13 +76,13 @@ const ListOutfit: FC = () => {
       <div className='d-flex justify-content-between align-items-center mb-4'>
         <h2>Outfits</h2>
         <div className='d-flex gap-2'>
-          <Button variant='secondary' onClick={() => navigate('/clothing/all')}>
+          <Button variant='secondary' onClick={() => void navigate('/clothing/all')}>
             <i className='bi bi-grid me-2'></i>All Clothing
           </Button>
-          <Button variant='success' onClick={() => navigate('/clothing/create')}>
+          <Button variant='success' onClick={() => void navigate('/clothing/create')}>
             Add Clothing
           </Button>
-          <Button variant='primary' onClick={() => navigate('/clothing/outfit/create')}>
+          <Button variant='primary' onClick={() => void navigate('/clothing/outfit/create')}>
             Create Outfit
           </Button>
         </div>
@@ -97,7 +97,7 @@ const ListOutfit: FC = () => {
       {outfitItems.length === 0 ? (
         <div className='text-center py-5 bg-light rounded border'>
           <h4 className='text-muted mb-3'>No outfits found in your wardrobe.</h4>
-          <Button variant='primary' onClick={() => navigate('/clothing/outfit/create')}>
+          <Button variant='primary' onClick={() => void navigate('/clothing/outfit/create')}>
             Create Your First Outfit
           </Button>
         </div>
@@ -170,7 +170,7 @@ const ListOutfit: FC = () => {
                     variant='outline-primary'
                     className='w-100'
                     size='sm'
-                    onClick={() => navigate(`/clothing/outfit/${item.id}`)}
+                    onClick={() => void navigate(`/clothing/outfit/${item.id}`)}
                   >
                     View Details
                   </Button>
@@ -178,7 +178,7 @@ const ListOutfit: FC = () => {
                     variant='outline-danger'
                     size='sm'
                     title='Delete Outfit'
-                    onClick={() => setOutfitToDelete({ id: item.id!, name: item.outfitName })}
+                    onClick={() => setOutfitToDelete({ id: item.id, name: item.outfitName })}
                   >
                     <i className='bi bi-trash'></i>
                   </Button>

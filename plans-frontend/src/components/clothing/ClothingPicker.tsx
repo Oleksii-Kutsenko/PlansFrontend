@@ -1,7 +1,8 @@
 import { FC, useState, useMemo } from 'react';
 import { Row, Col, Form, InputGroup, Badge } from 'react-bootstrap';
-import { Clothing } from '../store/slices/clothing';
+import { Clothing } from '../../store/slices/clothing';
 import ClothingCard from './ClothingCard';
+
 interface ClothingPickerProps {
   allItems: Clothing[];
   selectedIds: number[];

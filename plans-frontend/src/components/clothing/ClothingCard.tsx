@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import { Card, Badge, Button, Form } from 'react-bootstrap';
-import { Clothing } from '../store/slices/clothing';
+import { Clothing } from '../../store/slices/clothing';
 
 interface ClothingCardProps {
   item: Clothing;
@@ -30,7 +30,6 @@ const ClothingCard: FC<ClothingCardProps> = ({
           <Form.Check
             type='checkbox'
             checked={selected}
-            onChange={() => {}} // State handled by card click
             onClick={(e) => e.stopPropagation()} // Prevent double toggle if checkbox clicked directly
             className='fs-5 shadow-sm'
           />

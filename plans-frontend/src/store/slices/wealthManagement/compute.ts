@@ -8,10 +8,10 @@ import { WealthManagementModel } from './interfaces';
 export const computeDelta = (wealthManagement: WealthManagementModel): WealthManagementModel => {
   const totalAllocatedAmount = wealthManagement.totalCurrentAmount;
   const totalTargetAmount = wealthManagement.allocations.reduce((acc, allocation) => {
-    return acc + allocation.target_amount;
+    return acc + allocation.targetAmount;
   }, 0);
   const totalTargetPercentage = wealthManagement.allocations.reduce((acc, allocation) => {
-    return acc + allocation.target_percentage;
+    return acc + allocation.targetPercentage;
   }, 0);
 
   const updatedWealthManagement: WealthManagementModel = {
@@ -21,18 +21,18 @@ export const computeDelta = (wealthManagement: WealthManagementModel): WealthMan
   };
 
   for (const allocation of updatedWealthManagement.allocations) {
-    allocation.allocatedPercentage = (allocation.current_amount / totalAllocatedAmount) * 100;
-    if (allocation.target_percentage !== null) {
+    allocation.allocatedPercentage = (allocation.currentAmount / totalAllocatedAmount) * 100;
+    if (allocation.targetPercentage !== null) {
       allocation.delta =
-        allocation.target_percentage - (allocation.current_amount / totalAllocatedAmount) * 100;
+        allocation.targetPercentage - (allocation.currentAmount / totalAllocatedAmount) * 100;
     } else {
-      allocation.delta = allocation.target_amount - allocation.current_amount;
+      allocation.delta = allocation.targetAmount - allocation.currentAmount;
     }
 
     for (const assetAllocation of allocation.assetAllocations) {
       if (assetAllocation.targetPercentage !== null) {
         assetAllocation.delta =
-          assetAllocation.targetPercentage - assetAllocation.allocated_percentage;
+          assetAllocation.targetPercentage - assetAllocation.allocatedPercentage;
       } else if (assetAllocation.targetAmount !== null) {
         assetAllocation.delta = assetAllocation.targetAmount - assetAllocation.currentAmount;
       } else {

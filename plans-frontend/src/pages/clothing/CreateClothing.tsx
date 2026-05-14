@@ -6,10 +6,17 @@ import { clothingActions, createClothing } from '../../store/slices/clothing';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch } from '../../store/hooks';
 import { useForm } from 'react-hook-form';
-import { Button, Container, Form, Row, Col } from 'react-bootstrap';
+import { Button, Container, Form, Row } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 import { ValidationErrors } from '../../store/slices/utils';
 import ImageColorPicker from '../../components/clothing/ImageColorPicker';
+
+interface CreateClothingFormValues {
+  name: string;
+  clothingType: string;
+  color: string;
+  imagePath: FileList;
+}
 
 const CreateClothing = () => {
   const dispatch = useAppDispatch();
@@ -32,52 +39,58 @@ const CreateClothing = () => {
     setValue,
     setError,
     formState: { errors }
-  } = useForm<ClothingCreate>();
+  } = useForm<CreateClothingFormValues>();
 
   // Watch the image input so we can pass the file to the color picker
-  const imageFiles = watch('imagePath') as unknown as FileList;
-  const currentImageFile = imageFiles && imageFiles.length > 0 ? imageFiles[0] : null;
+  const imageFiles = watch('imagePath');
+  let currentImageFile = null;
+  if (imageFiles && imageFiles.length > 0) {
+    currentImageFile = imageFiles[0] ?? null;
+  }
 
-  const onSubmit = (data: ClothingCreate): void => {
-    const payload = { ...data };
+  const onSubmit = async (data: CreateClothingFormValues): Promise<void> => {
+    const imagePath = data.imagePath[0] ?? null;
+    if (imagePath) {
+      const payload: ClothingCreate = {
+        name: data.name,
+        clothingType: data.clothingType,
+        color: data.color,
+        imagePath: imagePath
+      };
 
-    // Convert FileList to File before dispatching
-    if (payload.imagePath && (payload.imagePath as unknown as FileList).length > 0) {
-      payload.imagePath = (payload.imagePath as unknown as FileList)[0];
-    } else {
-      delete payload.imagePath;
-    }
+      try {
+        await dispatch(createClothing(payload)).unwrap();
 
-    void dispatch(createClothing(payload))
-      .then((res) => {
-        if (createClothing.fulfilled.match(res)) {
-          void dispatch(clothingActions.fetchClothing());
-          void navigate('/clothing/all');
-        } else if (createClothing.rejected.match(res)) {
-          const error = res.payload as ValidationErrors;
-          const errorMessage = error?.errorMessage ?? 'Error adding clothing item.';
-          toast.error(errorMessage);
+        void dispatch(clothingActions.fetchClothing());
+        void navigate('/clothing/all');
+      } catch (err: any) {
+        console.error(err);
+        const error = err as ValidationErrors;
 
+        const errorMessage = error?.errorMessage ?? 'Error adding clothing item.';
+        toast.error(errorMessage);
+
+        if (error) {
           Object.keys(error).forEach((field: string) => {
-            const key = field as keyof ClothingCreate;
+            const key = field as keyof CreateClothingFormValues;
             error[key]?.forEach((message: string) => {
               toast.error(`${key}: ${message}`);
               setError(key, { type: 'custom', message: message });
             });
           });
         }
-      })
-      .catch((err) => {
-        console.log(err);
-        toast.error('Unexpected error occured.');
-      });
+      }
+    } else {
+      toast.error('Please upload an image!');
+      throw Error('Image is null or undefined.');
+    }
   };
 
   return (
     <Container className='mt-5 mb-5' style={{ maxWidth: '600px' }}>
       <div className='d-flex justify-content-between align-items-center mb-4'>
         <h1 className='mb-0'>Add Clothing Item</h1>
-        <Button variant='outline-secondary' onClick={() => navigate('/clothing/all')}>
+        <Button variant='outline-secondary' onClick={() => void navigate('/clothing/all')}>
           Cancel
         </Button>
       </div>
@@ -125,7 +138,7 @@ const CreateClothing = () => {
                 className='w-100 p-1'
                 title='Choose your color'
                 style={{ height: '38px', cursor: 'pointer' }}
-                {...register('color')}
+                {...register('color', { required: 'Main color is required' })}
                 defaultValue='#000000'
               />
             </Form.Group>
@@ -137,7 +150,7 @@ const CreateClothing = () => {
               className={`${errors.imagePath ? 'is-invalid' : ''}`}
               type='file'
               accept='image/*'
-              {...register('imagePath')}
+              {...register('imagePath', { required: 'An image is required!' })}
             />
             {errors.imagePath && (
               <Form.Control.Feedback type='invalid'>

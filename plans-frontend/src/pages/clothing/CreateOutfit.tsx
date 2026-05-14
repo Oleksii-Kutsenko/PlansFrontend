@@ -2,7 +2,7 @@ import { FC, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store';
 import { OutfitCreate, createOutfit } from '../../store/slices/clothing';
-import { clothingActions, Outfit } from '../../store/slices/clothing';
+import { clothingActions } from '../../store/slices/clothing';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch } from '../../store/hooks';
 import { useForm } from 'react-hook-form';
@@ -10,6 +10,14 @@ import { Button, Container, Form } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 import { ValidationErrors } from '../../store/slices/utils';
 import ClothingPicker from '../../components/clothing/ClothingPicker';
+
+interface CreateOutfitFormValues {
+  outfitName: string;
+  season: string;
+  occasion: number;
+  previewImage: FileList;
+  clothingIds: number[];
+}
 
 const CreateOutfit: FC = () => {
   const dispatch = useAppDispatch();
@@ -45,28 +53,26 @@ const CreateOutfit: FC = () => {
     handleSubmit,
     setError,
     formState: { errors }
-  } = useForm<OutfitCreate>();
+  } = useForm<CreateOutfitFormValues>();
 
-  const onSubmit = (data: OutfitCreate): void => {
+  const onSubmit = (data: CreateOutfitFormValues): void => {
     // Prepare payload matching the OutfitCreate interface
     const payload: OutfitCreate = {
       ...data,
-      occasion: Number(data.occasion),
-      clothingIds: selectedClothings
+      occasion: data.occasion,
+      clothingIds: selectedClothings,
+      previewImage: null
     };
 
-    // Extract file from FileList if it exists
-    if (payload.previewImage && (payload.previewImage as unknown as FileList).length > 0) {
-      payload.previewImage = (payload.previewImage as unknown as FileList)[0];
-    } else {
-      delete payload.previewImage;
+    if (data.previewImage && data.previewImage.length > 0) {
+      payload.previewImage = data.previewImage[0] ?? null;
     }
 
     void dispatch(createOutfit(payload))
       .then((res) => {
         if (createOutfit.fulfilled.match(res)) {
           void dispatch(clothingActions.fetchOutfits());
-          const newOutfit = res.payload as Outfit;
+          const newOutfit = res.payload;
           void navigate(`/clothing/outfit/${newOutfit.id}`);
         } else if (createOutfit.rejected.match(res)) {
           const error = res.payload as ValidationErrors;

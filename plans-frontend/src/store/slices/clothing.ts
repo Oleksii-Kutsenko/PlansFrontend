@@ -31,8 +31,8 @@ export interface Outfit {
 export interface ClothingCreate {
   name: string;
   clothingType: string;
-  color?: string;
-  imagePath?: File | null | undefined;
+  color: string;
+  imagePath: File;
 }
 
 export interface OutfitCreate {
