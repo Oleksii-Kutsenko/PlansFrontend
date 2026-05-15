@@ -47,12 +47,12 @@ export const AssetAllocationRow = ({
         <td>
           <i className={`bi bi-chevron-${expanded ? 'down' : 'right'}`}></i>
         </td>
-        <td>{allocation.asset_type.name}</td>
-        <td>{formatNumber(allocation.current_amount, baseCurrency.symbol)}</td>
-        <td>{formatNumber(allocation.target_amount, baseCurrency.symbol)}</td>
+        <td>{allocation.assetType.name}</td>
+        <td>{formatNumber(allocation.currentAmount, baseCurrency.symbol)}</td>
+        <td>{formatNumber(allocation.targetAmount, baseCurrency.symbol)}</td>
         <td>{formatPercentage(allocation.allocatedPercentage)}</td>
-        <td>{formatPercentage(allocation.target_percentage)}</td>
-        {allocation.target_percentage === null ? (
+        <td>{formatPercentage(allocation.targetPercentage)}</td>
+        {allocation.targetPercentage === null ? (
           <td>{formatNumber(allocation.delta, baseCurrency.symbol)}</td>
         ) : (
           <td>{formatPercentage(allocation.delta)}</td>
@@ -74,7 +74,7 @@ export const AssetAllocationRow = ({
                 </tr>
               </thead>
               <tbody>
-                {allocation.asset_allocations.map((assetAllocation, index) => {
+                {allocation.assetAllocations.map((assetAllocation, index) => {
                   return (
                     <tr key={index}>
                       <td>{assetAllocation.name}</td>
@@ -93,7 +93,7 @@ export const AssetAllocationRow = ({
                           onSubmit={handleSubmit('target_amount', assetAllocation.id)}
                         />
                       </td>
-                      <td>{formatPercentage(assetAllocation.allocated_percentage)}</td>
+                      <td>{formatPercentage(assetAllocation.allocatedPercentage)}</td>
                       <td>
                         {assetAllocation.targetPercentage === null ? (
                           <span>N/A</span>

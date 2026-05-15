@@ -9,7 +9,7 @@ interface ExpandableTableProps {
 }
 
 export function ExpandableTable({ wealthManagement }: ExpandableTableProps): React.ReactElement {
-  const baseCurrency = wealthManagement.base_currency;
+  const baseCurrency = wealthManagement.baseCurrency;
 
   return (
     <div className='table-container'>
