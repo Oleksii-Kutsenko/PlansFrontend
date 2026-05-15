@@ -45,6 +45,21 @@ fetcher.interceptors.response.use((res) => {
   return res;
 });
 
+let isRefreshing = false;
+let failedQueue: { resolve: (value?: unknown) => void; reject: (reason?: any) => void }[] = [];
+
+const processQueue = (error: Error | null, token: string | null = null) => {
+  failedQueue.forEach((prom) => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve(token);
+    }
+  });
+
+  failedQueue = [];
+};
+
 fetcher.interceptors.response.use(
   (res: AxiosResponse<InternalAxiosRequestConfig, AxiosError>) => {
     if (res.config.baseURL && res.config.url) {
@@ -53,39 +68,64 @@ fetcher.interceptors.response.use(
     return res;
   },
   async (err: AxiosError) => {
-    if (err?.config) {
+    const originalRequest = err.config;
+
+    if (originalRequest) {
       console.debug(
         '[Response]',
-        err.config.baseURL,
-        err.config.url,
+        originalRequest.baseURL,
+        originalRequest.url,
         err.response?.status,
         err.response?.data
       );
-      if (err.response?.status === 401) {
-        await refreshAuthLogic(err);
+
+      if (
+        err.response?.status === 401 &&
+        !originalRequest.url?.includes('/api/accounts/refresh/')
+      ) {
+        if (isRefreshing) {
+          try {
+            const token = await new Promise((resolve, reject) => {
+              failedQueue.push({ resolve, reject });
+            });
+            originalRequest.headers.Authorization = `Bearer ${String(token)}`;
+            return fetcher(originalRequest);
+          } catch (queueErr) {
+            const finalError = queueErr instanceof Error ? queueErr : new Error('Queue failed');
+            return Promise.reject(finalError);
+          }
+        }
+
+        isRefreshing = true;
+
+        try {
+          const { refreshToken } = store.getState().auth;
+          if (!refreshToken) {
+            store.dispatch(logout());
+            return Promise.reject(err);
+          }
+
+          const resp = await axios.post(`${import.meta.env.VITE_API_URL}/api/accounts/refresh/`, {
+            refresh: refreshToken
+          });
+          const { access, refresh } = resp.data as { access: string; refresh: string };
+          console.log('Refreshed token:', access, refresh);
+          store.dispatch(setToken({ access, refresh }));
+          originalRequest.headers.Authorization = `Bearer ${access}`;
+          processQueue(null, access);
+          return fetcher(originalRequest);
+        } catch (refreshErr: unknown) {
+          if (axios.isAxiosError(refreshErr) && refreshErr.response?.status === 401) {
+            store.dispatch(logout());
+          }
+          const finalError = refreshErr instanceof Error ? refreshErr : new Error('Refresh failed');
+          processQueue(finalError, null);
+          return Promise.reject(finalError);
+        } finally {
+          isRefreshing = false;
+        }
       }
-      return Promise.reject(err);
     }
+    return Promise.reject(err);
   }
 );
-
-const refreshAuthLogic = async (error: AxiosError) => {
-  const { refreshToken } = store.getState().auth;
-  if (refreshToken && error.response?.config.headers) {
-    try {
-      const resp = await fetcher.post('/api/accounts/refresh/', {
-        refresh: refreshToken
-      });
-      const { access, refresh } = resp.data as { access: string; refresh: string };
-      console.log('Refreshed token:', access, refresh);
-      error.response.config.headers.Authorization = `Bearer ${access}`;
-      store.dispatch(setToken({ access, refresh }));
-    } catch (err: unknown) {
-      if (axios.isAxiosError(err) && err.response?.status === 401) {
-        store.dispatch(logout());
-      }
-    }
-  } else {
-    store.dispatch(logout());
-  }
-};
