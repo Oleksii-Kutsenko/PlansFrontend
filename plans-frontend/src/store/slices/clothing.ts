@@ -51,12 +51,21 @@ export interface OutfitUpdate {
   previewImage?: File | null;
 }
 
+export interface ClothingOptions {
+  clothingType?: { value: string; displayName: string }[];
+  season?: { value: string; displayName: string }[];
+}
+
+export interface OutfitOptions {
+  season?: { value: string; displayName: string }[];
+}
+
 interface State {
   clothing: Clothing[];
   outfit: Outfit[];
   currentOutfit: Outfit | null;
-  options: any;
-  outfitOptions: any;
+  options: ClothingOptions | null;
+  outfitOptions: OutfitOptions | null;
   occasions: Occasion[];
   status: LoadingStatus;
 }

@@ -69,9 +69,9 @@ const CreateOutfit: FC = () => {
 
         void dispatch(clothingActions.fetchOutfits());
         void navigate(`/clothing/outfit/${newOutfit.id}`);
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error('Failed to create outfit:', err);
-        const error = err as ValidationErrors;
+        const error = err as ValidationErrors & { errorMessage?: string };
 
         const errorMessage = error?.errorMessage ?? 'Error creating outfit.';
         toast.error(errorMessage);

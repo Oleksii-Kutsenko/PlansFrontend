@@ -63,9 +63,9 @@ const CreateClothing = () => {
 
         void dispatch(clothingActions.fetchClothing());
         void navigate('/clothing/all');
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error(err);
-        const error = err as ValidationErrors;
+        const error = err as ValidationErrors & { errorMessage?: string };
 
         const errorMessage = error?.errorMessage ?? 'Error adding clothing item.';
         toast.error(errorMessage);
