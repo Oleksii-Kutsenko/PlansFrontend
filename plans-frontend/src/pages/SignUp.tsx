@@ -1,7 +1,8 @@
-import axios from 'axios';
 import type { FC } from 'react';
 import { useEffect, useState } from 'react';
 import { Button, Card, Col, Container, Form, Row } from 'react-bootstrap';
+import { fetcher } from '../utils/axios';
+import axios from 'axios';
 import { Controller, useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
 import Select from 'react-select';
@@ -63,8 +64,8 @@ const SignUp: FC = () => {
     };
 
     void toast.promise(
-      axios
-        .post('http://127.0.0.1:8000/api/accounts/register/', params)
+      fetcher
+        .post('/api/accounts/register/', params)
         .then(() => {
           void navigate('/login');
         })
@@ -99,7 +100,7 @@ const SignUp: FC = () => {
   useEffect(() => {
     const fetchData = async (): Promise<void> => {
       try {
-        const response = await axios.get<CountryResponse[]>('http://127.0.0.1:8000/api/countries/');
+        const response = await fetcher.get<CountryResponse[]>('/api/countries/');
         const newOptions = response.data.map((country: { name: string; id: number }) => {
           return { label: country.name, value: country.id };
         });

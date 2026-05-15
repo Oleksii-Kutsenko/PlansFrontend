@@ -1,6 +1,6 @@
-import axios from 'axios';
 import React from 'react';
 import { Button, Card, Col, Container, Form, Row } from 'react-bootstrap';
+import { fetcher } from '../utils/axios';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -33,15 +33,11 @@ const Login: React.FC = () => {
     };
 
     void toast.promise(
-      axios
-        .post('/api/accounts/token/', params, {
-          baseURL: import.meta.env.VITE_API_URL
-        })
-        .then((response: TokenResponse) => {
-          dispatch(setToken(response.data));
-          void dispatch(userActions.fetchCurrentUser());
-          void navigate('/');
-        }),
+      fetcher.post('/api/accounts/token/', params).then((response: TokenResponse) => {
+        dispatch(setToken(response.data));
+        void dispatch(userActions.fetchCurrentUser());
+        void navigate('/');
+      }),
       {
         pending: 'Logging in...',
         success: 'Logged in!',
