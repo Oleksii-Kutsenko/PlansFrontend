@@ -62,7 +62,7 @@ const CreateClothing = () => {
         await dispatch(createClothing(payload)).unwrap();
 
         void dispatch(clothingActions.fetchClothing());
-        void navigate('/clothing/all');
+        void navigate('/clothing/clothing');
       } catch (err: any) {
         console.error(err);
         const error = err as ValidationErrors;
@@ -90,7 +90,7 @@ const CreateClothing = () => {
     <Container className='mt-5 mb-5' style={{ maxWidth: '600px' }}>
       <div className='d-flex justify-content-between align-items-center mb-4'>
         <h1 className='mb-0'>Add Clothing Item</h1>
-        <Button variant='outline-secondary' onClick={() => void navigate('/clothing/all')}>
+        <Button variant='outline-secondary' onClick={() => void navigate('/clothing/clothing')}>
           Cancel
         </Button>
       </div>

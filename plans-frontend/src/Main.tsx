@@ -78,7 +78,7 @@ const Main: FC = () => {
 
           <Route path='/wealth-management' element={<WealthManagement />} />
 
-          <Route path='/clothing/all' element={<ListClothing />} />
+          <Route path='/clothing/clothing' element={<ListClothing />} />
           <Route path='/clothing' element={<ListOutfit />} />
           <Route path='/clothing/create' element={<CreateClothing />} />
           <Route path='/clothing/outfit/create' element={<CreateOutfit />} />

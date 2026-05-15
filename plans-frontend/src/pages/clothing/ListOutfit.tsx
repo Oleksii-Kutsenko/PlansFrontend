@@ -76,7 +76,7 @@ const ListOutfit: FC = () => {
       <div className='d-flex justify-content-between align-items-center mb-4'>
         <h2>Outfits</h2>
         <div className='d-flex gap-2'>
-          <Button variant='secondary' onClick={() => void navigate('/clothing/all')}>
+          <Button variant='secondary' onClick={() => void navigate('/clothing/clothing')}>
             <i className='bi bi-grid me-2'></i>All Clothing
           </Button>
           <Button variant='success' onClick={() => void navigate('/clothing/create')}>
