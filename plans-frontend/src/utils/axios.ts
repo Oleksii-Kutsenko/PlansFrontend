@@ -45,6 +45,10 @@ fetcher.interceptors.response.use((res) => {
   return res;
 });
 
+interface CustomAxiosRequestConfig extends InternalAxiosRequestConfig {
+  _retry?: boolean;
+}
+
 fetcher.interceptors.response.use(
   (res: AxiosResponse<InternalAxiosRequestConfig, AxiosError>) => {
     if (res.config.baseURL && res.config.url) {
@@ -53,19 +57,32 @@ fetcher.interceptors.response.use(
     return res;
   },
   async (err: AxiosError) => {
-    if (err?.config) {
+    const originalConfig = err.config as CustomAxiosRequestConfig;
+    if (originalConfig) {
       console.debug(
         '[Response]',
-        err.config.baseURL,
-        err.config.url,
+        originalConfig.baseURL,
+        originalConfig.url,
         err.response?.status,
         err.response?.data
       );
-      if (err.response?.status === 401) {
-        await refreshAuthLogic(err);
+      if (err.response?.status === 401 && !originalConfig._retry) {
+        originalConfig._retry = true;
+        try {
+          await refreshAuthLogic(err);
+          // Original request headers will be updated with the new token by authHeader()
+          // when the request is retried since we didn't statically set it in originalConfig
+          return fetcher(originalConfig);
+        } catch (refreshErr) {
+          if (refreshErr instanceof Error) {
+            return Promise.reject(refreshErr);
+          }
+          return Promise.reject(new Error(String(refreshErr)));
+        }
       }
       return Promise.reject(err);
     }
+    return Promise.reject(err);
   }
 );
 
@@ -73,7 +90,8 @@ const refreshAuthLogic = async (error: AxiosError) => {
   const { refreshToken } = store.getState().auth;
   if (refreshToken && error.response?.config.headers) {
     try {
-      const resp = await fetcher.post('/api/accounts/refresh/', {
+      // Use axios.post instead of fetcher.post to avoid hitting the interceptor again and causing an infinite loop
+      const resp = await axios.post(`${import.meta.env.VITE_API_URL}/api/accounts/refresh/`, {
         refresh: refreshToken
       });
       const { access, refresh } = resp.data as { access: string; refresh: string };
@@ -84,8 +102,10 @@ const refreshAuthLogic = async (error: AxiosError) => {
       if (axios.isAxiosError(err) && err.response?.status === 401) {
         store.dispatch(logout());
       }
+      throw err;
     }
   } else {
     store.dispatch(logout());
+    throw new Error('No refresh token available');
   }
 };
