@@ -49,6 +49,24 @@ interface CustomAxiosRequestConfig extends InternalAxiosRequestConfig {
   _retry?: boolean;
 }
 
+let isRefreshing = false;
+let failedQueue: {
+  resolve: (value?: unknown) => void;
+  reject: (reason?: unknown) => void;
+}[] = [];
+
+const processQueue = (error: Error | null, token: string | null = null) => {
+  failedQueue.forEach((prom) => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve(token);
+    }
+  });
+
+  failedQueue = [];
+};
+
 fetcher.interceptors.response.use(
   (res: AxiosResponse<InternalAxiosRequestConfig, AxiosError>) => {
     if (res.config.baseURL && res.config.url) {
@@ -66,18 +84,54 @@ fetcher.interceptors.response.use(
         err.response?.status,
         err.response?.data
       );
+
       if (err.response?.status === 401 && !originalConfig._retry) {
-        originalConfig._retry = true;
-        try {
-          await refreshAuthLogic(err);
-          // Original request headers will be updated with the new token by authHeader()
-          // when the request is retried since we didn't statically set it in originalConfig
-          return fetcher(originalConfig);
-        } catch (refreshErr) {
-          if (refreshErr instanceof Error) {
-            return Promise.reject(refreshErr);
+        if (isRefreshing) {
+          try {
+            const token = await new Promise((resolve, reject) => {
+              failedQueue.push({ resolve, reject });
+            });
+            if (token && typeof token === 'string') {
+              originalConfig.headers.Authorization = `Bearer ${token}`;
+            }
+            return await fetcher(originalConfig);
+          } catch (error) {
+            return await Promise.reject(error instanceof Error ? error : new Error(String(error)));
           }
-          return Promise.reject(new Error(String(refreshErr)));
+        }
+
+        originalConfig._retry = true;
+        isRefreshing = true;
+
+        try {
+          const { refreshToken } = store.getState().auth;
+          if (!refreshToken) {
+            throw new Error('No refresh token available');
+          }
+
+          const resp = await axios.post(`${import.meta.env.VITE_API_URL}/api/accounts/refresh/`, {
+            refresh: refreshToken
+          });
+
+          const { access, refresh } = resp.data as { access: string; refresh: string };
+          console.log('Refreshed token:', access, refresh);
+
+          store.dispatch(setToken({ access, refresh }));
+          originalConfig.headers.Authorization = `Bearer ${access}`;
+
+          processQueue(null, access);
+          return await fetcher(originalConfig);
+        } catch (refreshErr) {
+          processQueue(
+            refreshErr instanceof Error ? refreshErr : new Error(String(refreshErr)),
+            null
+          );
+          store.dispatch(logout());
+          return await Promise.reject(
+            refreshErr instanceof Error ? refreshErr : new Error(String(refreshErr))
+          );
+        } finally {
+          isRefreshing = false;
         }
       }
       return Promise.reject(err);
@@ -85,27 +139,3 @@ fetcher.interceptors.response.use(
     return Promise.reject(err);
   }
 );
-
-const refreshAuthLogic = async (error: AxiosError) => {
-  const { refreshToken } = store.getState().auth;
-  if (refreshToken && error.response?.config.headers) {
-    try {
-      // Use axios.post instead of fetcher.post to avoid hitting the interceptor again and causing an infinite loop
-      const resp = await axios.post(`${import.meta.env.VITE_API_URL}/api/accounts/refresh/`, {
-        refresh: refreshToken
-      });
-      const { access, refresh } = resp.data as { access: string; refresh: string };
-      console.log('Refreshed token:', access, refresh);
-      error.response.config.headers.Authorization = `Bearer ${access}`;
-      store.dispatch(setToken({ access, refresh }));
-    } catch (err: unknown) {
-      if (axios.isAxiosError(err) && err.response?.status === 401) {
-        store.dispatch(logout());
-      }
-      throw err;
-    }
-  } else {
-    store.dispatch(logout());
-    throw new Error('No refresh token available');
-  }
-};
