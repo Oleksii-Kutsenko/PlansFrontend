@@ -1,12 +1,11 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-
 import { fetcher } from '../../utils/axios';
 
 export enum CountriesOptionsStatus {
   IDLE = 'idle',
   LOADING = 'loading',
   SUCCEEDED = 'succeeded',
-  FAILED = 'failed',
+  FAILED = 'failed'
 }
 
 export interface Option {
@@ -29,7 +28,7 @@ export const fetchCountriesOptions = createAsyncThunk(
     const response = await fetcher.options<Option[]>('/api/countries/rating/');
     const data = response.data;
     return data;
-  },
+  }
 );
 
 const countriesOptionsSlice = createSlice({
@@ -48,7 +47,7 @@ const countriesOptionsSlice = createSlice({
       .addCase(fetchCountriesOptions.rejected, (state) => {
         state.status = CountriesOptionsStatus.FAILED;
       });
-  },
+  }
 });
 
 export const countriesOptionsReducer = countriesOptionsSlice.reducer;

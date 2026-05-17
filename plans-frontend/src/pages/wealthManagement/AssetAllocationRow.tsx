@@ -1,17 +1,15 @@
 import React, { useState } from 'react';
-
-import { CurrencyInput } from '@/components/CurrencyInput';
-import { PercentageInput } from '@/components/PercentageInput';
-
-import { type Allocation, type Currency, wealthManagementActions } from '../../store';
-import { useAppDispatch } from '../../store/hooks';
-import { fetcher } from '../../utils/axios';
+import { type Currency, type Allocation, wealthManagementActions } from '../../store';
 import { formatNumber, formatPercentage } from './formatting';
+import { PercentageInput } from '@/components/PercentageInput';
+import { fetcher } from '../../utils/axios';
+import { useAppDispatch } from '../../store/hooks';
+import { CurrencyInput } from '@/components/CurrencyInput';
 
 export const AssetAllocationRow = ({
   allocation,
   baseCurrency,
-  wealthManagementID,
+  wealthManagementID
 }: {
   allocation: Allocation;
   baseCurrency: Currency;
@@ -25,16 +23,16 @@ export const AssetAllocationRow = ({
     async (value: number): Promise<void> => {
       try {
         await fetcher.patch(`/api/assets/asset-allocation/${assetAllocationId}/`, {
-          [fieldName]: value,
+          [fieldName]: value
         });
         await dispatch(wealthManagementActions.fetchWealthManagement(wealthManagementID)).unwrap();
-      } catch (error: unknown) {
-        console.log(error);
+      } catch (err: unknown) {
+        console.log(err);
 
-        if (error instanceof Error) {
-          throw error;
+        if (err instanceof Error) {
+          throw err;
         }
-        throw new Error(String(error));
+        throw new Error(String(err));
       }
     };
 
@@ -62,9 +60,9 @@ export const AssetAllocationRow = ({
       </tr>
       {expanded && (
         <tr>
-          <td colSpan={7} className="inner-table-container">
-            <table className="inner-table">
-              <thead className="table-head">
+          <td colSpan={7} className='inner-table-container'>
+            <table className='inner-table'>
+              <thead className='table-head'>
                 <tr>
                   <th>Asset Name</th>
                   <th>Asset</th>

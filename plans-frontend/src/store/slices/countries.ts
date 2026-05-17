@@ -1,13 +1,12 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-
-import { fetcher } from '../../utils/axios';
 import { type RootState } from '..';
+import { fetcher } from '../../utils/axios';
 
 export enum CountriesStatus {
   IDLE = 'idle',
   LOADING = 'loading',
   SUCCEEDED = 'succeeded',
-  FAILED = 'failed',
+  FAILED = 'failed'
 }
 
 export interface Country {
@@ -27,7 +26,7 @@ interface State {
 const initialState: State = {
   countries: [],
   status: CountriesStatus.IDLE,
-  countriesRatingHistory: [],
+  countriesRatingHistory: []
 };
 
 // Thunk
@@ -39,11 +38,9 @@ export const fetchCountries = createAsyncThunk('countries/fetchCountries', async
 export const fetchCountryRatingHistory = createAsyncThunk<Country[], number>(
   'countries/fetchCountryRatingHistory',
   async (countryId: number) => {
-    const { data } = await fetcher.get<Country[]>(
-      `/api/countries/${String(countryId)}/rating-history/`,
-    );
+    const { data } = await fetcher.get<Country[]>(`/api/countries/${countryId}/rating-history/`);
     return data;
-  },
+  }
 );
 
 // Slice
@@ -66,12 +63,12 @@ const countriesSlice = createSlice({
       .addCase(fetchCountryRatingHistory.fulfilled, (state, action) => {
         const history = new Map<number, Country[]>(state.countriesRatingHistory);
         history.set(action.meta.arg, action.payload);
-        state.countriesRatingHistory = [...history];
+        state.countriesRatingHistory = Array.from(history);
       })
       .addCase(fetchCountryRatingHistory.rejected, () => {
         console.debug('Failed to load country rating history');
       });
-  },
+  }
 });
 
 // Selectors
@@ -81,6 +78,6 @@ export const getCountries = (state: RootState): Country[] => state.countries.cou
 export const countriesActions = {
   ...countriesSlice.actions,
   fetchCountries,
-  fetchCountryRatingHistory,
+  fetchCountryRatingHistory
 };
 export const countriesReducer = countriesSlice.reducer;

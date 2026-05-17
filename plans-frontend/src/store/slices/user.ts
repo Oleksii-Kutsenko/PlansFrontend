@@ -1,5 +1,4 @@
 import { createAsyncThunk, createSlice, type PayloadAction } from '@reduxjs/toolkit';
-
 import { fetcher } from '../../utils/axios';
 
 interface User {
@@ -23,13 +22,13 @@ export const fetchCurrentUser = createAsyncThunk(
   async (): Promise<User> => {
     const response = await fetcher.get<User>('/api/accounts/user/');
     return response.data;
-  },
+  }
 );
 
 // Initial state
 const initialState: State = {
   user: null,
-  userLoading: false,
+  userLoading: false
 };
 
 // Slice
@@ -49,7 +48,7 @@ const userSlice = createSlice({
       .addCase(fetchCurrentUser.rejected, (state) => {
         state.userLoading = false;
       });
-  },
+  }
 });
 
 // Exports

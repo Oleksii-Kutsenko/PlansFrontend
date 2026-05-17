@@ -31,7 +31,7 @@ export interface Allocation {
   currentAmount: number;
   delta: number;
   targetAmount: number;
-  targetPercentage: number | null;
+  targetPercentage: number;
 }
 
 export interface WealthManagementModel {

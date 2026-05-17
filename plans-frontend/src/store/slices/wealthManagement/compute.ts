@@ -11,30 +11,32 @@ export const computeDelta = (wealthManagement: WealthManagementModel): WealthMan
     return acc + allocation.targetAmount;
   }, 0);
   const totalTargetPercentage = wealthManagement.allocations.reduce((acc, allocation) => {
-    return acc + (allocation.targetPercentage ?? 0);
+    return acc + allocation.targetPercentage;
   }, 0);
 
   const updatedWealthManagement: WealthManagementModel = {
     ...wealthManagement,
     totalTargetAmount,
-    totalTargetPercentage,
+    totalTargetPercentage
   };
 
   for (const allocation of updatedWealthManagement.allocations) {
     allocation.allocatedPercentage = (allocation.currentAmount / totalAllocatedAmount) * 100;
-    allocation.delta =
-      allocation.targetPercentage === null
-        ? allocation.targetAmount - allocation.currentAmount
-        : allocation.targetPercentage - (allocation.currentAmount / totalAllocatedAmount) * 100;
+    if (allocation.targetPercentage !== null) {
+      allocation.delta =
+        allocation.targetPercentage - (allocation.currentAmount / totalAllocatedAmount) * 100;
+    } else {
+      allocation.delta = allocation.targetAmount - allocation.currentAmount;
+    }
 
     for (const assetAllocation of allocation.assetAllocations) {
       if (assetAllocation.targetPercentage !== null) {
         assetAllocation.delta =
           assetAllocation.targetPercentage - assetAllocation.allocatedPercentage;
-      } else if (assetAllocation.targetAmount === null) {
-        throw new Error('Invalid asset allocation');
-      } else {
+      } else if (assetAllocation.targetAmount !== null) {
         assetAllocation.delta = assetAllocation.targetAmount - assetAllocation.currentAmount;
+      } else {
+        throw new Error('Invalid asset allocation');
       }
     }
   }

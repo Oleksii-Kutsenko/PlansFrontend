@@ -1,9 +1,8 @@
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-
 import { fetcher } from '../../../utils/axios';
+import { WealthManagementModel, UpdateAssetAllocation } from './interfaces';
 import { computeDelta } from './compute';
-import { UpdateAssetAllocation, WealthManagementModel } from './interfaces';
 
 const name = 'wealthManagement';
 
@@ -11,7 +10,7 @@ export enum WealthManagementStatus {
   IDLE = 'idle',
   LOADING = 'loading',
   SUCCEEDED = 'succeeded',
-  FAILED = 'failed',
+  FAILED = 'failed'
 }
 
 interface State {
@@ -23,7 +22,7 @@ interface State {
 const initialState: State = {
   wealthManagement: undefined,
   wealthManagementChanged: false,
-  status: WealthManagementStatus.IDLE,
+  status: WealthManagementStatus.IDLE
 };
 
 // Thunk
@@ -31,10 +30,10 @@ export const fetchWealthManagement = createAsyncThunk(
   `${name}/fetchWealthManagement`,
   async (wealthManagementId: number) => {
     const { data } = await fetcher.get<WealthManagementModel>(
-      `/api/assets/wealth-management/${String(wealthManagementId)}`,
+      `/api/assets/wealth-management/${wealthManagementId}`
     );
     return data;
-  },
+  }
 );
 
 export const updateAssetAllocation = createAsyncThunk<
@@ -44,11 +43,11 @@ export const updateAssetAllocation = createAsyncThunk<
   `${name}/updateAssetAllocation`,
   async ({ assetAllocationId, assetAllocation: assetAllocation }) => {
     const { data } = await fetcher.patch<UpdateAssetAllocation>(
-      `/api/assets/asset-allocation/${String(assetAllocationId)}/`,
-      assetAllocation,
+      `/api/assets/asset-allocation/${assetAllocationId}/`,
+      assetAllocation
     );
     return data;
-  },
+  }
 );
 
 // Slice
@@ -61,7 +60,7 @@ const wealthManagementSlice = createSlice({
     },
     setWealthManagementChanged: (state, action: PayloadAction<boolean>) => {
       state.wealthManagementChanged = action.payload;
-    },
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -70,7 +69,7 @@ const wealthManagementSlice = createSlice({
         (state, action: PayloadAction<WealthManagementModel>) => {
           state.wealthManagement = computeDelta(action.payload);
           state.status = WealthManagementStatus.SUCCEEDED;
-        },
+        }
       )
       .addCase(fetchWealthManagement.pending, (state) => {
         state.status = WealthManagementStatus.LOADING;
@@ -81,7 +80,7 @@ const wealthManagementSlice = createSlice({
       .addCase(updateAssetAllocation.fulfilled, (state) => {
         state.wealthManagementChanged = true;
       });
-  },
+  }
 });
 
 // Exports
@@ -89,5 +88,5 @@ export const wealthManagementReducer = wealthManagementSlice.reducer;
 export const wealthManagementActions = {
   ...wealthManagementSlice.actions,
   fetchWealthManagement,
-  updateAssetAllocation,
+  updateAssetAllocation
 };

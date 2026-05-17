@@ -1,8 +1,8 @@
+import OutfitDetail from './pages/clothing/OutfitDetail';
+
+import { Route, Routes } from 'react-router-dom';
 import type { FC } from 'react';
 import React from 'react';
-import { Route, Routes } from 'react-router-dom';
-
-import OutfitDetail from './pages/clothing/OutfitDetail';
 import ProtectedRoutes from './routes/ProtectedRoutes';
 
 const CreateClothing = React.lazy(async () => {
@@ -67,29 +67,29 @@ const Main: FC = () => {
     <React.Suspense fallback={<Loading />}>
       <Routes>
         {/** Protected Routes */}
-        <Route path="/" element={<ProtectedRoutes />}>
-          <Route path="/" element={<Home />} />
+        <Route path='/' element={<ProtectedRoutes />}>
+          <Route path='/' element={<Home />} />
 
-          <Route path="/countries" element={<CountriesRating />} />
+          <Route path='/countries' element={<CountriesRating />} />
 
-          <Route path="/portfolios" element={<Portfolios />} />
+          <Route path='/portfolios' element={<Portfolios />} />
 
-          <Route path="/profile" element={<Profile />} />
+          <Route path='/profile' element={<Profile />} />
 
-          <Route path="/wealth-management" element={<WealthManagement />} />
+          <Route path='/wealth-management' element={<WealthManagement />} />
 
-          <Route path="/clothing/clothing" element={<ListClothing />} />
-          <Route path="/clothing" element={<ListOutfit />} />
-          <Route path="/clothing/create" element={<CreateClothing />} />
-          <Route path="/clothing/outfit/create" element={<CreateOutfit />} />
-          <Route path="/clothing/outfit/create" element={<CreateOutfit />} />
-          <Route path="/clothing/outfit/:id" element={<OutfitDetail />} />
+          <Route path='/clothing/clothing' element={<ListClothing />} />
+          <Route path='/clothing' element={<ListOutfit />} />
+          <Route path='/clothing/create' element={<CreateClothing />} />
+          <Route path='/clothing/outfit/create' element={<CreateOutfit />} />
+          <Route path='/clothing/outfit/create' element={<CreateOutfit />} />
+          <Route path='/clothing/outfit/:id' element={<OutfitDetail />} />
         </Route>
 
         {/** Public Routes */}
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<SignUp />} />
-        <Route path="*" element={<h1>Not Found</h1>} />
+        <Route path='/login' element={<Login />} />
+        <Route path='/register' element={<SignUp />} />
+        <Route path='*' element={<h1>Not Found</h1>} />
       </Routes>
     </React.Suspense>
   );

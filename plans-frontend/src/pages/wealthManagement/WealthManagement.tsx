@@ -1,40 +1,41 @@
-import { type FC, useEffect, useState } from 'react';
+import { useEffect, type FC, useState } from 'react';
 import { Container } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
-
 import {
+  WealthManagementStatus,
   type RootState,
   userActions,
   wealthManagementActions,
-  WealthManagementModel,
-  WealthManagementStatus,
+  WealthManagementModel
 } from '../../store';
 import { useAppDispatch } from '../../store/hooks';
 import { ExpandableTable } from './ExpandableTable';
 
 const WealthManagement: FC = () => {
-  const [wealthManagement, setWealthManagement] = useState<WealthManagementModel | undefined>();
+  const [wealthManagement, setWealthManagement] = useState<WealthManagementModel | undefined>(
+    undefined
+  );
 
   const dispatch = useAppDispatch();
   const {
     wealthManagement: reduxWealthManagement,
     status: wealthManagementStatus,
-    wealthManagementChanged,
+    wealthManagementChanged
   } = useSelector((state: RootState) => state.wealthManagement);
   const user = useSelector((state: RootState) => state.userInfo.user);
 
   useEffect(() => {
     if (user === null) {
-      dispatch(userActions.fetchCurrentUser()).catch((error) => {
-        console.log(error);
+      dispatch(userActions.fetchCurrentUser()).catch((err) => {
+        console.log(err);
       });
     }
 
     if (user?.wealthManagementID && wealthManagementStatus === WealthManagementStatus.IDLE) {
       dispatch(wealthManagementActions.fetchWealthManagement(user.wealthManagementID)).catch(
-        (error) => {
-          console.log(error);
-        },
+        (err) => {
+          console.log(err);
+        }
       );
     }
   }, [user, wealthManagementStatus]);
@@ -44,9 +45,9 @@ const WealthManagement: FC = () => {
       dispatch(wealthManagementActions.setWealthManagementChanged(false));
       if (user?.wealthManagementID) {
         dispatch(wealthManagementActions.fetchWealthManagement(user.wealthManagementID)).catch(
-          (error) => {
-            console.log(error);
-          },
+          (err) => {
+            console.log(err);
+          }
         );
       }
     }
@@ -63,27 +64,23 @@ const WealthManagement: FC = () => {
   if (wealthManagement) {
     content = (
       <>
-        <h1 className="text-center">Wealth Management</h1>
+        <h1 className='text-center'>Wealth Management</h1>
         <ExpandableTable wealthManagement={wealthManagement} />
       </>
     );
   } else {
     switch (wealthManagementStatus) {
-      case WealthManagementStatus.LOADING: {
+      case WealthManagementStatus.LOADING:
         content = <div>Loading...</div>;
         break;
-      }
-      case WealthManagementStatus.SUCCEEDED: {
+      case WealthManagementStatus.SUCCEEDED:
         content = <div>Failed to load wealth management data.</div>;
         break;
-      }
-      case WealthManagementStatus.FAILED: {
+      case WealthManagementStatus.FAILED:
         content = <div>Failed to load wealth management data.</div>;
         break;
-      }
-      default: {
+      default:
         content = <div>Unknown error.</div>;
-      }
     }
   }
 

@@ -1,12 +1,11 @@
 import { createAsyncThunk, createSlice, type PayloadAction } from '@reduxjs/toolkit';
-
 import { fetcher } from '../../utils/axios';
 
 export enum LoadStatus {
   IDLE = 'idle',
   LOADING = 'loading',
   SUCCEEDED = 'succeeded',
-  FAILED = 'failed',
+  FAILED = 'failed'
 }
 
 interface BacktestResultsPaginatedResponse {
@@ -64,40 +63,43 @@ export const fetchPortfolios = createAsyncThunk<Portfolio[]>(
   async () => {
     const response = await fetcher.get<Portfolio[]>('/api/investments/portfolios/');
     return response.data;
-  },
+  }
 );
 
 export const fetchPortfolioBacktestResults = createAsyncThunk<BacktestResults[]>(
   `${name}/fetchPortfolioBacktestResults`,
   async () => {
     const response = await fetcher.get<BacktestResultsPaginatedResponse>(
-      '/api/investments/portfolio-backtest-results/',
+      '/api/investments/portfolio-backtest-results/'
     );
     return response.data.results;
-  },
+  }
 );
 
 export const fetchPersonalMaxDrawdown = createAsyncThunk<number>(
   `${name}/fetchPersonalMaxDrawdown`,
   async () => {
     const response = await fetcher.get<PersonalMaxDrawdownResponse>(
-      '/api/investments/portfolios/personal-max-drawdown/',
+      '/api/investments/portfolios/personal-max-drawdown/'
     );
     return response.data.personalMaxDrawdown;
-  },
+  }
 );
 
 export const fetchAgeMaxDrawdownDependence = createAsyncThunk<
   AgeMaxDrawdownDependency[],
-  number | undefined
->(`${name}/fetchAgeMaxDrawdownDependence`, async (age: number | undefined) => {
-  const response = await (age
-    ? fetcher.get<AgeMaxDrawdownDependency[]>(
-        `/api/investments/portfolios/age-max-drawdown-dependence/?age=${String(age)}`,
-      )
-    : fetcher.get<AgeMaxDrawdownDependency[]>(
-        '/api/investments/portfolios/age-max-drawdown-dependence/',
-      ));
+  number | void
+>(`${name}/fetchAgeMaxDrawdownDependence`, async (age: number | void) => {
+  let response;
+  if (!age) {
+    response = await fetcher.get<AgeMaxDrawdownDependency[]>(
+      '/api/investments/portfolios/age-max-drawdown-dependence/'
+    );
+  } else {
+    response = await fetcher.get<AgeMaxDrawdownDependency[]>(
+      `/api/investments/portfolios/age-max-drawdown-dependence/?age=${age}`
+    );
+  }
   return response.data;
 });
 
@@ -115,7 +117,7 @@ function createInitialState(): State {
     personalMaxDrawdownLoadingStatus: LoadStatus.IDLE,
     backtestStartDate: fifteenYearsAgo.toISOString(),
     ageMaxDrawdownDependence: [],
-    ageMaxDrawdownDependenceLoadingStatus: LoadStatus.IDLE,
+    ageMaxDrawdownDependenceLoadingStatus: LoadStatus.IDLE
   };
 }
 const initialState: State = createInitialState();
@@ -127,7 +129,7 @@ const portfoliosSlice = createSlice({
   reducers: {
     setPersonalMaxDrawdown: (state, action: PayloadAction<number>) => {
       state.personalMaxDrawdown = action.payload;
-    },
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -171,7 +173,7 @@ const portfoliosSlice = createSlice({
       .addCase(fetchAgeMaxDrawdownDependence.rejected, (state) => {
         state.ageMaxDrawdownDependenceLoadingStatus = LoadStatus.FAILED;
       });
-  },
+  }
 });
 
 // Exports
@@ -182,5 +184,5 @@ export const portfoliosActions = {
   fetchPortfolios,
   fetchPortfolioBacktestResults,
   fetchPersonalMaxDrawdown,
-  fetchAgeMaxDrawdownDependence,
+  fetchAgeMaxDrawdownDependence
 };

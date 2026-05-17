@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from 'react';
+import { FC, useState, useEffect } from 'react';
 import { Form } from 'react-bootstrap';
 
 interface ImageColorPickerProps {
@@ -14,9 +14,7 @@ const ImageColorPicker: FC<ImageColorPickerProps> = ({ imageFile, onColorPick })
     if (imageFile) {
       const url = URL.createObjectURL(imageFile);
       setImgSrc(url);
-      return () => {
-        URL.revokeObjectURL(url);
-      };
+      return () => URL.revokeObjectURL(url);
     }
     setImgSrc(null);
   }, [imageFile]);
@@ -45,7 +43,7 @@ const ImageColorPicker: FC<ImageColorPickerProps> = ({ imageFile, onColorPick })
     const pixel = ctx.getImageData(x, y, 1, 1).data;
 
     if (pixel[0] === undefined || pixel[1] === undefined || pixel[2] === undefined) {
-      throw new Error('Pixel data is incomplete');
+      throw Error('Pixel data is incomplete');
     } else {
       const hex = rgbToHex(pixel[0], pixel[1], pixel[2]);
       onColorPick(hex);
@@ -55,9 +53,9 @@ const ImageColorPicker: FC<ImageColorPickerProps> = ({ imageFile, onColorPick })
   if (!imgSrc) return null;
 
   return (
-    <div className="mt-3">
-      <Form.Text className="text-primary fw-medium mb-2 d-block fs-6">
-        <i className="bi bi-eyedropper me-2"></i>
+    <div className='mt-3'>
+      <Form.Text className='text-primary fw-medium mb-2 d-block fs-6'>
+        <i className='bi bi-eyedropper me-2'></i>
         Click anywhere on the photo to auto-pick the main color!
       </Form.Text>
       <div
@@ -66,12 +64,12 @@ const ImageColorPicker: FC<ImageColorPickerProps> = ({ imageFile, onColorPick })
           borderRadius: '8px',
           padding: '4px',
           display: 'inline-block',
-          backgroundColor: '#f8f9fa',
+          backgroundColor: '#f8f9fa'
         }}
       >
         <img
           src={imgSrc}
-          alt="Preview"
+          alt='Preview'
           onClick={handleImageClick}
           style={{
             maxWidth: '100%',
@@ -79,7 +77,7 @@ const ImageColorPicker: FC<ImageColorPickerProps> = ({ imageFile, onColorPick })
             height: 'auto',
             display: 'block',
             cursor: 'crosshair',
-            borderRadius: '4px',
+            borderRadius: '4px'
           }}
         />
       </div>

@@ -1,36 +1,35 @@
 import type { FC } from 'react';
 import { useEffect } from 'react';
-import { Container, Table } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
-
-import type { Country, RootState } from '../../store';
+import type { RootState, Country } from '../../store';
+import { useAppDispatch } from '../../store/hooks';
 import {
-  countriesActions,
+  fetchCountriesOptions,
   CountriesOptionsStatus,
   CountriesStatus,
-  fetchCountriesOptions,
+  countriesActions
 } from '../../store';
-import { useAppDispatch } from '../../store/hooks';
+import { Container, Table } from 'react-bootstrap';
 import { CountriesRatingHistory } from './CountriesRatingRow';
 
 const CountriesRating: FC = () => {
   const dispatch = useAppDispatch();
 
   const { options: countriesOptions, status: countriesOptionsStatus } = useSelector(
-    (state: RootState) => state.countriesOptions,
+    (state: RootState) => state.countriesOptions
   );
 
   const { countries, status: countriesStatus } = useSelector((state: RootState) => state.countries);
 
   useEffect(() => {
     if (countriesOptionsStatus === CountriesOptionsStatus.IDLE) {
-      dispatch(fetchCountriesOptions()).catch((error) => {
-        console.log(error);
+      dispatch(fetchCountriesOptions()).catch((err) => {
+        console.log(err);
       });
     }
     if (countriesStatus === CountriesStatus.IDLE) {
-      dispatch(countriesActions.fetchCountries()).catch((error) => {
-        console.log(error);
+      dispatch(countriesActions.fetchCountries()).catch((err) => {
+        console.log(err);
       });
     }
   }, [countriesOptionsStatus, countriesStatus]);
@@ -46,15 +45,17 @@ const CountriesRating: FC = () => {
     countriesOptionsStatus === CountriesOptionsStatus.SUCCEEDED &&
     countriesStatus === CountriesStatus.SUCCEEDED
   ) {
-    const tableHeader = [<th key="chevron"></th>, <th key="name">Name</th>];
-    for (const [index, option] of countriesOptions.entries()) {
+    const tableHeader = [];
+    tableHeader.push(<th key='chevron'></th>);
+    tableHeader.push(<th key='name'>Name</th>);
+    countriesOptions.forEach((option, index) => {
       tableHeader.push(<th key={index}>{option.name}</th>);
-    }
-    tableHeader.push(<th key="rating">Rating</th>);
+    });
+    tableHeader.push(<th key='rating'>Rating</th>);
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const countriesOptionsNormalizedNames = countriesOptions.map(
-      (option) => option.normalized_name,
+      (option) => option.normalized_name
     );
     type ExactCountry = Record<(typeof countriesOptionsNormalizedNames)[number], number> & Country;
     const exactCountries = countries as ExactCountry[];
@@ -70,8 +71,8 @@ const CountriesRating: FC = () => {
     });
     content = (
       <Container fluid>
-        <h1 className="text-center">Countries Rating</h1>
-        <Table bordered className="text-center">
+        <h1 className='text-center'>Countries Rating</h1>
+        <Table bordered className='text-center'>
           <thead style={{ backgroundColor: 'rgb(220, 220, 220)' }}>
             <tr>{tableHeader}</tr>
           </thead>
