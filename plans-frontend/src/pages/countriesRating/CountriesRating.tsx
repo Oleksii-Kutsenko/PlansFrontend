@@ -1,15 +1,16 @@
 import type { FC } from 'react';
 import { useEffect } from 'react';
+import { Container, Table } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
-import type { RootState, Country } from '../../store';
-import { useAppDispatch } from '../../store/hooks';
+
+import type { Country, RootState } from '../../store';
 import {
-  fetchCountriesOptions,
+  countriesActions,
   CountriesOptionsStatus,
   CountriesStatus,
-  countriesActions
+  fetchCountriesOptions
 } from '../../store';
-import { Container, Table } from 'react-bootstrap';
+import { useAppDispatch } from '../../store/hooks';
 import { CountriesRatingHistory } from './CountriesRatingRow';
 
 const CountriesRating: FC = () => {
@@ -23,13 +24,13 @@ const CountriesRating: FC = () => {
 
   useEffect(() => {
     if (countriesOptionsStatus === CountriesOptionsStatus.IDLE) {
-      dispatch(fetchCountriesOptions()).catch((err) => {
-        console.log(err);
+      dispatch(fetchCountriesOptions()).catch((error) => {
+        console.log(error);
       });
     }
     if (countriesStatus === CountriesStatus.IDLE) {
-      dispatch(countriesActions.fetchCountries()).catch((err) => {
-        console.log(err);
+      dispatch(countriesActions.fetchCountries()).catch((error) => {
+        console.log(error);
       });
     }
   }, [countriesOptionsStatus, countriesStatus]);
@@ -45,12 +46,10 @@ const CountriesRating: FC = () => {
     countriesOptionsStatus === CountriesOptionsStatus.SUCCEEDED &&
     countriesStatus === CountriesStatus.SUCCEEDED
   ) {
-    const tableHeader = [];
-    tableHeader.push(<th key='chevron'></th>);
-    tableHeader.push(<th key='name'>Name</th>);
-    countriesOptions.forEach((option, index) => {
+    const tableHeader = [<th key='chevron'></th>, <th key='name'>Name</th>];
+    for (const [index, option] of countriesOptions.entries()) {
       tableHeader.push(<th key={index}>{option.name}</th>);
-    });
+    }
     tableHeader.push(<th key='rating'>Rating</th>);
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars

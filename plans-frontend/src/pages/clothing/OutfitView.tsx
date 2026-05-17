@@ -1,7 +1,8 @@
 import { FC } from 'react';
-import { Badge, Row, Col } from 'react-bootstrap';
-import { Outfit } from '../../store/slices/clothing';
+import { Badge, Col, Row } from 'react-bootstrap';
+
 import ClothingCard from '../../components/clothing/ClothingCard';
+import { Outfit } from '../../store/slices/clothing';
 
 interface OutfitViewProps {
   outfit: Outfit;

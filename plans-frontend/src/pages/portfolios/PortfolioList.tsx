@@ -1,7 +1,8 @@
 import { FC, useEffect, useState } from 'react';
-import { LoadStatus, BacktestResults, RootState } from '../../store';
 import { Card, Col, Container, Row, Table } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
+
+import { BacktestResults, LoadStatus, RootState } from '../../store';
 import { type Ticker as TickerType } from '../../store';
 import { PortfolioFilterFormInputs } from './shared_interfaces';
 

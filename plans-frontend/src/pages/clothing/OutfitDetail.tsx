@@ -1,16 +1,16 @@
 import { FC, useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { Button, Container, Spinner } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
-import { RootState } from '../../store';
-import { clothingActions } from '../../store/slices/clothing';
-import { useAppDispatch } from '../../store/hooks';
-import { Container, Button, Spinner } from 'react-bootstrap';
+import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import ConfirmModal from '../../components/ConfirmModal';
 
+import ConfirmModal from '../../components/ConfirmModal';
+import { RootState } from '../../store';
+import { useAppDispatch } from '../../store/hooks';
+import { clothingActions } from '../../store/slices/clothing';
+import OutfitEdit from './OutfitEdit';
 // Import our newly separated components
 import OutfitView from './OutfitView';
-import OutfitEdit from './OutfitEdit';
 
 const OutfitDetail: FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -62,25 +62,46 @@ const OutfitDetail: FC = () => {
           <i className='bi bi-arrow-left me-2'></i>Back to Outfits
         </Button>
         <div>
-          {!isEditing ? (
+          {isEditing ? (
+            <Button
+              variant='secondary'
+              onClick={() => {
+                setIsEditing(false);
+              }}
+            >
+              Cancel Edit
+            </Button>
+          ) : (
             <>
-              <Button variant='primary' className='me-2' onClick={() => setIsEditing(true)}>
+              <Button
+                variant='primary'
+                className='me-2'
+                onClick={() => {
+                  setIsEditing(true);
+                }}
+              >
                 <i className='bi bi-pencil me-2'></i>Edit Outfit
               </Button>
-              <Button variant='danger' onClick={() => setShowDeleteModal(true)}>
+              <Button
+                variant='danger'
+                onClick={() => {
+                  setShowDeleteModal(true);
+                }}
+              >
                 <i className='bi bi-trash'></i>
               </Button>
             </>
-          ) : (
-            <Button variant='secondary' onClick={() => setIsEditing(false)}>
-              Cancel Edit
-            </Button>
           )}
         </div>
       </div>
 
       {isEditing ? (
-        <OutfitEdit outfit={currentOutfit} onEditComplete={() => setIsEditing(false)} />
+        <OutfitEdit
+          outfit={currentOutfit}
+          onEditComplete={() => {
+            setIsEditing(false);
+          }}
+        />
       ) : (
         <OutfitView outfit={currentOutfit} />
       )}
@@ -92,7 +113,9 @@ const OutfitDetail: FC = () => {
         confirmLabel='Delete'
         variant='danger'
         onConfirm={handleDeleteOutfit}
-        onCancel={() => setShowDeleteModal(false)}
+        onCancel={() => {
+          setShowDeleteModal(false);
+        }}
       />
     </Container>
   );

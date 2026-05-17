@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { type RootState } from '..';
+
 import { fetcher } from '../../utils/axios';
+import { type RootState } from '..';
 
 export enum CountriesStatus {
   IDLE = 'idle',
@@ -63,7 +64,7 @@ const countriesSlice = createSlice({
       .addCase(fetchCountryRatingHistory.fulfilled, (state, action) => {
         const history = new Map<number, Country[]>(state.countriesRatingHistory);
         history.set(action.meta.arg, action.payload);
-        state.countriesRatingHistory = Array.from(history);
+        state.countriesRatingHistory = [...history];
       })
       .addCase(fetchCountryRatingHistory.rejected, () => {
         console.debug('Failed to load country rating history');

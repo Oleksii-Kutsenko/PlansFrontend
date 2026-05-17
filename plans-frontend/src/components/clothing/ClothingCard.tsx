@@ -1,5 +1,6 @@
 import { FC } from 'react';
-import { Card, Badge, Button, Form } from 'react-bootstrap';
+import { Badge, Button, Card, Form } from 'react-bootstrap';
+
 import { Clothing } from '../../store/slices/clothing';
 
 interface ClothingCardProps {
@@ -22,7 +23,7 @@ const ClothingCard: FC<ClothingCardProps> = ({
   return (
     <Card
       className={`h-100 ${selectable ? 'cursor-pointer' : ''} ${selected ? 'border-primary' : ''}`}
-      onClick={() => selectable && onToggle && onToggle(item.id)}
+      onClick={() => selectable && onToggle?.(item.id)}
       style={{ cursor: selectable ? 'pointer' : 'default', transition: 'border-color 0.2s' }}
     >
       {selectable && (
@@ -30,7 +31,9 @@ const ClothingCard: FC<ClothingCardProps> = ({
           <Form.Check
             type='checkbox'
             checked={selected}
-            onClick={(e) => e.stopPropagation()} // Prevent double toggle if checkbox clicked directly
+            onClick={(e) => {
+              e.stopPropagation();
+            }} // Prevent double toggle if checkbox clicked directly
             className='fs-5 shadow-sm'
           />
         </div>

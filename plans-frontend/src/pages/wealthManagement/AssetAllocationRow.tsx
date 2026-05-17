@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
-import { type Currency, type Allocation, wealthManagementActions } from '../../store';
-import { formatNumber, formatPercentage } from './formatting';
-import { PercentageInput } from '@/components/PercentageInput';
-import { fetcher } from '../../utils/axios';
-import { useAppDispatch } from '../../store/hooks';
+
 import { CurrencyInput } from '@/components/CurrencyInput';
+import { PercentageInput } from '@/components/PercentageInput';
+
+import { type Allocation, type Currency, wealthManagementActions } from '../../store';
+import { useAppDispatch } from '../../store/hooks';
+import { fetcher } from '../../utils/axios';
+import { formatNumber, formatPercentage } from './formatting';
 
 export const AssetAllocationRow = ({
   allocation,
@@ -26,13 +28,13 @@ export const AssetAllocationRow = ({
           [fieldName]: value
         });
         await dispatch(wealthManagementActions.fetchWealthManagement(wealthManagementID)).unwrap();
-      } catch (err: unknown) {
-        console.log(err);
+      } catch (error: unknown) {
+        console.log(error);
 
-        if (err instanceof Error) {
-          throw err;
+        if (error instanceof Error) {
+          throw error;
         }
-        throw new Error(String(err));
+        throw new Error(String(error));
       }
     };
 

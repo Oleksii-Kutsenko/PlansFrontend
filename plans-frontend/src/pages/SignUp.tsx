@@ -1,12 +1,13 @@
+import axios from 'axios';
 import type { FC } from 'react';
 import { useEffect, useState } from 'react';
 import { Button, Card, Col, Container, Form, Row } from 'react-bootstrap';
-import { fetcher } from '../utils/axios';
-import axios from 'axios';
 import { Controller, useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
 import Select from 'react-select';
 import { toast } from 'react-toastify';
+
+import { fetcher } from '../utils/axios';
 
 interface FormValues {
   birthDate: string;

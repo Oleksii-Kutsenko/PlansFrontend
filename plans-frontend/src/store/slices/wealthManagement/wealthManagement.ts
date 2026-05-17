@@ -1,8 +1,9 @@
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+
 import { fetcher } from '../../../utils/axios';
-import { WealthManagementModel, UpdateAssetAllocation } from './interfaces';
 import { computeDelta } from './compute';
+import { UpdateAssetAllocation, WealthManagementModel } from './interfaces';
 
 const name = 'wealthManagement';
 

@@ -1,15 +1,7 @@
-import importPlugin from 'eslint-plugin-import';
-import react from 'eslint-plugin-react';
 import reactHooks from 'eslint-plugin-react-hooks';
-import typescriptEslint from '@typescript-eslint/eslint-plugin';
-import prettier from 'eslint-plugin-prettier';
-import { fixupPluginRules } from '@eslint/compat';
 import globals from 'globals';
-import tsParser from '@typescript-eslint/parser';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import js from '@eslint/js';
-import { FlatCompat } from '@eslint/eslintrc';
+import jsxA11y from 'eslint-plugin-jsx-a11y';
 
 import tseslint from 'typescript-eslint';
 import importXPlugin from 'eslint-plugin-import-x';
@@ -35,57 +27,58 @@ export default tseslint.config(
   prettierPlugin,
   sonarjs.configs.recommended,
   {
-    plugins: {
-      react,
-      'react-hooks': fixupPluginRules(reactHooks),
-      '@typescript-eslint': typescriptEslint,
-      prettier,
-      import: importPlugin
-    },
-
     languageOptions: {
-      globals: {
-        ...globals.browser
-      },
-
-      parser: tsParser,
-      ecmaVersion: 'latest',
-      sourceType: 'module',
-
+      globals: { ...globals.browser, ...globals.es2020 },
       parserOptions: {
-        project: true,
-        tsconfigRootDir: __dirname,
-        ecmaFeatures: {
-          jsx: true
-        }
+        projectService: true,
+        tsconfigRootDir: import.meta.dirname
       }
     },
-
+    plugins: {
+      react: reactPlugin,
+      'react-hooks': reactHooks,
+      'react-refresh': reactRefresh,
+      'simple-import-sort': simpleImportSort,
+      'react-compiler': reactCompiler
+    },
     settings: {
-      react: {
-        version: 'detect'
-      },
-
-      'import/resolver': {
-        typescript: {}
+      react: { version: 'detect' },
+      'import-x/resolver': {
+        typescript: true
       }
     },
-
     rules: {
-      'react/react-in-jsx-scope': 'off',
-      '@typescript-eslint/no-explicit-any': 'off',
-      'prettier/prettier': 'error',
+      ...reactPlugin.configs.recommended.rules,
+      ...reactPlugin.configs['jsx-runtime'].rules, // Automatically disables react-in-jsx-scope
+
+      // React Hooks & Refresh
+      'react-hooks/rules-of-hooks': 'error',
+      'react-hooks/exhaustive-deps': 'error',
+      'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
+
+      // Import Sorting
+      'simple-import-sort/imports': 'error',
+      'simple-import-sort/exports': 'error',
+
+      // Unicorn Overrides (reducing noise for common React patterns)
+      'unicorn/prevent-abbreviations': 'off',
+      'unicorn/no-null': 'off',
+
+      'react-compiler/react-compiler': 'error',
+
       camelcase: 'warn',
       'spaced-comment': 'error',
 
-      quotes: [
+      'unicorn/filename-case': [
         'error',
-        'single',
         {
-          allowTemplateLiterals: true
+          cases: {
+            camelCase: true,
+            pascalCase: true
+          },
+          ignore: ['^vite-env\\.d\\.ts$', '^vite\\.config\\.js$', '^eslint\\.config\\.mjs$']
         }
-      ],
-      'import/newline-after-import': ['error', { count: 1 }]
+      ]
     }
   }
-];
+);

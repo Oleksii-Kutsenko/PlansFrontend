@@ -1,6 +1,3 @@
-import { useEffect, useState } from 'react';
-import { countriesActions, type Country, type RootState } from '@/store';
-import type { Option } from '@/store';
 import {
   CategoryScale,
   Chart as ChartJS,
@@ -11,8 +8,11 @@ import {
   Title,
   Tooltip
 } from 'chart.js';
+import { useEffect, useState } from 'react';
 import { Line } from 'react-chartjs-2';
 import { useSelector } from 'react-redux';
+
+import type { countriesActions, type Country, Option, type RootState } from '@/store';
 import { useAppDispatch } from '@/store/hooks';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
@@ -71,8 +71,8 @@ export const CountriesRatingHistory = ({
     if (expanded && !countriesRatingHistoryMap.has(country.id)) {
       void dispatch(countriesActions.fetchCountryRatingHistory(country.id))
         .unwrap()
-        .catch((e) => {
-          console.error('Failed to fetch rating history', e);
+        .catch((error) => {
+          console.error('Failed to fetch rating history', error);
         });
     }
   }, [expanded, countriesRatingHistory, country.id, dispatch]);

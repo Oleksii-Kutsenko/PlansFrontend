@@ -1,4 +1,5 @@
-import { isRejectedWithValue, type Middleware, isRejected } from '@reduxjs/toolkit';
+import { isRejected, isRejectedWithValue, type Middleware } from '@reduxjs/toolkit';
+
 import { logout } from '../slices/auth';
 
 interface AuthErrorPayload {

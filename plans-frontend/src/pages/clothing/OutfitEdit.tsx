@@ -1,13 +1,14 @@
-import { FC, useEffect, useState, useMemo } from 'react';
+import { FC, useEffect, useMemo, useState } from 'react';
+import { Button, Col, Form, Row, Spinner } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
-import { Button, Row, Col, Form, Spinner } from 'react-bootstrap';
-import { toast } from 'react-toastify';
-import { useAppDispatch } from '../../store/hooks';
 import { useSelector } from 'react-redux';
-import { RootState } from '../../store';
-import { clothingActions, OutfitUpdate, Outfit } from '../../store/slices/clothing';
+import { toast } from 'react-toastify';
+
 import ClothingCard from '../../components/clothing/ClothingCard';
 import ClothingPicker from '../../components/clothing/ClothingPicker';
+import { RootState } from '../../store';
+import { useAppDispatch } from '../../store/hooks';
+import { clothingActions, Outfit, OutfitUpdate } from '../../store/slices/clothing';
 
 interface OutfitEditProps {
   outfit: Outfit;
@@ -54,8 +55,8 @@ const OutfitEdit: FC<OutfitEditProps> = ({ outfit, onEditComplete }) => {
 
   const availableItemsToAdd = useMemo(() => {
     if (!outfit.clothings) return clothingItems;
-    const currentIds = outfit.clothings.map((c) => (typeof c === 'number' ? c : c.id));
-    return clothingItems.filter((item) => !currentIds.includes(item.id));
+    const currentIds = new Set(outfit.clothings.map((c) => (typeof c === 'number' ? c : c.id)));
+    return clothingItems.filter((item) => !currentIds.has(item.id));
   }, [clothingItems, outfit]);
 
   const onSaveMetadata = (data: OutfitFormValues) => {
@@ -89,8 +90,8 @@ const OutfitEdit: FC<OutfitEditProps> = ({ outfit, onEditComplete }) => {
           clothingActions.addItemToOutfit({ outfitId: outfit.id, clothingId })
         ).unwrap();
         successCount++;
-      } catch (err) {
-        console.error(err);
+      } catch (error) {
+        console.error(error);
         toast.error(`Failed to add item ID ${clothingId}`);
       }
     }

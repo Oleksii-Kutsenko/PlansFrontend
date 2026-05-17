@@ -1,8 +1,8 @@
-import OutfitDetail from './pages/clothing/OutfitDetail';
-
-import { Route, Routes } from 'react-router-dom';
 import type { FC } from 'react';
 import React from 'react';
+import { Route, Routes } from 'react-router-dom';
+
+import OutfitDetail from './pages/clothing/OutfitDetail';
 import ProtectedRoutes from './routes/ProtectedRoutes';
 
 const CreateClothing = React.lazy(async () => {

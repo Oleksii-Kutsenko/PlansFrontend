@@ -1,4 +1,4 @@
-import { FC, useState, useEffect } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { Form } from 'react-bootstrap';
 
 interface ImageColorPickerProps {
@@ -14,7 +14,9 @@ const ImageColorPicker: FC<ImageColorPickerProps> = ({ imageFile, onColorPick })
     if (imageFile) {
       const url = URL.createObjectURL(imageFile);
       setImgSrc(url);
-      return () => URL.revokeObjectURL(url);
+      return () => {
+        URL.revokeObjectURL(url);
+      };
     }
     setImgSrc(null);
   }, [imageFile]);
@@ -43,7 +45,7 @@ const ImageColorPicker: FC<ImageColorPickerProps> = ({ imageFile, onColorPick })
     const pixel = ctx.getImageData(x, y, 1, 1).data;
 
     if (pixel[0] === undefined || pixel[1] === undefined || pixel[2] === undefined) {
-      throw Error('Pixel data is incomplete');
+      throw new Error('Pixel data is incomplete');
     } else {
       const hex = rgbToHex(pixel[0], pixel[1], pixel[2]);
       onColorPick(hex);

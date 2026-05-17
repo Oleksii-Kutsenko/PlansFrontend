@@ -1,15 +1,15 @@
 import { useEffect } from 'react';
-import { useSelector } from 'react-redux';
-import { RootState } from '../../store';
-import { ClothingCreate } from '../../store/slices/clothing';
-import { clothingActions, createClothing } from '../../store/slices/clothing';
-import { useNavigate } from 'react-router-dom';
-import { useAppDispatch } from '../../store/hooks';
-import { useForm } from 'react-hook-form';
 import { Button, Container, Form, Row } from 'react-bootstrap';
+import { useForm } from 'react-hook-form';
+import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { ValidationErrors } from '../../store/slices/utils';
+
 import ImageColorPicker from '../../components/clothing/ImageColorPicker';
+import { RootState } from '../../store';
+import { useAppDispatch } from '../../store/hooks';
+import { clothingActions, ClothingCreate, createClothing } from '../../store/slices/clothing';
+import { ValidationErrors } from '../../store/slices/utils';
 
 interface CreateClothingFormValues {
   name: string;
@@ -63,9 +63,9 @@ const CreateClothing = () => {
 
         void dispatch(clothingActions.fetchClothing());
         void navigate('/clothing/clothing');
-      } catch (err: any) {
-        console.error(err);
-        const error = err as ValidationErrors;
+      } catch (error_: any) {
+        console.error(error_);
+        const error = error_ as ValidationErrors;
 
         const errorMessage = error?.errorMessage ?? 'Error adding clothing item.';
         toast.error(errorMessage);
@@ -82,7 +82,7 @@ const CreateClothing = () => {
       }
     } else {
       toast.error('Please upload an image!');
-      throw Error('Image is null or undefined.');
+      throw new Error('Image is null or undefined.');
     }
   };
 
@@ -100,7 +100,7 @@ const CreateClothing = () => {
           <Form.Group className='mb-3' controlId='name'>
             <Form.Label className='fw-medium'>Name</Form.Label>
             <Form.Control
-              className={`${errors.name ? 'is-invalid' : ''}`}
+              className={errors.name ? 'is-invalid' : ''}
               type='text'
               placeholder='e.g. Favorite Blue Jeans'
               {...register('name', { required: 'Name is required' })}
@@ -114,7 +114,7 @@ const CreateClothing = () => {
             <Form.Group className='mb-3 col-md-8' controlId='clothingType'>
               <Form.Label className='fw-medium'>Type</Form.Label>
               <Form.Select
-                className={`${errors.clothingType ? 'is-invalid' : ''}`}
+                className={errors.clothingType ? 'is-invalid' : ''}
                 {...register('clothingType', { required: 'Clothing type is required' })}
               >
                 <option value=''>Select Type</option>
@@ -147,7 +147,7 @@ const CreateClothing = () => {
           <Form.Group controlId='imagePath' className='mb-4'>
             <Form.Label className='fw-medium'>Image</Form.Label>
             <Form.Control
-              className={`${errors.imagePath ? 'is-invalid' : ''}`}
+              className={errors.imagePath ? 'is-invalid' : ''}
               type='file'
               accept='image/*'
               {...register('imagePath', { required: 'An image is required!' })}
@@ -161,9 +161,9 @@ const CreateClothing = () => {
             {/* The Magic Color Picker preview component! */}
             <ImageColorPicker
               imageFile={currentImageFile}
-              onColorPick={(hex) =>
-                setValue('color', hex, { shouldValidate: true, shouldDirty: true })
-              }
+              onColorPick={(hex) => {
+                setValue('color', hex, { shouldValidate: true, shouldDirty: true });
+              }}
             />
           </Form.Group>
 

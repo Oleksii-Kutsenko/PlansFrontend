@@ -1,5 +1,6 @@
-import { FC, useState, useMemo } from 'react';
-import { Row, Col, Form, InputGroup, Badge } from 'react-bootstrap';
+import { FC, useMemo, useState } from 'react';
+import { Badge, Col, Form, InputGroup, Row } from 'react-bootstrap';
+
 import { Clothing } from '../../store/slices/clothing';
 import ClothingCard from './ClothingCard';
 
@@ -42,13 +43,17 @@ const ClothingPicker: FC<ClothingPickerProps> = ({
             <Form.Control
               placeholder='Search clothing...'
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+              }}
             />
           </InputGroup>
           <Form.Select
             style={{ maxWidth: '200px' }}
             value={selectedType}
-            onChange={(e) => setSelectedType(e.target.value)}
+            onChange={(e) => {
+              setSelectedType(e.target.value);
+            }}
           >
             <option value=''>All Types</option>
             {typeOptions.map((opt) => (

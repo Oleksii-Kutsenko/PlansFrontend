@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { Modal, Button } from 'react-bootstrap';
+import { Button, Modal } from 'react-bootstrap';
 
 interface ConfirmModalProps {
   show: boolean;

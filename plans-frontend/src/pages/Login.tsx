@@ -1,12 +1,13 @@
 import React from 'react';
 import { Button, Card, Col, Container, Form, Row } from 'react-bootstrap';
-import { fetcher } from '../utils/axios';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { AuthTokens, setToken } from '../store/slices/auth';
+
 import { userActions } from '../store';
 import { useAppDispatch } from '../store/hooks';
+import { AuthTokens, setToken } from '../store/slices/auth';
+import { fetcher } from '../utils/axios';
 
 interface LoginFormInputs {
   username: string;

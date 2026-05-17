@@ -1,15 +1,15 @@
 import { FC, useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
-import { RootState } from '../../store';
-import { OutfitCreate, createOutfit } from '../../store/slices/clothing';
-import { clothingActions } from '../../store/slices/clothing';
-import { useNavigate } from 'react-router-dom';
-import { useAppDispatch } from '../../store/hooks';
-import { useForm } from 'react-hook-form';
 import { Button, Container, Form } from 'react-bootstrap';
+import { useForm } from 'react-hook-form';
+import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { ValidationErrors } from '../../store/slices/utils';
+
 import ClothingPicker from '../../components/clothing/ClothingPicker';
+import { RootState } from '../../store';
+import { useAppDispatch } from '../../store/hooks';
+import { clothingActions, createOutfit, OutfitCreate } from '../../store/slices/clothing';
+import { ValidationErrors } from '../../store/slices/utils';
 
 interface CreateOutfitFormValues {
   outfitName: string;
@@ -69,26 +69,26 @@ const CreateOutfit: FC = () => {
 
         void dispatch(clothingActions.fetchOutfits());
         void navigate(`/clothing/outfit/${newOutfit.id}`);
-      } catch (err: any) {
-        console.error('Failed to create outfit:', err);
-        const error = err as ValidationErrors;
+      } catch (error_: any) {
+        console.error('Failed to create outfit:', error_);
+        const error = error_ as ValidationErrors;
 
         const errorMessage = error?.errorMessage ?? 'Error creating outfit.';
         toast.error(errorMessage);
 
         if (error) {
-          Object.keys(error).forEach((field) => {
+          for (const field of Object.keys(error)) {
             const key = field as keyof CreateOutfitFormValues;
             error[key]?.forEach((message: string) => {
               toast.error(`${key}: ${message}`);
               setError(key, { type: 'custom', message: message });
             });
-          });
+          }
         }
       }
     } else {
       toast.error('Please upload an image!');
-      throw Error('Image is null or undefined.');
+      throw new Error('Image is null or undefined.');
     }
   };
 
@@ -102,7 +102,7 @@ const CreateOutfit: FC = () => {
           <Form.Group className='mb-3' controlId='outfitName'>
             <Form.Label className='fw-medium'>Outfit Name</Form.Label>
             <Form.Control
-              className={`${errors.outfitName ? 'is-invalid' : ''}`}
+              className={errors.outfitName ? 'is-invalid' : ''}
               type='text'
               placeholder='e.g. Summer Beach Party'
               {...register('outfitName')}
@@ -118,7 +118,7 @@ const CreateOutfit: FC = () => {
             <Form.Group className='mb-3 col-md-6' controlId='occasion'>
               <Form.Label className='fw-medium'>Occasion</Form.Label>
               <Form.Select
-                className={`${errors.occasion ? 'is-invalid' : ''}`}
+                className={errors.occasion ? 'is-invalid' : ''}
                 {...register('occasion')}
               >
                 <option value=''>Select Occasion</option>
@@ -137,10 +137,7 @@ const CreateOutfit: FC = () => {
 
             <Form.Group className='mb-3 col-md-6' controlId='season'>
               <Form.Label className='fw-medium'>Season</Form.Label>
-              <Form.Select
-                className={`${errors.season ? 'is-invalid' : ''}`}
-                {...register('season')}
-              >
+              <Form.Select className={errors.season ? 'is-invalid' : ''} {...register('season')}>
                 <option value=''>Select Season</option>
                 {(outfitOptions?.season ?? []).map((opt) => (
                   <option key={opt.value} value={opt.value}>
@@ -159,7 +156,7 @@ const CreateOutfit: FC = () => {
           <Form.Group className='mb-3' controlId='previewImage'>
             <Form.Label className='fw-medium'>Preview Image (Optional)</Form.Label>
             <Form.Control
-              className={`${errors.previewImage ? 'is-invalid' : ''}`}
+              className={errors.previewImage ? 'is-invalid' : ''}
               type='file'
               accept='image/*'
               {...register('previewImage')}

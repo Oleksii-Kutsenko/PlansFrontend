@@ -1,4 +1,5 @@
 import { createAsyncThunk, createSlice, type PayloadAction } from '@reduxjs/toolkit';
+
 import { fetcher } from '../../utils/axios';
 
 interface User {

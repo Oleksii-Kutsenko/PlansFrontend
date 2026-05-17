@@ -1,5 +1,6 @@
-import { FC, useState, useEffect } from 'react';
-import { Row, Col, Form, InputGroup, Button } from 'react-bootstrap';
+import { FC, useEffect, useState } from 'react';
+import { Button, Col, Form, InputGroup, Row } from 'react-bootstrap';
+
 import { Occasion } from '../../store/slices/clothing';
 
 export interface FilterState {
@@ -40,7 +41,9 @@ const OutfitFilters: FC<OutfitFiltersProps> = ({ occasions, seasonChoices, onCha
             <Form.Control
               placeholder='Search outfits...'
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+              }}
             />
           </InputGroup>
         </Col>
@@ -48,7 +51,9 @@ const OutfitFilters: FC<OutfitFiltersProps> = ({ occasions, seasonChoices, onCha
         <Col xs={12} sm={6} md={3}>
           <Form.Select
             value={selectedOccasion}
-            onChange={(e) => setSelectedOccasion(e.target.value)}
+            onChange={(e) => {
+              setSelectedOccasion(e.target.value);
+            }}
           >
             <option value=''>All Occasions</option>
             {occasions.map((occ) => (
@@ -60,7 +65,12 @@ const OutfitFilters: FC<OutfitFiltersProps> = ({ occasions, seasonChoices, onCha
         </Col>
 
         <Col xs={12} sm={6} md={3}>
-          <Form.Select value={selectedSeason} onChange={(e) => setSelectedSeason(e.target.value)}>
+          <Form.Select
+            value={selectedSeason}
+            onChange={(e) => {
+              setSelectedSeason(e.target.value);
+            }}
+          >
             <option value=''>All Seasons</option>
             {seasonChoices.map((season) => (
               <option key={season.value} value={season.value}>

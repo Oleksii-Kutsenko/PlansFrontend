@@ -1,9 +1,10 @@
+import { useEffect } from 'react';
 import { Col, Container, Row, Spinner } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
+
 import { type RootState } from '../store';
-import { useEffect } from 'react';
-import { useAppDispatch } from '../store/hooks';
 import { userActions } from '../store';
+import { useAppDispatch } from '../store/hooks';
 
 const Profile: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -12,8 +13,8 @@ const Profile: React.FC = () => {
 
   useEffect(() => {
     if (user === null && !userLoading) {
-      dispatch(userActions.fetchCurrentUser()).catch((err) => {
-        console.log(err);
+      dispatch(userActions.fetchCurrentUser()).catch((error) => {
+        console.log(error);
       });
     }
   }, [dispatch, user, userLoading]);
@@ -26,7 +27,9 @@ const Profile: React.FC = () => {
         </Spinner>
       </Container>
     );
-  } else if (user !== null) {
+  } else if (user === null) {
+    return <p>Failed to load profile</p>;
+  } else {
     return (
       <Container className='mt-4'>
         <Row>
@@ -50,8 +53,6 @@ const Profile: React.FC = () => {
         </Row>
       </Container>
     );
-  } else {
-    return <p>Failed to load profile</p>;
   }
 };
 

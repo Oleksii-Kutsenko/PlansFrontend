@@ -1,17 +1,18 @@
-import type { FC, ChangeEvent } from 'react';
+import './styles.css';
+
+import type { ChangeEvent, FC } from 'react';
 import { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
-import { Line } from 'react-chartjs-2';
 import { Col, Container, Form, Row } from 'react-bootstrap';
+import { Line } from 'react-chartjs-2';
+import { useSelector } from 'react-redux';
 
 import {
+  type AgeMaxDrawdownDependency,
   LoadStatus,
-  RootState,
   portfoliosActions,
-  type AgeMaxDrawdownDependency
+  RootState
 } from '../../../store';
 import { useAppDispatch } from '../../../store/hooks';
-import './styles.css';
 
 const AGE_MIN = 18;
 

@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 
-import { type RootState, portfoliosActions, LoadStatus } from '../../store';
+import { LoadStatus, portfoliosActions, type RootState } from '../../store';
 import { useAppDispatch } from '../../store/hooks';
 import { type PortfolioFilterFormInputs } from './shared_interfaces';
 
@@ -47,8 +47,8 @@ export const PersonalMaxDrawdownForm = ({ onApply }: Props) => {
     if (personalMaxDrawdownLoadingStatus !== LoadStatus.LOADING && personalMaxDrawdown === null) {
       void dispatch(portfoliosActions.fetchPersonalMaxDrawdown())
         .unwrap()
-        .catch((err: unknown) => {
-          const msg = err instanceof Error ? err.message : String(err);
+        .catch((error: unknown) => {
+          const msg = error instanceof Error ? error.message : String(error);
           toast.error(`Error fetching personal max drawdown: ${msg}`);
         });
     }
@@ -82,8 +82,8 @@ export const PersonalMaxDrawdownForm = ({ onApply }: Props) => {
 
     void dispatch(portfoliosActions.fetchPersonalMaxDrawdown())
       .unwrap()
-      .catch((err: unknown) => {
-        const msg = err instanceof Error ? err.message : String(err);
+      .catch((error: unknown) => {
+        const msg = error instanceof Error ? error.message : String(error);
         toast.error(`Error fetching personal max drawdown: ${msg}`);
       });
   };

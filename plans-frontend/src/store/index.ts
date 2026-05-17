@@ -1,20 +1,20 @@
 import { configureStore } from '@reduxjs/toolkit';
 
+import { unauthorizedMiddleware } from './middleware/authMiddleware';
 import { authReducer } from './slices/auth';
+import { clothingReducer } from './slices/clothing';
 import { countriesReducer } from './slices/countries';
 import { countriesOptionsReducer } from './slices/countriesOptions';
-import { userReducer } from './slices/user';
 import { portfoliosReducer } from './slices/portfolios';
+import { userReducer } from './slices/user';
 import { wealthManagementReducer } from './slices/wealthManagement/';
-import { clothingReducer } from './slices/clothing';
-import { unauthorizedMiddleware } from './middleware/authMiddleware';
 
 export * from './slices/auth';
 export * from './slices/clothing';
 export * from './slices/countries';
 export * from './slices/countriesOptions';
-export * from './slices/user';
 export * from './slices/portfolios';
+export * from './slices/user';
 export * from './slices/wealthManagement';
 
 const store = configureStore({

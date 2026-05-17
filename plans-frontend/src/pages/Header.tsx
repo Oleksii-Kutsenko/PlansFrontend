@@ -2,6 +2,7 @@ import type { FC } from 'react';
 import { Nav, Navbar } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { NavLink } from 'react-router-dom';
+
 import type { RootState } from '../store';
 import { logout } from '../store';
 
@@ -12,7 +13,7 @@ const Header: FC = () => {
 
   const handleLogout = (): void => {
     dispatch(logout());
-    window.location.replace('/login');
+    globalThis.location.replace('/login');
   };
 
   return (

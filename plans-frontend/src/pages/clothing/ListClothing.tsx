@@ -1,14 +1,15 @@
-import { FC, useEffect, useState, useMemo } from 'react';
+import { FC, useEffect, useMemo, useState } from 'react';
+import { Button, Col, Row } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
-import { RootState } from '../../store';
-import { clothingActions } from '../../store/slices/clothing';
-import { useAppDispatch } from '../../store/hooks';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { Button, Row, Col } from 'react-bootstrap';
+
+import ClothingCard from '../../components/clothing/ClothingCard';
 import ClothingFilters, { ClothingFilterState } from '../../components/clothing/ClothingFilters';
 import ConfirmModal from '../../components/ConfirmModal';
-import ClothingCard from '../../components/clothing/ClothingCard';
+import { RootState } from '../../store';
+import { useAppDispatch } from '../../store/hooks';
+import { clothingActions } from '../../store/slices/clothing';
 
 const ClothingList: FC = () => {
   const dispatch = useAppDispatch();
@@ -100,7 +101,9 @@ const ClothingList: FC = () => {
               <ClothingCard
                 item={item}
                 removable={true}
-                onRemove={() => setItemToDelete({ id: item.id, name: item.name })}
+                onRemove={() => {
+                  setItemToDelete({ id: item.id, name: item.name });
+                }}
               />
             </Col>
           ))}
@@ -115,7 +118,9 @@ const ClothingList: FC = () => {
         confirmLabel='Delete Item'
         variant='danger'
         onConfirm={confirmDelete}
-        onCancel={() => setItemToDelete(null)}
+        onCancel={() => {
+          setItemToDelete(null);
+        }}
       />
     </div>
   );

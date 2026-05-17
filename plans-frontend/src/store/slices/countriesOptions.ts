@@ -1,4 +1,5 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
+
 import { fetcher } from '../../utils/axios';
 
 export enum CountriesOptionsStatus {

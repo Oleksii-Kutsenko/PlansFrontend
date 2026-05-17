@@ -1,24 +1,23 @@
+import {
+  CategoryScale,
+  Chart as ChartJS,
+  Legend,
+  LinearScale,
+  LineElement,
+  PointElement,
+  Title,
+  Tooltip
+} from 'chart.js';
 import type { FC } from 'react';
 import { useEffect, useState } from 'react';
 import { Col, Container, Row } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 
-import { type RootState, LoadStatus, portfoliosActions } from '../../store';
+import { LoadStatus, portfoliosActions, type RootState } from '../../store';
 import { useAppDispatch } from '../../store/hooks';
-
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend
-} from 'chart.js';
-import { PersonalMaxDrawdownForm } from './PersonalMaxDrawdownForm';
 import AgeMaxDrawdownDependenceGraph from './AgeMaxDrawdownDependenceGraph/AgeMaxDrawdownDependenceGraph';
+import { PersonalMaxDrawdownForm } from './PersonalMaxDrawdownForm';
 import PortfolioList from './PortfolioList';
 import { PortfolioFilterFormInputs } from './shared_interfaces';
 
@@ -80,7 +79,11 @@ const Portfolios: FC = () => {
         </Row>
         <Row>
           <Col xs={3} className='d-flex'>
-            <PersonalMaxDrawdownForm onApply={(v) => setFilters(v)} />
+            <PersonalMaxDrawdownForm
+              onApply={(v) => {
+                setFilters(v);
+              }}
+            />
           </Col>
           <Col xs={9}>
             <AgeMaxDrawdownDependenceGraph graphData={ageMaxDrawdownDependence} />

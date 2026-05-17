@@ -25,7 +25,7 @@ export const CurrencyInput: FC<Props> = ({ symbol, value, onSubmit }) => {
 
     let money = 0;
     if (targetValue !== '') {
-      money = parseFloat(targetValue);
+      money = Number.parseFloat(targetValue);
     }
 
     if (money < 0) {
@@ -54,8 +54,8 @@ export const CurrencyInput: FC<Props> = ({ symbol, value, onSubmit }) => {
   const handleSubmit = (): void => {
     setIsInputDisabled(true);
     if (onSubmit) {
-      onSubmit(currentValue).catch((err: unknown) => {
-        const msg = err instanceof Error ? err.message : String(err);
+      onSubmit(currentValue).catch((error: unknown) => {
+        const msg = error instanceof Error ? error.message : String(error);
         console.log(msg);
         toast.error('Failed to update value');
         updateCurrentValue(previousValueRef.current);

@@ -1,7 +1,7 @@
-import { keysToCamel, keysToSnake } from './caseUtils';
-
 import type { AxiosError, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
 import axios from 'axios';
+
+import { keysToCamel, keysToSnake } from './caseUtils';
 
 export const fetcher = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
@@ -61,13 +61,13 @@ let failedQueue: {
 }[] = [];
 
 const processQueue = (error: Error | null, token: string | null = null) => {
-  failedQueue.forEach((prom) => {
+  for (const prom of failedQueue) {
     if (error) {
       prom.reject(error);
     } else {
       prom.resolve(token);
     }
-  });
+  }
 
   failedQueue = [];
 };
@@ -122,21 +122,16 @@ const handleResponseError = async (err: AxiosError) => {
 
         processQueue(null, access);
         return await fetcher(originalConfig);
-      } catch (refreshErr) {
-        processQueue(
-          refreshErr instanceof Error ? refreshErr : new Error(String(refreshErr)),
-          null
-        );
-        return await Promise.reject(
-          refreshErr instanceof Error ? refreshErr : new Error(String(refreshErr))
-        );
+      } catch (error) {
+        processQueue(error instanceof Error ? error : new Error(String(error)), null);
+        return await Promise.reject(error instanceof Error ? error : new Error(String(error)));
       } finally {
         isRefreshing = false;
       }
     }
-    return Promise.reject(err);
+    throw err;
   }
-  return Promise.reject(err);
+  throw err;
 };
 
 fetcher.interceptors.response.use((res: AxiosResponse<InternalAxiosRequestConfig, AxiosError>) => {

@@ -1,7 +1,9 @@
-import React from 'react';
 import './ExpandableTable.css';
-import { AssetAllocationRow } from './AssetAllocationRow';
+
+import React from 'react';
+
 import { WealthManagementModel } from '../../store';
+import { AssetAllocationRow } from './AssetAllocationRow';
 import { formatNumber, formatPercentage } from './formatting';
 
 interface ExpandableTableProps {

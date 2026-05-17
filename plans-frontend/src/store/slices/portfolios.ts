@@ -1,4 +1,5 @@
 import { createAsyncThunk, createSlice, type PayloadAction } from '@reduxjs/toolkit';
+
 import { fetcher } from '../../utils/axios';
 
 export enum LoadStatus {
@@ -91,15 +92,13 @@ export const fetchAgeMaxDrawdownDependence = createAsyncThunk<
   number | void
 >(`${name}/fetchAgeMaxDrawdownDependence`, async (age: number | void) => {
   let response;
-  if (!age) {
-    response = await fetcher.get<AgeMaxDrawdownDependency[]>(
-      '/api/investments/portfolios/age-max-drawdown-dependence/'
-    );
-  } else {
-    response = await fetcher.get<AgeMaxDrawdownDependency[]>(
-      `/api/investments/portfolios/age-max-drawdown-dependence/?age=${age}`
-    );
-  }
+  response = await (age
+    ? fetcher.get<AgeMaxDrawdownDependency[]>(
+        `/api/investments/portfolios/age-max-drawdown-dependence/?age=${age}`
+      )
+    : fetcher.get<AgeMaxDrawdownDependency[]>(
+        '/api/investments/portfolios/age-max-drawdown-dependence/'
+      ));
   return response.data;
 });
 

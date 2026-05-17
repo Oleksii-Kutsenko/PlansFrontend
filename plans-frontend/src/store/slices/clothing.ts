@@ -1,7 +1,8 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { AxiosError } from 'axios';
+
 import { fetcher } from '../../utils/axios';
 import { LoadingStatus, ValidationErrors } from './utils';
-import { AxiosError } from 'axios';
 
 export interface Clothing {
   id: number;
@@ -153,8 +154,8 @@ export const createClothing = createAsyncThunk(
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       return data;
-    } catch (err) {
-      const error = err as AxiosError<ValidationErrors>;
+    } catch (error_) {
+      const error = error_ as AxiosError<ValidationErrors>;
       if (!error.response) {
         throw error;
       }
@@ -176,7 +177,7 @@ export const createOutfit = createAsyncThunk(
         formData.append('occasion', String(outfit.occasion));
         formData.append('season', outfit.season);
         formData.append('preview_image', outfit.previewImage);
-        outfit.clothingIds.forEach((id) => formData.append('clothing_ids', String(id)));
+        for (const id of outfit.clothingIds) formData.append('clothing_ids', String(id));
         payload = formData;
         headers['Content-Type'] = 'multipart/form-data';
       } else {
@@ -185,8 +186,8 @@ export const createOutfit = createAsyncThunk(
 
       const { data } = await fetcher.post<Outfit>('/api/clothing/outfit/', payload, { headers });
       return data;
-    } catch (err) {
-      const error = err as AxiosError<ValidationErrors>;
+    } catch (error_) {
+      const error = error_ as AxiosError<ValidationErrors>;
       if (!error.response) throw error;
       return rejectWithValue(error.response.data);
     }
@@ -199,8 +200,8 @@ export const deleteClothing = createAsyncThunk(
     try {
       await fetcher.delete(`/api/clothing/clothing/${id}/`);
       return id;
-    } catch (err) {
-      const error = err as AxiosError;
+    } catch (error_) {
+      const error = error_ as AxiosError;
       return rejectWithValue(error.response?.data || error.message);
     }
   }
@@ -212,8 +213,8 @@ export const deleteOutfit = createAsyncThunk(
     try {
       await fetcher.delete(`/api/clothing/outfit/${id}/`);
       return id;
-    } catch (err) {
-      const error = err as AxiosError;
+    } catch (error_) {
+      const error = error_ as AxiosError;
       return rejectWithValue(error.response?.data || error.message);
     }
   }
@@ -225,8 +226,8 @@ export const fetchOutfit = createAsyncThunk(
     try {
       const { data } = await fetcher.get<Outfit>(`/api/clothing/outfit/${id}/`);
       return data;
-    } catch (err) {
-      const error = err as AxiosError;
+    } catch (error_) {
+      const error = error_ as AxiosError;
       return rejectWithValue(error.response?.data || error.message);
     }
   }
@@ -239,8 +240,8 @@ export const updateOutfit = createAsyncThunk(
       const { id, ...payload } = outfit;
       const { data } = await fetcher.patch<Outfit>(`/api/clothing/outfit/${id}/`, payload);
       return data;
-    } catch (err) {
-      const error = err as AxiosError<ValidationErrors>;
+    } catch (error_) {
+      const error = error_ as AxiosError<ValidationErrors>;
       if (!error.response) {
         throw error;
       }
@@ -271,8 +272,8 @@ export const addItemToOutfit = createAsyncThunk(
         clothingId
       });
       return data;
-    } catch (err) {
-      const error = err as AxiosError;
+    } catch (error_) {
+      const error = error_ as AxiosError;
       return rejectWithValue(error.response?.data || error.message);
     }
   }
@@ -289,8 +290,8 @@ export const removeItemFromOutfit = createAsyncThunk(
         `/api/clothing/outfit/${outfitId}/clothings/${clothingId}/`
       );
       return data;
-    } catch (err) {
-      const error = err as AxiosError;
+    } catch (error_) {
+      const error = error_ as AxiosError;
       return rejectWithValue(error.response?.data || error.message);
     }
   }

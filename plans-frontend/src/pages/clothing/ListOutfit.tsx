@@ -1,13 +1,14 @@
-import { FC, useEffect, useState, useMemo } from 'react';
+import { FC, useEffect, useMemo, useState } from 'react';
+import { Badge, Button, Card, Col, Row } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
-import { RootState } from '../../store';
-import { clothingActions } from '../../store/slices/clothing';
-import { useAppDispatch } from '../../store/hooks';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { Button, Card, Row, Col, Badge } from 'react-bootstrap';
+
 import OutfitFilters, { FilterState } from '../../components/clothing/OutfitFilters';
 import ConfirmModal from '../../components/ConfirmModal';
+import { RootState } from '../../store';
+import { useAppDispatch } from '../../store/hooks';
+import { clothingActions } from '../../store/slices/clothing';
 
 const ListOutfit: FC = () => {
   const dispatch = useAppDispatch();
@@ -178,7 +179,9 @@ const ListOutfit: FC = () => {
                     variant='outline-danger'
                     size='sm'
                     title='Delete Outfit'
-                    onClick={() => setOutfitToDelete({ id: item.id, name: item.outfitName })}
+                    onClick={() => {
+                      setOutfitToDelete({ id: item.id, name: item.outfitName });
+                    }}
                   >
                     <i className='bi bi-trash'></i>
                   </Button>
@@ -196,7 +199,9 @@ const ListOutfit: FC = () => {
         message={`Are you sure you want to delete the outfit "${outfitToDelete?.name}"? This action cannot be undone.`}
         confirmLabel='Delete Outfit'
         onConfirm={confirmDelete}
-        onCancel={() => setOutfitToDelete(null)}
+        onCancel={() => {
+          setOutfitToDelete(null);
+        }}
       />
     </div>
   );
