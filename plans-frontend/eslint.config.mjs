@@ -11,27 +11,29 @@ import { fileURLToPath } from 'node:url';
 import js from '@eslint/js';
 import { FlatCompat } from '@eslint/eslintrc';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const compat = new FlatCompat({
-  baseDirectory: __dirname,
-  recommendedConfig: js.configs.recommended,
-  allConfig: js.configs.all
-});
+import tseslint from 'typescript-eslint';
+import importXPlugin from 'eslint-plugin-import-x';
+import prettierPlugin from 'eslint-plugin-prettier/recommended';
+import promisePlugin from 'eslint-plugin-promise';
+import unicornPlugin from 'eslint-plugin-unicorn';
+import reactPlugin from 'eslint-plugin-react';
+import reactRefresh from 'eslint-plugin-react-refresh';
+import simpleImportSort from 'eslint-plugin-simple-import-sort';
+import reactCompiler from 'eslint-plugin-react-compiler';
+import sonarjs from 'eslint-plugin-sonarjs';
 
-export default [
-  {
-    ignores: ['**/reportWebVitals.ts', '**/react-app-env.d.ts']
-  },
-  ...compat.extends(
-    'eslint:recommended',
-    'plugin:react/recommended',
-    'plugin:@typescript-eslint/recommended',
-    'plugin:@typescript-eslint/recommended-type-checked',
-    'plugin:@typescript-eslint/stylistic-type-checked',
-    'prettier',
-    'plugin:prettier/recommended'
-  ),
+export default tseslint.config(
+  { ignores: ['**/reportWebVitals.ts', '**/react-app-env.d.ts', 'dist', 'build'] },
+  js.configs.recommended,
+  ...tseslint.configs.strictTypeChecked,
+  ...tseslint.configs.stylisticTypeChecked,
+  promisePlugin.configs['flat/recommended'],
+  importXPlugin.flatConfigs.recommended,
+  importXPlugin.flatConfigs.typescript,
+  jsxA11y.flatConfigs.recommended,
+  unicornPlugin.configs['flat/recommended'],
+  prettierPlugin,
+  sonarjs.configs.recommended,
   {
     plugins: {
       react,
