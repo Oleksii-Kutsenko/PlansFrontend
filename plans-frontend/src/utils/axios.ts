@@ -67,75 +67,74 @@ const processQueue = (error: Error | null, token: string | null = null) => {
   failedQueue = [];
 };
 
-fetcher.interceptors.response.use(
-  (res: AxiosResponse<InternalAxiosRequestConfig, AxiosError>) => {
-    if (res.config.baseURL && res.config.url) {
-      console.debug('[Response]', res.config.baseURL + res.config.url, res.status, res.data);
-    }
-    return res;
-  },
-  async (err: AxiosError) => {
-    const originalConfig = err.config as CustomAxiosRequestConfig;
-    if (originalConfig) {
-      console.debug(
-        '[Response]',
-        originalConfig.baseURL,
-        originalConfig.url,
-        err.response?.status,
-        err.response?.data
-      );
+const handleResponseError = async (err: AxiosError) => {
+  const originalConfig = err.config as CustomAxiosRequestConfig;
+  if (originalConfig) {
+    console.debug(
+      '[Response]',
+      originalConfig.baseURL,
+      originalConfig.url,
+      err.response?.status,
+      err.response?.data
+    );
 
-      if (err.response?.status === 401 && !originalConfig._retry) {
-        if (isRefreshing) {
-          try {
-            const token = await new Promise((resolve, reject) => {
-              failedQueue.push({ resolve, reject });
-            });
-            if (token && typeof token === 'string') {
-              originalConfig.headers.Authorization = `Bearer ${token}`;
-            }
-            return await fetcher(originalConfig);
-          } catch (error) {
-            return await Promise.reject(error instanceof Error ? error : new Error(String(error)));
-          }
-        }
-
-        originalConfig._retry = true;
-        isRefreshing = true;
-
+    if (err.response?.status === 401 && !originalConfig._retry) {
+      if (isRefreshing) {
         try {
-          const { refreshToken } = store.getState().auth;
-          if (!refreshToken) {
-            throw new Error('No refresh token available');
-          }
-
-          const resp = await axios.post(`${import.meta.env.VITE_API_URL}/api/accounts/refresh/`, {
-            refresh: refreshToken
+          const token = await new Promise((resolve, reject) => {
+            failedQueue.push({ resolve, reject });
           });
-
-          const { access, refresh } = resp.data as { access: string; refresh: string };
-          console.log('Refreshed token:', access, refresh);
-
-          store.dispatch(setToken({ access, refresh }));
-          originalConfig.headers.Authorization = `Bearer ${access}`;
-
-          processQueue(null, access);
+          if (token && typeof token === 'string') {
+            originalConfig.headers.Authorization = `Bearer ${token}`;
+          }
           return await fetcher(originalConfig);
-        } catch (refreshErr) {
-          processQueue(
-            refreshErr instanceof Error ? refreshErr : new Error(String(refreshErr)),
-            null
-          );
-          store.dispatch(logout());
-          return await Promise.reject(
-            refreshErr instanceof Error ? refreshErr : new Error(String(refreshErr))
-          );
-        } finally {
-          isRefreshing = false;
+        } catch (error) {
+          return await Promise.reject(error instanceof Error ? error : new Error(String(error)));
         }
       }
-      return Promise.reject(err);
+
+      originalConfig._retry = true;
+      isRefreshing = true;
+
+      try {
+        const { refreshToken } = store.getState().auth;
+        if (!refreshToken) {
+          throw new Error('No refresh token available');
+        }
+
+        const resp = await axios.post(`${import.meta.env.VITE_API_URL}/api/accounts/refresh/`, {
+          refresh: refreshToken
+        });
+
+        const { access, refresh } = resp.data as { access: string; refresh: string };
+        console.log('Refreshed token:', access, refresh);
+
+        store.dispatch(setToken({ access, refresh }));
+        originalConfig.headers.Authorization = `Bearer ${access}`;
+
+        processQueue(null, access);
+        return await fetcher(originalConfig);
+      } catch (refreshErr) {
+        processQueue(
+          refreshErr instanceof Error ? refreshErr : new Error(String(refreshErr)),
+          null
+        );
+        store.dispatch(logout());
+        return await Promise.reject(
+          refreshErr instanceof Error ? refreshErr : new Error(String(refreshErr))
+        );
+      } finally {
+        isRefreshing = false;
+      }
     }
     return Promise.reject(err);
   }
-);
+  return Promise.reject(err);
+};
+
+fetcher.interceptors.response.use((res: AxiosResponse<InternalAxiosRequestConfig, AxiosError>) => {
+  if (res.config.baseURL && res.config.url) {
+    console.debug('[Response]', res.config.baseURL + res.config.url, res.status, res.data);
+  }
+  return res;
+}, handleResponseError);
