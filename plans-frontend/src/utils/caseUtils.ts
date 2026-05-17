@@ -4,7 +4,7 @@
  * Already-camelCase strings pass through unchanged.
  */
 export const toCamel = (str: string): string =>
-  str.replace(/([-_][a-z])/g, (group) => group.toUpperCase().replace('-', '').replace('_', ''));
+  str.replaceAll(/([-_][a-z])/g, (group) => group.toUpperCase().replace('-', '').replace('_', ''));
 
 /**
  * Convert a single camelCase string to snake_case.
@@ -12,7 +12,7 @@ export const toCamel = (str: string): string =>
  * Already-snake_case strings pass through unchanged.
  */
 export const toSnake = (str: string): string =>
-  str.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`);
+  str.replaceAll(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`);
 
 /**
  * Recursively convert all keys in an object/array from snake_case to camelCase.
@@ -20,7 +20,7 @@ export const toSnake = (str: string): string =>
  */
 export const keysToCamel = (obj: unknown): unknown => {
   if (Array.isArray(obj)) {
-    return obj.map(keysToCamel);
+    return obj.map((obj) => keysToCamel(obj));
   }
   if (
     obj !== null &&
@@ -29,13 +29,13 @@ export const keysToCamel = (obj: unknown): unknown => {
     !(obj instanceof Blob) &&
     !(obj instanceof FormData)
   ) {
-    return Object.entries(obj as Record<string, unknown>).reduce(
-      (result, [key, value]) => {
-        result[toCamel(key)] = keysToCamel(value);
-        return result;
-      },
-      {} as Record<string, unknown>
-    );
+    const result: Record<string, unknown> = {};
+
+    for (const [key, value] of Object.entries(obj as Record<string, unknown>)) {
+      result[toCamel(key)] = keysToCamel(value);
+    }
+
+    return result;
   }
   return obj;
 };
@@ -46,7 +46,7 @@ export const keysToCamel = (obj: unknown): unknown => {
  */
 export const keysToSnake = (obj: unknown): unknown => {
   if (Array.isArray(obj)) {
-    return obj.map(keysToSnake);
+    return obj.map((obj) => keysToSnake(obj));
   }
   if (
     obj !== null &&
@@ -55,13 +55,13 @@ export const keysToSnake = (obj: unknown): unknown => {
     !(obj instanceof Blob) &&
     !(obj instanceof FormData)
   ) {
-    return Object.entries(obj as Record<string, unknown>).reduce(
-      (result, [key, value]) => {
-        result[toSnake(key)] = keysToSnake(value);
-        return result;
-      },
-      {} as Record<string, unknown>
-    );
+    const result: Record<string, unknown> = {};
+
+    for (const [key, value] of Object.entries(obj)) {
+      result[toSnake(key)] = keysToSnake(value);
+    }
+
+    return result;
   }
   return obj;
 };

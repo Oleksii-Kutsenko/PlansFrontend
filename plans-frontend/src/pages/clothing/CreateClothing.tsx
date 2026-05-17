@@ -1,15 +1,15 @@
 import { useEffect } from 'react';
-import { useSelector } from 'react-redux';
-import { RootState } from '../../store';
-import { ClothingCreate } from '../../store/slices/clothing';
-import { clothingActions, createClothing } from '../../store/slices/clothing';
-import { useNavigate } from 'react-router-dom';
-import { useAppDispatch } from '../../store/hooks';
-import { useForm } from 'react-hook-form';
 import { Button, Container, Form, Row } from 'react-bootstrap';
+import { useForm } from 'react-hook-form';
+import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { ValidationErrors } from '../../store/slices/utils';
+
 import ImageColorPicker from '../../components/clothing/ImageColorPicker';
+import { RootState } from '../../store';
+import { useAppDispatch } from '../../store/hooks';
+import { clothingActions, ClothingCreate, createClothing } from '../../store/slices/clothing';
+import { ValidationErrors } from '../../store/slices/utils';
 
 interface CreateClothingFormValues {
   name: string;
@@ -25,7 +25,7 @@ const CreateClothing = () => {
     (state: RootState) =>
       state.clothing.options as {
         clothingType?: { value: string; displayName: string }[];
-      } | null
+      } | null,
   );
 
   useEffect(() => {
@@ -38,7 +38,7 @@ const CreateClothing = () => {
     watch,
     setValue,
     setError,
-    formState: { errors }
+    formState: { errors },
   } = useForm<CreateClothingFormValues>();
 
   // Watch the image input so we can pass the file to the color picker
@@ -55,7 +55,7 @@ const CreateClothing = () => {
         name: data.name,
         clothingType: data.clothingType,
         color: data.color,
-        imagePath: imagePath
+        imagePath: imagePath,
       };
 
       try {
@@ -63,9 +63,9 @@ const CreateClothing = () => {
 
         void dispatch(clothingActions.fetchClothing());
         void navigate('/clothing/clothing');
-      } catch (err: any) {
-        console.error(err);
-        const error = err as ValidationErrors;
+      } catch (error_: any) {
+        console.error(error_);
+        const error = error_ as ValidationErrors;
 
         const errorMessage = error?.errorMessage ?? 'Error adding clothing item.';
         toast.error(errorMessage);
@@ -82,42 +82,42 @@ const CreateClothing = () => {
       }
     } else {
       toast.error('Please upload an image!');
-      throw Error('Image is null or undefined.');
+      throw new Error('Image is null or undefined.');
     }
   };
 
   return (
-    <Container className='mt-5 mb-5' style={{ maxWidth: '600px' }}>
-      <div className='d-flex justify-content-between align-items-center mb-4'>
-        <h1 className='mb-0'>Add Clothing Item</h1>
-        <Button variant='outline-secondary' onClick={() => void navigate('/clothing/clothing')}>
+    <Container className="mt-5 mb-5" style={{ maxWidth: '600px' }}>
+      <div className="d-flex justify-content-between align-items-center mb-4">
+        <h1 className="mb-0">Add Clothing Item</h1>
+        <Button variant="outline-secondary" onClick={() => void navigate('/clothing/clothing')}>
           Cancel
         </Button>
       </div>
 
-      <div className='bg-light p-4 rounded border shadow-sm'>
+      <div className="bg-light p-4 rounded border shadow-sm">
         <Form onSubmit={(e) => void handleSubmit(onSubmit)(e)}>
-          <Form.Group className='mb-3' controlId='name'>
-            <Form.Label className='fw-medium'>Name</Form.Label>
+          <Form.Group className="mb-3" controlId="name">
+            <Form.Label className="fw-medium">Name</Form.Label>
             <Form.Control
-              className={`${errors.name ? 'is-invalid' : ''}`}
-              type='text'
-              placeholder='e.g. Favorite Blue Jeans'
+              className={errors.name ? 'is-invalid' : ''}
+              type="text"
+              placeholder="e.g. Favorite Blue Jeans"
               {...register('name', { required: 'Name is required' })}
             />
             {errors.name && (
-              <Form.Control.Feedback type='invalid'>{errors.name.message}</Form.Control.Feedback>
+              <Form.Control.Feedback type="invalid">{errors.name.message}</Form.Control.Feedback>
             )}
           </Form.Group>
 
           <Row>
-            <Form.Group className='mb-3 col-md-8' controlId='clothingType'>
-              <Form.Label className='fw-medium'>Type</Form.Label>
+            <Form.Group className="mb-3 col-md-8" controlId="clothingType">
+              <Form.Label className="fw-medium">Type</Form.Label>
               <Form.Select
-                className={`${errors.clothingType ? 'is-invalid' : ''}`}
+                className={errors.clothingType ? 'is-invalid' : ''}
                 {...register('clothingType', { required: 'Clothing type is required' })}
               >
-                <option value=''>Select Type</option>
+                <option value="">Select Type</option>
                 {(options?.clothingType ?? []).map((opt) => (
                   <option key={opt.value} value={opt.value}>
                     {opt.displayName}
@@ -125,35 +125,35 @@ const CreateClothing = () => {
                 ))}
               </Form.Select>
               {errors.clothingType && (
-                <Form.Control.Feedback type='invalid'>
+                <Form.Control.Feedback type="invalid">
                   {errors.clothingType.message}
                 </Form.Control.Feedback>
               )}
             </Form.Group>
 
-            <Form.Group className='mb-3 col-md-4' controlId='color'>
-              <Form.Label className='fw-medium'>Main Color</Form.Label>
+            <Form.Group className="mb-3 col-md-4" controlId="color">
+              <Form.Label className="fw-medium">Main Color</Form.Label>
               <Form.Control
-                type='color'
-                className='w-100 p-1'
-                title='Choose your color'
+                type="color"
+                className="w-100 p-1"
+                title="Choose your color"
                 style={{ height: '38px', cursor: 'pointer' }}
                 {...register('color', { required: 'Main color is required' })}
-                defaultValue='#000000'
+                defaultValue="#000000"
               />
             </Form.Group>
           </Row>
 
-          <Form.Group controlId='imagePath' className='mb-4'>
-            <Form.Label className='fw-medium'>Image</Form.Label>
+          <Form.Group controlId="imagePath" className="mb-4">
+            <Form.Label className="fw-medium">Image</Form.Label>
             <Form.Control
-              className={`${errors.imagePath ? 'is-invalid' : ''}`}
-              type='file'
-              accept='image/*'
+              className={errors.imagePath ? 'is-invalid' : ''}
+              type="file"
+              accept="image/*"
               {...register('imagePath', { required: 'An image is required!' })}
             />
             {errors.imagePath && (
-              <Form.Control.Feedback type='invalid'>
+              <Form.Control.Feedback type="invalid">
                 {errors.imagePath.message}
               </Form.Control.Feedback>
             )}
@@ -161,14 +161,14 @@ const CreateClothing = () => {
             {/* The Magic Color Picker preview component! */}
             <ImageColorPicker
               imageFile={currentImageFile}
-              onColorPick={(hex) =>
-                setValue('color', hex, { shouldValidate: true, shouldDirty: true })
-              }
+              onColorPick={(hex) => {
+                setValue('color', hex, { shouldValidate: true, shouldDirty: true });
+              }}
             />
           </Form.Group>
 
-          <div className='d-grid mt-4'>
-            <Button variant='success' size='lg' type='submit'>
+          <div className="d-grid mt-4">
+            <Button variant="success" size="lg" type="submit">
               Save Clothing Item
             </Button>
           </div>

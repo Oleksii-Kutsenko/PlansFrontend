@@ -24,12 +24,16 @@
 
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "styles/*": ["./src/styles/*"],
+      "modules/*": ["./src/modules/*"],
+      "assets/*": ["./src/assets/*"],
+      "~bootstrap/*": ["./node_modules/bootstrap/*"]
     },
     "jsx": "react-jsx",
 
-    "allowJs": false,
-    "strictNullChecks": true
+    "allowJs": false
   },
-  "include": ["src"]
+  "include": ["src"],
+  "types": ["vite/client"]
 }

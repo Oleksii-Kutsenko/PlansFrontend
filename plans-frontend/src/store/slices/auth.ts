@@ -33,8 +33,8 @@ const authSlice = createSlice({
       state.isAuthenticated = false;
       localStorage.removeItem('access');
       localStorage.removeItem('refresh');
-    }
-  }
+    },
+  },
 });
 
 // Exports
@@ -54,6 +54,6 @@ function createInitialState(): State {
   return {
     token: localStorage.getItem('access') ?? '',
     refreshToken: localStorage.getItem('refresh') ?? '',
-    isAuthenticated: Boolean(localStorage.getItem('access'))
+    isAuthenticated: Boolean(localStorage.getItem('access')),
   };
 }

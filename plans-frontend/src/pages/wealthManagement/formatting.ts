@@ -6,9 +6,5 @@ export const formatNumber = (number: number | null, currencySymbol: string) => {
 };
 
 export const formatPercentage = (percentage: number | null) => {
-  if (percentage !== null) {
-    return `${percentage.toFixed(2)}%`;
-  } else {
-    return 'N/A';
-  }
+  return percentage === null ? 'N/A' : `${percentage.toFixed(2)}%`;
 };

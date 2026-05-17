@@ -1,5 +1,6 @@
-import { FC, useState, useEffect } from 'react';
-import { Row, Col, Form, InputGroup, Button } from 'react-bootstrap';
+import { FC, useEffect, useState } from 'react';
+import { Button, Col, Form, InputGroup, Row } from 'react-bootstrap';
+
 import { Occasion } from '../../store/slices/clothing';
 
 export interface FilterState {
@@ -30,17 +31,19 @@ const OutfitFilters: FC<OutfitFiltersProps> = ({ occasions, seasonChoices, onCha
   };
 
   return (
-    <div className='bg-light p-3 rounded mb-4 shadow-sm border'>
-      <Row className='g-3 align-items-center'>
+    <div className="bg-light p-3 rounded mb-4 shadow-sm border">
+      <Row className="g-3 align-items-center">
         <Col xs={12} md={4}>
           <InputGroup>
             <InputGroup.Text>
-              <i className='bi bi-search'></i>
+              <i className="bi bi-search"></i>
             </InputGroup.Text>
             <Form.Control
-              placeholder='Search outfits...'
+              placeholder="Search outfits..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+              }}
             />
           </InputGroup>
         </Col>
@@ -48,9 +51,11 @@ const OutfitFilters: FC<OutfitFiltersProps> = ({ occasions, seasonChoices, onCha
         <Col xs={12} sm={6} md={3}>
           <Form.Select
             value={selectedOccasion}
-            onChange={(e) => setSelectedOccasion(e.target.value)}
+            onChange={(e) => {
+              setSelectedOccasion(e.target.value);
+            }}
           >
-            <option value=''>All Occasions</option>
+            <option value="">All Occasions</option>
             {occasions.map((occ) => (
               <option key={occ.id} value={occ.id}>
                 {occ.occasionName}
@@ -60,8 +65,13 @@ const OutfitFilters: FC<OutfitFiltersProps> = ({ occasions, seasonChoices, onCha
         </Col>
 
         <Col xs={12} sm={6} md={3}>
-          <Form.Select value={selectedSeason} onChange={(e) => setSelectedSeason(e.target.value)}>
-            <option value=''>All Seasons</option>
+          <Form.Select
+            value={selectedSeason}
+            onChange={(e) => {
+              setSelectedSeason(e.target.value);
+            }}
+          >
+            <option value="">All Seasons</option>
             {seasonChoices.map((season) => (
               <option key={season.value} value={season.value}>
                 {season.displayName}
@@ -70,12 +80,12 @@ const OutfitFilters: FC<OutfitFiltersProps> = ({ occasions, seasonChoices, onCha
           </Form.Select>
         </Col>
 
-        <Col xs={12} md={2} className='text-md-end'>
+        <Col xs={12} md={2} className="text-md-end">
           <Button
-            variant='outline-secondary'
+            variant="outline-secondary"
             onClick={handleClear}
             disabled={!searchQuery && !selectedOccasion && !selectedSeason}
-            className='w-100'
+            className="w-100"
           >
             Clear Filters
           </Button>

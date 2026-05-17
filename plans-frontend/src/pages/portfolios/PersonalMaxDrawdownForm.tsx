@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 
-import { type RootState, portfoliosActions, LoadStatus } from '../../store';
+import { LoadStatus, portfoliosActions, type RootState } from '../../store';
 import { useAppDispatch } from '../../store/hooks';
 import { type PortfolioFilterFormInputs } from './shared_interfaces';
 
@@ -22,7 +22,7 @@ const toDateInputValue = (d: Date): string => {
 export const PersonalMaxDrawdownForm = ({ onApply }: Props) => {
   const dispatch = useAppDispatch();
   const { personalMaxDrawdown, personalMaxDrawdownLoadingStatus } = useSelector(
-    (state: RootState) => state.portfolios
+    (state: RootState) => state.portfolios,
   );
 
   const defaultBacktestStartDate = useMemo(() => {
@@ -35,20 +35,20 @@ export const PersonalMaxDrawdownForm = ({ onApply }: Props) => {
     register,
     handleSubmit,
     reset,
-    formState: { errors }
+    formState: { errors },
   } = useForm<PortfolioFilterFormInputs>({
     defaultValues: {
       personalMaxDrawdown: personalMaxDrawdown ?? null,
-      backtestStartDate: defaultBacktestStartDate
-    }
+      backtestStartDate: defaultBacktestStartDate,
+    },
   });
 
   useEffect(() => {
     if (personalMaxDrawdownLoadingStatus !== LoadStatus.LOADING && personalMaxDrawdown === null) {
       void dispatch(portfoliosActions.fetchPersonalMaxDrawdown())
         .unwrap()
-        .catch((err: unknown) => {
-          const msg = err instanceof Error ? err.message : String(err);
+        .catch((error: unknown) => {
+          const msg = error instanceof Error ? error.message : String(error);
           toast.error(`Error fetching personal max drawdown: ${msg}`);
         });
     }
@@ -57,7 +57,7 @@ export const PersonalMaxDrawdownForm = ({ onApply }: Props) => {
   useEffect(() => {
     reset({
       personalMaxDrawdown: personalMaxDrawdown ?? null,
-      backtestStartDate: defaultBacktestStartDate
+      backtestStartDate: defaultBacktestStartDate,
     });
   }, [personalMaxDrawdown, reset, defaultBacktestStartDate]);
 
@@ -74,7 +74,7 @@ export const PersonalMaxDrawdownForm = ({ onApply }: Props) => {
   const handleFormReset = (): void => {
     const resetValues: PortfolioFilterFormInputs = {
       personalMaxDrawdown: personalMaxDrawdown ?? null,
-      backtestStartDate: defaultBacktestStartDate
+      backtestStartDate: defaultBacktestStartDate,
     };
 
     reset(resetValues);
@@ -82,8 +82,8 @@ export const PersonalMaxDrawdownForm = ({ onApply }: Props) => {
 
     void dispatch(portfoliosActions.fetchPersonalMaxDrawdown())
       .unwrap()
-      .catch((err: unknown) => {
-        const msg = err instanceof Error ? err.message : String(err);
+      .catch((error: unknown) => {
+        const msg = error instanceof Error ? error.message : String(error);
         toast.error(`Error fetching personal max drawdown: ${msg}`);
       });
   };
@@ -92,44 +92,44 @@ export const PersonalMaxDrawdownForm = ({ onApply }: Props) => {
   if (personalMaxDrawdown == null) return <div>Personal max drawdown not found.</div>;
 
   return (
-    <div className='my-auto'>
+    <div className="my-auto">
       <Form
-        className='border border-secondary rounded m-3 p-3'
+        className="border border-secondary rounded m-3 p-3"
         style={{ backgroundColor: 'rgb(70, 130, 180)' }}
         onSubmit={(e) => void handleSubmit(handleFormSubmit)(e)}
       >
         <Form.Group>
-          <Form.Label htmlFor='personalMaxDrawdown'>Personal Max Drawdown</Form.Label>
+          <Form.Label htmlFor="personalMaxDrawdown">Personal Max Drawdown</Form.Label>
           <Form.Control
-            type='number'
-            id='personalMaxDrawdown'
-            step='0.01'
-            inputMode='decimal'
+            type="number"
+            id="personalMaxDrawdown"
+            step="0.01"
+            inputMode="decimal"
             {...register('personalMaxDrawdown', {
               // empty => null, otherwise number
-              setValueAs: (v) => (v === '' || v == null ? null : Number(v))
+              setValueAs: (v) => (v === '' || v == null ? null : Number(v)),
             })}
             isInvalid={errors.personalMaxDrawdown != null}
           />
-          <Form.Control.Feedback type='invalid'>This field has an error.</Form.Control.Feedback>
+          <Form.Control.Feedback type="invalid">This field has an error.</Form.Control.Feedback>
         </Form.Group>
 
         <Form.Group>
-          <Form.Label htmlFor='backtestStartDate'>Backtest Start Date</Form.Label>
+          <Form.Label htmlFor="backtestStartDate">Backtest Start Date</Form.Label>
           <Form.Control
-            type='date'
-            id='backtestStartDate'
+            type="date"
+            id="backtestStartDate"
             {...register('backtestStartDate', { required: true })}
             isInvalid={errors.backtestStartDate != null}
           />
-          <Form.Control.Feedback type='invalid'>This field has an error.</Form.Control.Feedback>
+          <Form.Control.Feedback type="invalid">This field has an error.</Form.Control.Feedback>
         </Form.Group>
 
-        <Form.Group className='d-flex justify-content-between'>
-          <Button type='submit' className='mt-3 mr-auto'>
+        <Form.Group className="d-flex justify-content-between">
+          <Button type="submit" className="mt-3 mr-auto">
             Apply
           </Button>
-          <Button type='reset' className='mt-3 ml-auto' onClick={handleFormReset}>
+          <Button type="reset" className="mt-3 ml-auto" onClick={handleFormReset}>
             Reset
           </Button>
         </Form.Group>

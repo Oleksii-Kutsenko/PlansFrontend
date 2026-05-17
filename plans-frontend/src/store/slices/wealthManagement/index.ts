@@ -1,2 +1,2 @@
-export * from './wealthManagement';
 export * from './interfaces';
+export * from './wealthManagement';

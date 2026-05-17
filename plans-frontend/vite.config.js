@@ -10,22 +10,22 @@ export default defineConfig(() => {
         { find: 'styles', replacement: path.resolve(__dirname, 'src/styles') },
         {
           find: 'modules',
-          replacement: path.resolve(__dirname, 'src/modules')
+          replacement: path.resolve(__dirname, 'src/modules'),
         },
         { find: 'assets', replacement: path.resolve(__dirname, 'src/assets') },
         {
           find: '~bootstrap',
-          replacement: path.resolve(__dirname, 'node_modules/bootstrap')
-        }
-      ]
+          replacement: path.resolve(__dirname, 'node_modules/bootstrap'),
+        },
+      ],
     },
     server: {
       port: 3000,
-      host: true
+      host: true,
     },
     build: {
-      outDir: 'build'
+      outDir: 'build',
     },
-    plugins: [react()]
+    plugins: [react()],
   };
 });

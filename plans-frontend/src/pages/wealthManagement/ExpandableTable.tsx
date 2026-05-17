@@ -1,7 +1,9 @@
-import React from 'react';
 import './ExpandableTable.css';
-import { AssetAllocationRow } from './AssetAllocationRow';
+
+import React from 'react';
+
 import { WealthManagementModel } from '../../store';
+import { AssetAllocationRow } from './AssetAllocationRow';
 import { formatNumber, formatPercentage } from './formatting';
 
 interface ExpandableTableProps {
@@ -12,17 +14,17 @@ export function ExpandableTable({ wealthManagement }: ExpandableTableProps): Rea
   const baseCurrency = wealthManagement.baseCurrency;
 
   return (
-    <div className='table-container'>
-      <table className='outer-table'>
-        <thead className='table-head'>
+    <div className="table-container">
+      <table className="outer-table">
+        <thead className="table-head">
           <tr>
-            <th className='chevron'></th>
-            <th className='asset-type'>Asset Type</th>
-            <th className='current-amount'>Current Amount</th>
-            <th className='allocation-amount'>Target Amount</th>
-            <th className='allocated-percentage'>Allocated Percentage</th>
-            <th className='target-percentage'>Target Percentage</th>
-            <th className='difference'>Delta</th>
+            <th className="chevron"></th>
+            <th className="asset-type">Asset Type</th>
+            <th className="current-amount">Current Amount</th>
+            <th className="allocation-amount">Target Amount</th>
+            <th className="allocated-percentage">Allocated Percentage</th>
+            <th className="target-percentage">Target Percentage</th>
+            <th className="difference">Delta</th>
           </tr>
         </thead>
         <tbody>
@@ -36,7 +38,7 @@ export function ExpandableTable({ wealthManagement }: ExpandableTableProps): Rea
               />
             );
           })}
-          <tr className='total-row'>
+          <tr className="total-row">
             <td></td>
             <td>Total</td>
             <td>{formatNumber(wealthManagement.totalCurrentAmount, baseCurrency.symbol)}</td>
