@@ -20,7 +20,7 @@ export const CurrencyInput: FC<Props> = ({ symbol, value, onSubmit }) => {
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>): void => {
     const {
-      target: { value: targetValue }
+      target: { value: targetValue },
     } = event;
 
     let money = 0;
@@ -72,48 +72,48 @@ export const CurrencyInput: FC<Props> = ({ symbol, value, onSubmit }) => {
   };
 
   return (
-    <InputGroup className=''>
+    <InputGroup className="">
       <InputGroup.Text>{symbol}</InputGroup.Text>
       <Form.Control
         style={{ textAlign: 'left', fontSize: '0.95rem' }}
         ref={inputRef}
         disabled={isInputDisabled}
-        aria-label='Amount'
+        aria-label="Amount"
         onChange={handleChange}
-        type='number'
+        type="number"
         value={currentValue}
-        min='0'
+        min="0"
         onKeyDown={handleKeyDown}
       />
       {isInputDisabled ? (
         <Button
-          variant='outline-secondary'
-          id='edit-button'
+          variant="outline-secondary"
+          id="edit-button"
           onClick={handleEdit}
-          aria-label='Edit amount'
-          title='Edit amount'
+          aria-label="Edit amount"
+          title="Edit amount"
         >
-          <i className='bi bi-pencil' aria-hidden='true'></i>
+          <i className="bi bi-pencil" aria-hidden="true"></i>
         </Button>
       ) : (
         <>
           <Button
-            variant='outline-danger'
-            id='cancel-button'
+            variant="outline-danger"
+            id="cancel-button"
             onClick={handleCancel}
-            aria-label='Cancel edit'
-            title='Cancel edit'
+            aria-label="Cancel edit"
+            title="Cancel edit"
           >
-            <i className='bi bi-x' aria-hidden='true'></i>
+            <i className="bi bi-x" aria-hidden="true"></i>
           </Button>
           <Button
-            variant='outline-success'
-            id='submit-button'
+            variant="outline-success"
+            id="submit-button"
             onClick={handleSubmit}
-            aria-label='Submit amount'
-            title='Submit amount'
+            aria-label="Submit amount"
+            title="Submit amount"
           >
-            <i className='bi bi-check' aria-hidden='true'></i>
+            <i className="bi bi-check" aria-hidden="true"></i>
           </Button>
         </>
       )}

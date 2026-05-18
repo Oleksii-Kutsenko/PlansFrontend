@@ -11,7 +11,7 @@ import { formatNumber, formatPercentage } from './formatting';
 export const AssetAllocationRow = ({
   allocation,
   baseCurrency,
-  wealthManagementID
+  wealthManagementID,
 }: {
   allocation: Allocation;
   baseCurrency: Currency;
@@ -24,8 +24,8 @@ export const AssetAllocationRow = ({
     (fieldName: string, assetAllocationId: number) =>
     async (value: number): Promise<void> => {
       try {
-        await fetcher.patch(`/api/assets/asset-allocation/${assetAllocationId}/`, {
-          [fieldName]: value
+        await fetcher.patch(`/api/assets/asset-allocation/${String(assetAllocationId)}/`, {
+          [fieldName]: value,
         });
         await dispatch(wealthManagementActions.fetchWealthManagement(wealthManagementID)).unwrap();
       } catch (error: unknown) {
@@ -62,9 +62,9 @@ export const AssetAllocationRow = ({
       </tr>
       {expanded && (
         <tr>
-          <td colSpan={7} className='inner-table-container'>
-            <table className='inner-table'>
-              <thead className='table-head'>
+          <td colSpan={7} className="inner-table-container">
+            <table className="inner-table">
+              <thead className="table-head">
                 <tr>
                   <th>Asset Name</th>
                   <th>Asset</th>

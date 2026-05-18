@@ -8,5 +8,5 @@ interface Props {
 }
 
 export const PercentageInput: FC<Props> = ({ value, onSubmit }) => {
-  return <CurrencyInput symbol='%' value={value} {...(onSubmit ? { onSubmit } : {})} />;
+  return <CurrencyInput symbol="%" value={value} {...(onSubmit ? { onSubmit } : {})} />;
 };

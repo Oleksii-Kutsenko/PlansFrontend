@@ -10,7 +10,7 @@ import {
   type AgeMaxDrawdownDependency,
   LoadStatus,
   portfoliosActions,
-  RootState
+  RootState,
 } from '../../../store';
 import { useAppDispatch } from '../../../store/hooks';
 
@@ -23,7 +23,7 @@ interface AgeMaxDrawdownDependenceGraphProps {
 const AgeMaxDrawdownDependenceGraph: FC<AgeMaxDrawdownDependenceGraphProps> = ({ graphData }) => {
   const dispatch = useAppDispatch();
   const { ageMaxDrawdownDependenceLoadingStatus } = useSelector(
-    (state: RootState) => state.portfolios
+    (state: RootState) => state.portfolios,
   );
 
   const defaultColor = 'rgba(255, 99, 132, 0.2';
@@ -31,12 +31,12 @@ const AgeMaxDrawdownDependenceGraph: FC<AgeMaxDrawdownDependenceGraphProps> = ({
 
   const [age, setAge] = useState(AGE_MIN);
   const [pointBackgroundColor, setPointBackgroundColor] = useState(
-    graphData.map((_, index) => (index === 0 ? selectedColor : defaultColor))
+    graphData.map((_, index) => (index === 0 ? selectedColor : defaultColor)),
   );
 
   useEffect(() => {
     setPointBackgroundColor(
-      graphData.map((_, index) => (index === 0 ? selectedColor : defaultColor))
+      graphData.map((_, index) => (index === 0 ? selectedColor : defaultColor)),
     );
     setAge(AGE_MIN);
   }, [graphData]);
@@ -50,7 +50,7 @@ const AgeMaxDrawdownDependenceGraph: FC<AgeMaxDrawdownDependenceGraphProps> = ({
     setAge(selectedAge);
 
     setPointBackgroundColor((prev) =>
-      prev.map((_c, i) => (i + AGE_MIN === selectedAge ? selectedColor : defaultColor))
+      prev.map((_c, i) => (i + AGE_MIN === selectedAge ? selectedColor : defaultColor)),
     );
   };
 
@@ -66,9 +66,9 @@ const AgeMaxDrawdownDependenceGraph: FC<AgeMaxDrawdownDependenceGraphProps> = ({
         data: graphData.map((d) => d.maxDrawdown),
         fill: false,
         borderColor: defaultColor,
-        pointBackgroundColor
-      }
-    ]
+        pointBackgroundColor,
+      },
+    ],
   };
 
   return (
@@ -86,7 +86,7 @@ const AgeMaxDrawdownDependenceGraph: FC<AgeMaxDrawdownDependenceGraphProps> = ({
       </Row>
       <Row>
         <Col>
-          <div className='age-range'>
+          <div className="age-range">
             <Form.Label>Age: {age}</Form.Label>
             <Form.Range
               min={AGE_MIN}

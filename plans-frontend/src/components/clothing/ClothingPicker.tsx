@@ -14,7 +14,7 @@ const ClothingPicker: FC<ClothingPickerProps> = ({
   allItems,
   selectedIds,
   onSelectionChange,
-  typeOptions = []
+  typeOptions = [],
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedType, setSelectedType] = useState('');
@@ -33,15 +33,15 @@ const ClothingPicker: FC<ClothingPickerProps> = ({
     }
   };
   return (
-    <div className='clothing-picker'>
-      <div className='d-flex justify-content-between align-items-center mb-3'>
-        <div className='d-flex gap-2 flex-grow-1 me-3'>
+    <div className="clothing-picker">
+      <div className="d-flex justify-content-between align-items-center mb-3">
+        <div className="d-flex gap-2 flex-grow-1 me-3">
           <InputGroup style={{ maxWidth: '300px' }}>
             <InputGroup.Text>
-              <i className='bi bi-search'></i>
+              <i className="bi bi-search"></i>
             </InputGroup.Text>
             <Form.Control
-              placeholder='Search clothing...'
+              placeholder="Search clothing..."
               value={searchQuery}
               onChange={(e) => {
                 setSearchQuery(e.target.value);
@@ -55,7 +55,7 @@ const ClothingPicker: FC<ClothingPickerProps> = ({
               setSelectedType(e.target.value);
             }}
           >
-            <option value=''>All Types</option>
+            <option value="">All Types</option>
             {typeOptions.map((opt) => (
               <option key={opt.value} value={opt.value}>
                 {opt.displayName}
@@ -64,16 +64,16 @@ const ClothingPicker: FC<ClothingPickerProps> = ({
           </Form.Select>
         </div>
         <div>
-          <Badge bg={selectedIds.length > 0 ? 'primary' : 'secondary'} className='fs-6'>
+          <Badge bg={selectedIds.length > 0 ? 'primary' : 'secondary'} className="fs-6">
             {selectedIds.length} Selected
           </Badge>
         </div>
       </div>
-      <div className='bg-light p-3 rounded border overflow-auto' style={{ maxHeight: '500px' }}>
+      <div className="bg-light p-3 rounded border overflow-auto" style={{ maxHeight: '500px' }}>
         {filteredItems.length === 0 ? (
-          <p className='text-center text-muted my-5'>No clothing items match your filters.</p>
+          <p className="text-center text-muted my-5">No clothing items match your filters.</p>
         ) : (
-          <Row xs={2} md={3} lg={4} className='g-3'>
+          <Row xs={2} md={3} lg={4} className="g-3">
             {filteredItems.map((item) => (
               <Col key={item.id}>
                 <ClothingCard

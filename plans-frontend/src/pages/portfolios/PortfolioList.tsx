@@ -39,7 +39,7 @@ const PortfolioList: FC<{
         <Col xs={12}>
           {toBeRenderedPortfolios.map((backtestResults: BacktestResults) => {
             return (
-              <Card key={backtestResults.id} className='m-3'>
+              <Card key={backtestResults.id} className="m-3">
                 <Card.Header style={{ backgroundColor: 'pink' }}>
                   <h4>
                     {backtestResults.portfolio.name} / {backtestResults.strategy}

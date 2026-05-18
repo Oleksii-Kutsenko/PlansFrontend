@@ -6,20 +6,21 @@ import {
   LineElement,
   PointElement,
   Title,
-  Tooltip
+  Tooltip,
 } from 'chart.js';
 import { useEffect, useState } from 'react';
 import { Line } from 'react-chartjs-2';
 import { useSelector } from 'react-redux';
 
-import type { countriesActions, type Country, Option, type RootState } from '@/store';
+import { countriesActions } from '@/store';
+import type { Country, Option, RootState } from '@/store';
 import { useAppDispatch } from '@/store/hooks';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
 export const CountriesRatingHistory = ({
   country,
-  countriesOptions
+  countriesOptions,
 }: {
   country: Country;
   countriesOptions: Option[];
@@ -49,14 +50,14 @@ export const CountriesRatingHistory = ({
       color = [
         lerp(minColor[0], zeroColor[0], t),
         lerp(minColor[1], zeroColor[1], t),
-        lerp(minColor[2], zeroColor[2], t)
+        lerp(minColor[2], zeroColor[2], t),
       ];
     } else if (numValue > 0) {
       const t = numValue / max;
       color = [
         lerp(zeroColor[0], maxColor[0], t),
         lerp(zeroColor[1], maxColor[1], t),
-        lerp(zeroColor[2], maxColor[2], t)
+        lerp(zeroColor[2], maxColor[2], t),
       ];
     } else {
       color = zeroColor;
@@ -88,9 +89,9 @@ export const CountriesRatingHistory = ({
         label: `Rating ${country.name} history`,
         data: valuesMap,
         borderColor: 'rgba(75, 192, 192, 1)',
-        backgroundColor: 'rgba(255, 99, 132, 0.5)'
-      }
-    ]
+        backgroundColor: 'rgba(255, 99, 132, 0.5)',
+      },
+    ],
   };
 
   return (

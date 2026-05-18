@@ -29,14 +29,9 @@
     "serve": "vite preview",
     "lint": "eslint src",
     "lint:fix": "eslint --fix src",
-    "format": "prettier --write src/**/*.{js,jsx,ts,tsx,css,md,json} --config ./.prettierrc",
+    "format": "prettier --write . --log-level warn",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "check": "npm run lint && npm run typecheck"
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app"
-    ]
   },
   "browserslist": {
     "production": [

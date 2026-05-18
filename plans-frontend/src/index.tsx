@@ -23,7 +23,7 @@ if (rootElement !== null) {
           <App />
         </Provider>
       </BrowserRouter>
-    </React.StrictMode>
+    </React.StrictMode>,
   );
 }
 

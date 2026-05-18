@@ -1,43 +1,29 @@
-import { useEffect } from 'react';
 import { Col, Container, Row, Spinner } from 'react-bootstrap';
-import { useSelector } from 'react-redux';
 
-import { type RootState } from '../store';
-import { userActions } from '../store';
-import { useAppDispatch } from '../store/hooks';
+import { useFetchCurrentUserQuery } from '../store/api/userApi';
 
 const Profile: React.FC = () => {
-  const dispatch = useAppDispatch();
-
-  const { user, userLoading } = useSelector((state: RootState) => state.userInfo);
-
-  useEffect(() => {
-    if (user === null && !userLoading) {
-      dispatch(userActions.fetchCurrentUser()).catch((error) => {
-        console.log(error);
-      });
-    }
-  }, [dispatch, user, userLoading]);
+  const { data: user, isLoading: userLoading } = useFetchCurrentUserQuery();
 
   if (userLoading) {
     return (
-      <Container className='mt-4 text-center'>
-        <Spinner animation='border' role='status'>
-          <span className='visually-hidden'>Loading...</span>
+      <Container className="mt-4 text-center">
+        <Spinner animation="border" role="status">
+          <span className="visually-hidden">Loading...</span>
         </Spinner>
       </Container>
     );
-  } else if (user === null) {
+  } else if (!user) {
     return <p>Failed to load profile</p>;
   } else {
     return (
-      <Container className='mt-4'>
+      <Container className="mt-4">
         <Row>
           <Col>
             <h2>Profile</h2>
           </Col>
         </Row>
-        <Row className='mt-4'>
+        <Row className="mt-4">
           <Col md={6}>
             <h5>Username:</h5>
             <p>{user.username}</p>

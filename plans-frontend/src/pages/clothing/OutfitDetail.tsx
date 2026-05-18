@@ -48,23 +48,23 @@ const OutfitDetail: FC = () => {
 
   if (!currentOutfit) {
     return (
-      <Container className='mt-5 text-center'>
-        <Spinner animation='border' variant='primary' />
-        <p className='mt-3'>Loading outfit details...</p>
+      <Container className="mt-5 text-center">
+        <Spinner animation="border" variant="primary" />
+        <p className="mt-3">Loading outfit details...</p>
       </Container>
     );
   }
 
   return (
-    <Container className='mt-5 mb-5'>
-      <div className='d-flex justify-content-between align-items-center mb-4'>
-        <Button variant='outline-secondary' onClick={() => void navigate('/clothing')}>
-          <i className='bi bi-arrow-left me-2'></i>Back to Outfits
+    <Container className="mt-5 mb-5">
+      <div className="d-flex justify-content-between align-items-center mb-4">
+        <Button variant="outline-secondary" onClick={() => void navigate('/clothing')}>
+          <i className="bi bi-arrow-left me-2"></i>Back to Outfits
         </Button>
         <div>
           {isEditing ? (
             <Button
-              variant='secondary'
+              variant="secondary"
               onClick={() => {
                 setIsEditing(false);
               }}
@@ -74,21 +74,21 @@ const OutfitDetail: FC = () => {
           ) : (
             <>
               <Button
-                variant='primary'
-                className='me-2'
+                variant="primary"
+                className="me-2"
                 onClick={() => {
                   setIsEditing(true);
                 }}
               >
-                <i className='bi bi-pencil me-2'></i>Edit Outfit
+                <i className="bi bi-pencil me-2"></i>Edit Outfit
               </Button>
               <Button
-                variant='danger'
+                variant="danger"
                 onClick={() => {
                   setShowDeleteModal(true);
                 }}
               >
-                <i className='bi bi-trash'></i>
+                <i className="bi bi-trash"></i>
               </Button>
             </>
           )}
@@ -108,10 +108,10 @@ const OutfitDetail: FC = () => {
 
       <ConfirmModal
         show={showDeleteModal}
-        title='Delete Outfit'
+        title="Delete Outfit"
         message={`Are you sure you want to completely delete "${currentOutfit.outfitName}"? This cannot be undone.`}
-        confirmLabel='Delete'
-        variant='danger'
+        confirmLabel="Delete"
+        variant="danger"
         onConfirm={handleDeleteOutfit}
         onCancel={() => {
           setShowDeleteModal(false);

@@ -31,21 +31,21 @@ export default tseslint.config(
       globals: { ...globals.browser, ...globals.es2020 },
       parserOptions: {
         projectService: true,
-        tsconfigRootDir: import.meta.dirname
-      }
+        tsconfigRootDir: import.meta.dirname,
+      },
     },
     plugins: {
       react: reactPlugin,
       'react-hooks': reactHooks,
       'react-refresh': reactRefresh,
       'simple-import-sort': simpleImportSort,
-      'react-compiler': reactCompiler
+      'react-compiler': reactCompiler,
     },
     settings: {
       react: { version: 'detect' },
       'import-x/resolver': {
-        typescript: true
-      }
+        typescript: true,
+      },
     },
     rules: {
       ...reactPlugin.configs.recommended.rules,
@@ -74,11 +74,11 @@ export default tseslint.config(
         {
           cases: {
             camelCase: true,
-            pascalCase: true
+            pascalCase: true,
           },
-          ignore: ['^vite-env\\.d\\.ts$', '^vite\\.config\\.js$', '^eslint\\.config\\.mjs$']
-        }
-      ]
-    }
-  }
+          ignore: ['^vite-env\\.d\\.ts$', '^vite\\.config\\.js$', '^eslint\\.config\\.mjs$'],
+        },
+      ],
+    },
+  },
 );

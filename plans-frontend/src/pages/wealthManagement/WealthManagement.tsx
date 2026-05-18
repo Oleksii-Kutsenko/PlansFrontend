@@ -2,15 +2,10 @@ import { type FC, useEffect, useState } from 'react';
 import { Container } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 
-import {
-  type RootState,
-  userActions,
-  wealthManagementActions,
-  WealthManagementModel,
-  WealthManagementStatus
-} from '../../store';
+import { type RootState, wealthManagementActions, WealthManagementModel, WealthManagementStatus } from '../../store';
 import { useAppDispatch } from '../../store/hooks';
 import { ExpandableTable } from './ExpandableTable';
+import { useFetchCurrentUserQuery } from '../../store/api/userApi';
 
 const WealthManagement: FC = () => {
   const [wealthManagement, setWealthManagement] = useState<WealthManagementModel | undefined>();
@@ -19,38 +14,32 @@ const WealthManagement: FC = () => {
   const {
     wealthManagement: reduxWealthManagement,
     status: wealthManagementStatus,
-    wealthManagementChanged
+    wealthManagementChanged,
   } = useSelector((state: RootState) => state.wealthManagement);
-  const user = useSelector((state: RootState) => state.userInfo.user);
+  const { data: user } = useFetchCurrentUserQuery();
 
   useEffect(() => {
-    if (user === null) {
-      dispatch(userActions.fetchCurrentUser()).catch((error) => {
-        console.log(error);
-      });
-    }
-
     if (user?.wealthManagementID && wealthManagementStatus === WealthManagementStatus.IDLE) {
       dispatch(wealthManagementActions.fetchWealthManagement(user.wealthManagementID)).catch(
-        (error) => {
+        (error: unknown) => {
           console.log(error);
-        }
+        },
       );
     }
-  }, [user, wealthManagementStatus]);
+  }, [user, wealthManagementStatus, dispatch]);
 
   useEffect(() => {
     if (wealthManagementChanged) {
       dispatch(wealthManagementActions.setWealthManagementChanged(false));
       if (user?.wealthManagementID) {
         dispatch(wealthManagementActions.fetchWealthManagement(user.wealthManagementID)).catch(
-          (error) => {
+          (error: unknown) => {
             console.log(error);
-          }
+          },
         );
       }
     }
-  }, [wealthManagementChanged]);
+  }, [wealthManagementChanged, user?.wealthManagementID, dispatch]);
 
   useEffect(() => {
     if (reduxWealthManagement) {
@@ -63,7 +52,7 @@ const WealthManagement: FC = () => {
   if (wealthManagement) {
     content = (
       <>
-        <h1 className='text-center'>Wealth Management</h1>
+        <h1 className="text-center">Wealth Management</h1>
         <ExpandableTable wealthManagement={wealthManagement} />
       </>
     );

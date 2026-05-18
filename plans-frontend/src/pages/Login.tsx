@@ -4,88 +4,85 @@ import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
-import { userActions } from '../store';
 import { useAppDispatch } from '../store/hooks';
-import { AuthTokens, setToken } from '../store/slices/auth';
-import { fetcher } from '../utils/axios';
+import { loginSuccess } from '../store/slices/auth';
+import { useLoginMutation } from '../store/api/authApi';
 
 interface LoginFormInputs {
   username: string;
   password: string;
 }
 
-interface TokenResponse {
-  data: AuthTokens;
-}
-
 const Login: React.FC = () => {
   const {
     register,
     handleSubmit,
-    formState: { errors }
+    formState: { errors },
   } = useForm<LoginFormInputs>();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const [login] = useLoginMutation();
 
   const onSubmit = (data: LoginFormInputs): void => {
     const params = {
       username: data.username,
-      password: data.password
+      password: data.password,
     };
 
     void toast.promise(
-      fetcher.post('/api/accounts/token/', params).then((response: TokenResponse) => {
-        dispatch(setToken(response.data));
-        void dispatch(userActions.fetchCurrentUser());
+      login(params).unwrap().then((response) => {
+        localStorage.setItem('access', response.access);
+        localStorage.setItem('refresh', response.refresh);
+        dispatch(loginSuccess());
         void navigate('/');
       }),
       {
         pending: 'Logging in...',
         success: 'Logged in!',
-        error: 'Error logging in.'
-      }
+        error: 'Error logging in.',
+      },
     );
   };
 
   return (
     <Container>
-      <Row className='justify-content-center align-items-center' style={{ minHeight: '100vh' }}>
+      <Row className="justify-content-center align-items-center" style={{ minHeight: '100vh' }}>
         <Col sm={12} md={6}>
           <Card>
             <Card.Body>
-              <h3 className='card-title text-center text-secondary mt-3'>Login Form</h3>
+              <h3 className="card-title text-center text-secondary mt-3">Login Form</h3>
               <Form onSubmit={(e) => void handleSubmit(onSubmit)(e)}>
-                <Form.Group className='mb-3' controlId='username'>
+                <Form.Group className="mb-3" controlId="username">
                   <Form.Label>Username</Form.Label>
                   <Form.Control
-                    type='text'
-                    placeholder='Enter username'
+                    type="text"
+                    placeholder="Enter username"
                     {...register('username', { required: true })}
                     isInvalid={!(errors.username == null)}
                   />
                   {errors.username != null && (
-                    <Form.Control.Feedback type='invalid'>
+                    <Form.Control.Feedback type="invalid">
                       Username is required.
                     </Form.Control.Feedback>
                   )}
                 </Form.Group>
 
-                <Form.Group className='mb-3' controlId='password'>
+                <Form.Group className="mb-3" controlId="password">
                   <Form.Label>Password</Form.Label>
                   <Form.Control
-                    type='password'
-                    placeholder='Password'
+                    type="password"
+                    placeholder="Password"
                     {...register('password', { required: true })}
                     isInvalid={!(errors.password == null)}
                   />
                   {errors.password != null && (
-                    <Form.Control.Feedback type='invalid'>
+                    <Form.Control.Feedback type="invalid">
                       Password is required.
                     </Form.Control.Feedback>
                   )}
                 </Form.Group>
-                <div className='text-center mt-4'>
-                  <Button type='submit'>Submit</Button>
+                <div className="text-center mt-4">
+                  <Button type="submit">Submit</Button>
                 </div>
               </Form>
             </Card.Body>

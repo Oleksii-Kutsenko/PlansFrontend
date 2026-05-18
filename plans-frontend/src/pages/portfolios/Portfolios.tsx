@@ -6,7 +6,7 @@ import {
   LineElement,
   PointElement,
   Title,
-  Tooltip
+  Tooltip,
 } from 'chart.js';
 import type { FC } from 'react';
 import { useEffect, useState } from 'react';
@@ -30,7 +30,7 @@ const Portfolios: FC = () => {
     backtestResultsLoadingStatus,
     personalMaxDrawdownLoadingStatus,
     ageMaxDrawdownDependence,
-    ageMaxDrawdownDependenceLoadingStatus
+    ageMaxDrawdownDependenceLoadingStatus,
   } = useSelector((state: RootState) => state.portfolios);
 
   const [filters, setFilters] = useState<PortfolioFilterFormInputs | null>(null);
@@ -56,7 +56,7 @@ const Portfolios: FC = () => {
     dispatch,
     backtestResultsLoadingStatus,
     ageMaxDrawdownDependenceLoadingStatus,
-    personalMaxDrawdownLoadingStatus
+    personalMaxDrawdownLoadingStatus,
   ]);
 
   if (
@@ -75,10 +75,10 @@ const Portfolios: FC = () => {
     return (
       <Container>
         <Row>
-          <h1 className='text-center'>Portfolios</h1>
+          <h1 className="text-center">Portfolios</h1>
         </Row>
         <Row>
-          <Col xs={3} className='d-flex'>
+          <Col xs={3} className="d-flex">
             <PersonalMaxDrawdownForm
               onApply={(v) => {
                 setFilters(v);

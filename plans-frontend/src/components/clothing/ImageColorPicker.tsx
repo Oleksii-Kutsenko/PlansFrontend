@@ -55,9 +55,9 @@ const ImageColorPicker: FC<ImageColorPickerProps> = ({ imageFile, onColorPick })
   if (!imgSrc) return null;
 
   return (
-    <div className='mt-3'>
-      <Form.Text className='text-primary fw-medium mb-2 d-block fs-6'>
-        <i className='bi bi-eyedropper me-2'></i>
+    <div className="mt-3">
+      <Form.Text className="text-primary fw-medium mb-2 d-block fs-6">
+        <i className="bi bi-eyedropper me-2"></i>
         Click anywhere on the photo to auto-pick the main color!
       </Form.Text>
       <div
@@ -66,12 +66,12 @@ const ImageColorPicker: FC<ImageColorPickerProps> = ({ imageFile, onColorPick })
           borderRadius: '8px',
           padding: '4px',
           display: 'inline-block',
-          backgroundColor: '#f8f9fa'
+          backgroundColor: '#f8f9fa',
         }}
       >
         <img
           src={imgSrc}
-          alt='Preview'
+          alt="Preview"
           onClick={handleImageClick}
           style={{
             maxWidth: '100%',
@@ -79,7 +79,7 @@ const ImageColorPicker: FC<ImageColorPickerProps> = ({ imageFile, onColorPick })
             height: 'auto',
             display: 'block',
             cursor: 'crosshair',
-            borderRadius: '4px'
+            borderRadius: '4px',
           }}
         />
       </div>

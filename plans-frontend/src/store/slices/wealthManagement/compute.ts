@@ -11,19 +11,19 @@ export const computeDelta = (wealthManagement: WealthManagementModel): WealthMan
     return acc + allocation.targetAmount;
   }, 0);
   const totalTargetPercentage = wealthManagement.allocations.reduce((acc, allocation) => {
-    return acc + allocation.targetPercentage;
+    return acc + (allocation.targetPercentage ?? 0);
   }, 0);
 
   const updatedWealthManagement: WealthManagementModel = {
     ...wealthManagement,
     totalTargetAmount,
-    totalTargetPercentage
+    totalTargetPercentage,
   };
 
   for (const allocation of updatedWealthManagement.allocations) {
     allocation.allocatedPercentage = (allocation.currentAmount / totalAllocatedAmount) * 100;
     allocation.delta =
-      allocation.targetPercentage === null
+      allocation.targetPercentage == null
         ? allocation.targetAmount - allocation.currentAmount
         : allocation.targetPercentage - (allocation.currentAmount / totalAllocatedAmount) * 100;
 

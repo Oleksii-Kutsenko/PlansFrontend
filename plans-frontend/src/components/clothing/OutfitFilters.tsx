@@ -31,15 +31,15 @@ const OutfitFilters: FC<OutfitFiltersProps> = ({ occasions, seasonChoices, onCha
   };
 
   return (
-    <div className='bg-light p-3 rounded mb-4 shadow-sm border'>
-      <Row className='g-3 align-items-center'>
+    <div className="bg-light p-3 rounded mb-4 shadow-sm border">
+      <Row className="g-3 align-items-center">
         <Col xs={12} md={4}>
           <InputGroup>
             <InputGroup.Text>
-              <i className='bi bi-search'></i>
+              <i className="bi bi-search"></i>
             </InputGroup.Text>
             <Form.Control
-              placeholder='Search outfits...'
+              placeholder="Search outfits..."
               value={searchQuery}
               onChange={(e) => {
                 setSearchQuery(e.target.value);
@@ -55,7 +55,7 @@ const OutfitFilters: FC<OutfitFiltersProps> = ({ occasions, seasonChoices, onCha
               setSelectedOccasion(e.target.value);
             }}
           >
-            <option value=''>All Occasions</option>
+            <option value="">All Occasions</option>
             {occasions.map((occ) => (
               <option key={occ.id} value={occ.id}>
                 {occ.occasionName}
@@ -71,7 +71,7 @@ const OutfitFilters: FC<OutfitFiltersProps> = ({ occasions, seasonChoices, onCha
               setSelectedSeason(e.target.value);
             }}
           >
-            <option value=''>All Seasons</option>
+            <option value="">All Seasons</option>
             {seasonChoices.map((season) => (
               <option key={season.value} value={season.value}>
                 {season.displayName}
@@ -80,12 +80,12 @@ const OutfitFilters: FC<OutfitFiltersProps> = ({ occasions, seasonChoices, onCha
           </Form.Select>
         </Col>
 
-        <Col xs={12} md={2} className='text-md-end'>
+        <Col xs={12} md={2} className="text-md-end">
           <Button
-            variant='outline-secondary'
+            variant="outline-secondary"
             onClick={handleClear}
             disabled={!searchQuery && !selectedOccasion && !selectedSeason}
-            className='w-100'
+            className="w-100"
           >
             Clear Filters
           </Button>

@@ -20,7 +20,7 @@ export const toSnake = (str: string): string =>
  */
 export const keysToCamel = (obj: unknown): unknown => {
   if (Array.isArray(obj)) {
-    return obj.map(keysToCamel);
+    return obj.map((obj) => keysToCamel(obj));
   }
   if (
     obj !== null &&
@@ -29,13 +29,13 @@ export const keysToCamel = (obj: unknown): unknown => {
     !(obj instanceof Blob) &&
     !(obj instanceof FormData)
   ) {
-    return Object.entries(obj as Record<string, unknown>).reduce<Record<string, unknown>>(
-      (result, [key, value]) => {
-        result[toCamel(key)] = keysToCamel(value);
-        return result;
-      },
-      {}
-    );
+    const result: Record<string, unknown> = {};
+
+    for (const [key, value] of Object.entries(obj as Record<string, unknown>)) {
+      result[toCamel(key)] = keysToCamel(value);
+    }
+
+    return result;
   }
   return obj;
 };
@@ -46,7 +46,7 @@ export const keysToCamel = (obj: unknown): unknown => {
  */
 export const keysToSnake = (obj: unknown): unknown => {
   if (Array.isArray(obj)) {
-    return obj.map(keysToSnake);
+    return obj.map((obj) => keysToSnake(obj));
   }
   if (
     obj !== null &&
@@ -55,13 +55,13 @@ export const keysToSnake = (obj: unknown): unknown => {
     !(obj instanceof Blob) &&
     !(obj instanceof FormData)
   ) {
-    return Object.entries(obj as Record<string, unknown>).reduce<Record<string, unknown>>(
-      (result, [key, value]) => {
-        result[toSnake(key)] = keysToSnake(value);
-        return result;
-      },
-      {}
-    );
+    const result: Record<string, unknown> = {};
+
+    for (const [key, value] of Object.entries(obj as Record<string, unknown>)) {
+      result[toSnake(key)] = keysToSnake(value);
+    }
+
+    return result;
   }
   return obj;
 };
