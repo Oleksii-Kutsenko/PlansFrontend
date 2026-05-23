@@ -1,5 +1,5 @@
-import { apiSlice } from './apiSlice';
 import { AuthTokens } from '../slices/auth';
+import { apiSlice } from './apiSlice';
 
 interface LoginFormInputs {
   username?: string;

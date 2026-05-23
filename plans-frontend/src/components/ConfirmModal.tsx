@@ -8,7 +8,7 @@ interface ConfirmModalProps {
   confirmLabel?: string;
   cancelLabel?: string;
   variant?: 'primary' | 'danger' | 'warning' | 'success';
-  onConfirm: () => void;
+  onConfirm: () => Promise<void>;
   onCancel: () => void;
 }
 

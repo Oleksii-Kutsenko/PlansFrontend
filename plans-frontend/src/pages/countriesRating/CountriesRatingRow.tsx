@@ -1,3 +1,4 @@
+import { skipToken } from '@reduxjs/toolkit/query';
 import {
   CategoryScale,
   Chart as ChartJS,
@@ -8,34 +9,37 @@ import {
   Title,
   Tooltip,
 } from 'chart.js';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Line } from 'react-chartjs-2';
-import { useSelector } from 'react-redux';
 
-import { countriesActions } from '@/store';
-import type { Country, Option, RootState } from '@/store';
-import { useAppDispatch } from '@/store/hooks';
+import {
+  Country,
+  CountryOption,
+  useFetchCountryRatingHistoryQuery,
+} from '@/store/api/countriesApi';
+import { toCamel } from '@/utils/caseUtils';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
+
+const lerp = (a: number, b: number, t: number) => Math.round(a + t * (b - a));
 
 export const CountriesRatingHistory = ({
   country,
   countriesOptions,
 }: {
   country: Country;
-  countriesOptions: Option[];
+  countriesOptions: CountryOption[];
 }) => {
-  const dispatch = useAppDispatch();
   const [expanded, setExpanded] = useState(false);
-  const { countriesRatingHistory } = useSelector((state: RootState) => state.countries);
+  const { data: countriesRatingHistory } = useFetchCountryRatingHistoryQuery(
+    expanded ? country.id : skipToken,
+  );
 
   type RGB = readonly [number, number, number];
 
   const minColor: RGB = [203, 52, 66];
   const maxColor: RGB = [125, 177, 69];
   const zeroColor: RGB = [255, 255, 0];
-
-  const lerp = (a: number, b: number, t: number) => Math.round(a + t * (b - a));
 
   function mapValueToColor(value: number | string): string {
     const numValue = Number.isFinite(Number(value)) ? Number(value) : 0;
@@ -63,24 +67,11 @@ export const CountriesRatingHistory = ({
       color = zeroColor;
     }
 
-    return `rgb(${color[0]}, ${color[1]}, ${color[2]})`;
+    return `rgb(${String(color[0])}, ${String(color[1])}, ${String(color[2])})`;
   }
 
-  const countriesRatingHistoryMap = new Map<number, Country[]>(countriesRatingHistory);
-
-  useEffect(() => {
-    if (expanded && !countriesRatingHistoryMap.has(country.id)) {
-      void dispatch(countriesActions.fetchCountryRatingHistory(country.id))
-        .unwrap()
-        .catch((error) => {
-          console.error('Failed to fetch rating history', error);
-        });
-    }
-  }, [expanded, countriesRatingHistory, country.id, dispatch]);
-
-  const values = countriesRatingHistoryMap.get(country.id);
-  const valuesMap = values?.map((val) => val.rating) ?? [];
-  const labels = values?.map((val) => val.year) ?? [];
+  const labels = countriesRatingHistory?.map((val) => val.year) ?? [];
+  const valuesMap = countriesRatingHistory?.map((val) => val.rating) ?? [];
 
   const data = {
     labels,
@@ -103,18 +94,26 @@ export const CountriesRatingHistory = ({
         }}
       >
         <td>
-          <a>
-            <i className={`bi bi-chevron-${expanded ? 'down' : 'right'}`}></i>
-          </a>
+          <button
+            type="button"
+            className="btn"
+            onClick={() => {
+              setExpanded(!expanded);
+            }}
+          >
+            <i className={`bi bi-chevron-${expanded ? 'down' : 'right'}`} />
+          </button>
         </td>
         <td>{country.name}</td>
         {countriesOptions.map((option, j) => {
           return (
             <td
               key={j}
-              style={{ backgroundColor: mapValueToColor(country[option.normalized_name] ?? 0) }}
+              style={{
+                backgroundColor: mapValueToColor(country[toCamel(option.normalizedName)] ?? 0),
+              }}
             >
-              {country[option.normalized_name]}
+              {country[toCamel(option.normalizedName)]}
             </td>
           );
         })}

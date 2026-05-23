@@ -1,15 +1,16 @@
-import { useEffect } from 'react';
 import { Button, Container, Form, Row } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
-import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
+import {
+  ClothingCreate,
+  useCreateClothingMutation,
+  useFetchClothingOptionsQuery,
+} from '@/store/api/clothingApi';
+import { handleApiFormError } from '@/utils/errorUtils';
+
 import ImageColorPicker from '../../components/clothing/ImageColorPicker';
-import { RootState } from '../../store';
-import { useAppDispatch } from '../../store/hooks';
-import { clothingActions, ClothingCreate, createClothing } from '../../store/slices/clothing';
-import { ValidationErrors } from '../../store/slices/utils';
 
 interface CreateClothingFormValues {
   name: string;
@@ -19,18 +20,10 @@ interface CreateClothingFormValues {
 }
 
 const CreateClothing = () => {
-  const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const options = useSelector(
-    (state: RootState) =>
-      state.clothing.options as {
-        clothingType?: { value: string; displayName: string }[];
-      } | null,
-  );
 
-  useEffect(() => {
-    void dispatch(clothingActions.fetchClothingOptions());
-  }, [dispatch]);
+  const { data: clothingOptions } = useFetchClothingOptionsQuery();
+  const [createClothing] = useCreateClothingMutation();
 
   const {
     register,
@@ -41,48 +34,34 @@ const CreateClothing = () => {
     formState: { errors },
   } = useForm<CreateClothingFormValues>();
 
-  // Watch the image input so we can pass the file to the color picker
   const imageFiles = watch('imagePath');
-  let currentImageFile = null;
-  if (imageFiles && imageFiles.length > 0) {
+  let currentImageFile: File | null = null;
+  if (imageFiles.length > 0) {
     currentImageFile = imageFiles[0] ?? null;
   }
 
   const onSubmit = async (data: CreateClothingFormValues): Promise<void> => {
     const imagePath = data.imagePath[0] ?? null;
-    if (imagePath) {
-      const payload: ClothingCreate = {
-        name: data.name,
-        clothingType: data.clothingType,
-        color: data.color,
-        imagePath: imagePath,
-      };
 
-      try {
-        await dispatch(createClothing(payload)).unwrap();
-
-        void dispatch(clothingActions.fetchClothing());
-        void navigate('/clothing/clothing');
-      } catch (error_: any) {
-        console.error(error_);
-        const error = error_ as ValidationErrors;
-
-        const errorMessage = error?.errorMessage ?? 'Error adding clothing item.';
-        toast.error(errorMessage);
-
-        if (error) {
-          Object.keys(error).forEach((field: string) => {
-            const key = field as keyof CreateClothingFormValues;
-            error[key]?.forEach((message: string) => {
-              toast.error(`${key}: ${message}`);
-              setError(key, { type: 'custom', message: message });
-            });
-          });
-        }
-      }
-    } else {
+    if (!imagePath) {
       toast.error('Please upload an image!');
-      throw new Error('Image is null or undefined.');
+      return;
+    }
+
+    const payload: ClothingCreate = {
+      name: data.name,
+      clothingType: data.clothingType,
+      color: data.color,
+      imagePath: imagePath,
+    };
+
+    try {
+      await createClothing(payload).unwrap();
+
+      toast.success('Clothing item created successfully!');
+      void navigate('/clothing/clothing');
+    } catch (error: unknown) {
+      handleApiFormError(error, setError, 'Failed to create clothing item.');
     }
   };
 
@@ -118,9 +97,9 @@ const CreateClothing = () => {
                 {...register('clothingType', { required: 'Clothing type is required' })}
               >
                 <option value="">Select Type</option>
-                {(options?.clothingType ?? []).map((opt) => (
-                  <option key={opt.value} value={opt.value}>
-                    {opt.displayName}
+                {clothingOptions.clothingType.map((clothingTypeOption) => (
+                  <option key={clothingTypeOption.value} value={clothingTypeOption.value}>
+                    {clothingTypeOption.displayName}
                   </option>
                 ))}
               </Form.Select>

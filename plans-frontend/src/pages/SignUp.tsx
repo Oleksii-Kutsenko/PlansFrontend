@@ -78,7 +78,7 @@ const SignUp: FC = () => {
           const errors = error.response.data;
 
           for (const [key, value] of Object.entries(errors)) {
-            const message = Array.isArray(value) ? value.join(' ') : String(value);
+            const message = Array.isArray(value) ? value.join(' ') : value;
 
             if (key === 'non_field_errors' || key === 'detail') {
               setError('root', { message });
@@ -150,7 +150,7 @@ const SignUp: FC = () => {
                     render={({ field }) => (
                       <Select
                         {...field}
-                        value={field.value || null}
+                        value={field.value}
                         onChange={field.onChange}
                         ref={field.ref}
                         options={options}

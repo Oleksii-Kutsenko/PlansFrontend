@@ -1,96 +1,92 @@
-import { FC, useEffect, useState } from 'react';
+import { FC, useMemo } from 'react';
 import { Card, Col, Container, Row, Table } from 'react-bootstrap';
-import { useSelector } from 'react-redux';
 
-import { BacktestResults, LoadStatus, RootState } from '../../store';
-import { type Ticker as TickerType } from '../../store';
-import { PortfolioFilterFormInputs } from './shared_interfaces';
+import {
+  BacktestResults,
+  type Ticker as TickerType,
+  useFetchPortfolioBacktestResultsQuery,
+} from '@/store/api/portfoliosApi';
+
+import { PortfolioFilterFormInputs } from './sharedInterfaces';
 
 const PortfolioList: FC<{
   backtestResults: BacktestResults[];
   filters: PortfolioFilterFormInputs | null;
 }> = ({ backtestResults, filters }) => {
-  const { backtestResultsLoadingStatus } = useSelector((state: RootState) => state.portfolios);
-  const [toBeRenderedPortfolios, setToBeRenderedPortfolios] = useState<BacktestResults[]>([]);
+  const { isLoading: isBacktestResultsLoading, isError: isBacktestResultsError } =
+    useFetchPortfolioBacktestResultsQuery();
 
-  useEffect(() => {
+  const toBeRenderedPortfolios = useMemo(() => {
     const md = filters?.personalMaxDrawdown;
     const start = filters?.backtestStartDate;
-
+    const results = backtestResults;
     if (md == null || start == null) {
-      setToBeRenderedPortfolios(backtestResults.slice(0, 10));
-      return;
+      return results.slice(0, 10);
     }
-
     const startDate = new Date(start);
-
-    const filteredPortfolios = backtestResults.filter((r) => {
-      return r.maxDrawdown >= md && new Date(r.startDate) <= startDate;
-    });
-
-    setToBeRenderedPortfolios(filteredPortfolios.slice(0, 10));
+    return results
+      .filter((r) => r.maxDrawdown >= md && new Date(r.startDate) <= startDate)
+      .slice(0, 10);
   }, [backtestResults, filters]);
 
-  if (backtestResultsLoadingStatus === LoadStatus.LOADING) return <p>Loading...</p>;
+  if (isBacktestResultsLoading) return <p>Loading...</p>;
 
-  if (backtestResultsLoadingStatus === LoadStatus.SUCCEEDED && toBeRenderedPortfolios.length > 0) {
-    return (
-      <Row>
-        <Col xs={12}>
-          {toBeRenderedPortfolios.map((backtestResults: BacktestResults) => {
-            return (
-              <Card key={backtestResults.id} className="m-3">
-                <Card.Header style={{ backgroundColor: 'pink' }}>
-                  <h4>
-                    {backtestResults.portfolio.name} / {backtestResults.strategy}
-                  </h4>
-                </Card.Header>
-                <Card.Body>
-                  <Container>
-                    <Row>
-                      <Col xs={6}>
-                        <h5>Backtest Data</h5>
-                        <p>TWR: {backtestResults.twr_annual}%</p>
-                        <p>Max Drawdown: {backtestResults.maxDrawdown}%</p>
-                        <p>Sharpe: {backtestResults.sharpe}</p>
-                        <p>Standard Deviation: {backtestResults.standardDeviation}</p>
-                        <p>Start Date: {backtestResults.startDate}</p>
-                      </Col>
-                      <Col xs={6}>
-                        <h5>Constituents</h5>
-                        <Table>
-                          <thead>
-                            <tr>
-                              <th>Symbol</th>
-                              <th>Name</th>
-                              <th>Weight</th>
+  if (isBacktestResultsError) return <p>Something went wrong.</p>;
+
+  return toBeRenderedPortfolios.length > 0 ? (
+    <Row>
+      <Col xs={12}>
+        {toBeRenderedPortfolios.map((backtestResults: BacktestResults) => {
+          return (
+            <Card key={backtestResults.id} className="m-3">
+              <Card.Header style={{ backgroundColor: 'pink' }}>
+                <h4>
+                  {backtestResults.portfolio.name} / {backtestResults.strategy}
+                </h4>
+              </Card.Header>
+              <Card.Body>
+                <Container>
+                  <Row>
+                    <Col xs={6}>
+                      <h5>Backtest Data</h5>
+                      <p>TWR: {backtestResults.twrAnnual}%</p>
+                      <p>Max Drawdown: {backtestResults.maxDrawdown}%</p>
+                      <p>Sharpe: {backtestResults.sharpe}</p>
+                      <p>Standard Deviation: {backtestResults.standardDeviation}</p>
+                      <p>Start Date: {backtestResults.startDate}</p>
+                    </Col>
+                    <Col xs={6}>
+                      <h5>Constituents</h5>
+                      <Table>
+                        <thead>
+                          <tr>
+                            <th>Symbol</th>
+                            <th>Name</th>
+                            <th>Weight</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {backtestResults.portfolio.tickers.map((ticker: TickerType) => (
+                            <tr key={ticker.symbol}>
+                              <td>{ticker.symbol}</td>
+                              <td>{ticker.name}</td>
+                              <td>{ticker.weight}</td>
                             </tr>
-                          </thead>
-                          <tbody>
-                            {backtestResults.portfolio.tickers.map((ticker: TickerType) => (
-                              <tr key={ticker.symbol}>
-                                <td>{ticker.symbol}</td>
-                                <td>{ticker.name}</td>
-                                <td>{ticker.weight}</td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </Table>
-                      </Col>
-                    </Row>
-                  </Container>
-                </Card.Body>
-              </Card>
-            );
-          })}
-        </Col>
-      </Row>
-    );
-  }
-  if (backtestResultsLoadingStatus === LoadStatus.SUCCEEDED) {
-    return <p>Portfolios did not pass the filters.</p>;
-  }
-  return <p>Something went wrong.</p>;
+                          ))}
+                        </tbody>
+                      </Table>
+                    </Col>
+                  </Row>
+                </Container>
+              </Card.Body>
+            </Card>
+          );
+        })}
+      </Col>
+    </Row>
+  ) : (
+    <p>Portfolios did not pass the filters.</p>
+  );
 };
 
 export default PortfolioList;

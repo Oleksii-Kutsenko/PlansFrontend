@@ -1,7 +1,8 @@
 import { FC, useMemo, useState } from 'react';
 import { Badge, Col, Form, InputGroup, Row } from 'react-bootstrap';
 
-import { Clothing } from '../../store/slices/clothing';
+import { Clothing } from '@/store/api/clothingApi';
+
 import ClothingCard from './ClothingCard';
 
 interface ClothingPickerProps {
@@ -10,6 +11,7 @@ interface ClothingPickerProps {
   onSelectionChange: (ids: number[]) => void;
   typeOptions?: { value: string; displayName: string }[];
 }
+
 const ClothingPicker: FC<ClothingPickerProps> = ({
   allItems,
   selectedIds,

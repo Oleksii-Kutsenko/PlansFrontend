@@ -9,7 +9,7 @@ interface ClothingCardProps {
   selectable?: boolean;
   removable?: boolean;
   onToggle?: (id: number) => void;
-  onRemove?: (id: number) => void;
+  onRemove?: (id: number) => Promise<void>;
 }
 
 const ClothingCard: FC<ClothingCardProps> = ({

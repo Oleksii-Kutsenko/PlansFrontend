@@ -1,8 +1,9 @@
 import { FC } from 'react';
 import { Badge, Col, Row } from 'react-bootstrap';
 
+import { Outfit } from '@/store/api/clothingApi';
+
 import ClothingCard from '../../components/clothing/ClothingCard';
-import { Outfit } from '../../store/slices/clothing';
 
 interface OutfitViewProps {
   outfit: Outfit;
@@ -57,11 +58,10 @@ const OutfitView: FC<OutfitViewProps> = ({ outfit }) => {
       <h3 className="mb-4 mt-5 border-bottom pb-2">Clothing Items</h3>
       {Array.isArray(outfit.clothings) && outfit.clothings.length > 0 ? (
         <Row xs={2} md={3} lg={4} className="g-4">
-          {outfit.clothings.map((item, index) => {
-            if (typeof item === 'number') return null;
+          {outfit.clothings.map((clothing) => {
             return (
-              <Col key={item.id ?? index}>
-                <ClothingCard item={item} />
+              <Col key={clothing.id}>
+                <ClothingCard item={clothing} />
               </Col>
             );
           })}

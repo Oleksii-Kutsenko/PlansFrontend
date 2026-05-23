@@ -1,14 +1,23 @@
-import { FC, useEffect, useMemo, useState } from 'react';
+import { FC, useMemo, useState } from 'react';
 import { Button, Col, Form, Row, Spinner } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
-import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
+
+import {
+  Occasion,
+  Outfit,
+  OutfitUpdate,
+  useAddItemToOutfitMutation,
+  useFetchClothingOptionsQuery,
+  useFetchClothingQuery,
+  useFetchOccasionsQuery,
+  useFetchOutfitOptionsQuery,
+  useRemoveItemFromOutfitMutation,
+  useUpdateOutfitMutation,
+} from '@/store/api/clothingApi';
 
 import ClothingCard from '../../components/clothing/ClothingCard';
 import ClothingPicker from '../../components/clothing/ClothingPicker';
-import { RootState } from '../../store';
-import { useAppDispatch } from '../../store/hooks';
-import { clothingActions, Outfit, OutfitUpdate } from '../../store/slices/clothing';
 
 interface OutfitEditProps {
   outfit: Outfit;
@@ -24,88 +33,78 @@ interface OutfitFormValues {
 }
 
 const OutfitEdit: FC<OutfitEditProps> = ({ outfit, onEditComplete }) => {
-  const dispatch = useAppDispatch();
+  const [updateOutfit] = useUpdateOutfitMutation();
+  const [addItemToOutfit] = useAddItemToOutfitMutation();
+  const [removeItemFromOutfit] = useRemoveItemFromOutfitMutation();
 
-  // Redux Data
-  const clothingItems = useSelector((state: RootState) => state.clothing.clothing);
-  const occasions = useSelector((state: RootState) => state.clothing.occasions);
-  const clothingOptions = useSelector(
-    (state: RootState) =>
-      state.clothing.options as { clothingType?: { value: string; displayName: string }[] } | null,
-  );
-  const outfitOptions = useSelector(
-    (state: RootState) =>
-      state.clothing.outfitOptions as { season?: { value: string; displayName: string }[] } | null,
-  );
+  const { data: clothingItems = [] } = useFetchClothingQuery();
+  const { data: occasions = [] } = useFetchOccasionsQuery();
+  const { data: clothingOptions } = useFetchClothingOptionsQuery();
+  const { data: outfitOptions } = useFetchOutfitOptionsQuery();
 
-  // Local State
   const [selectedToAdd, setSelectedToAdd] = useState<number[]>([]);
   const [isAddingItems, setIsAddingItems] = useState(false);
 
-  const { register, handleSubmit, reset } = useForm<OutfitFormValues>();
-
-  useEffect(() => {
-    reset({
+  const { register, handleSubmit } = useForm<OutfitFormValues>({
+    values: {
       id: outfit.id,
       outfitName: outfit.outfitName,
       occasion: outfit.occasion,
       season: outfit.season,
-    });
-  }, [outfit, reset]);
+    },
+  });
 
   const availableItemsToAdd = useMemo(() => {
-    if (!outfit.clothings) return clothingItems;
     const currentIds = new Set(outfit.clothings.map((c) => (typeof c === 'number' ? c : c.id)));
     return clothingItems.filter((item) => !currentIds.has(item.id));
   }, [clothingItems, outfit]);
 
-  const onSaveMetadata = (data: OutfitFormValues) => {
+  const onSaveMetadata = async (data: OutfitFormValues): Promise<void> => {
     const payload: OutfitUpdate = {
       id: data.id,
       outfitName: data.outfitName,
       occasion: data.occasion,
       season: data.season,
     };
-    if (data.previewImage && data.previewImage.length > 0) {
+    if (data.previewImage.length > 0) {
       payload.previewImage = data.previewImage[0] ?? null;
     }
 
-    dispatch(clothingActions.updateOutfit(payload))
-      .unwrap()
-      .then(() => {
-        toast.success('Outfit updated successfully!');
-        onEditComplete(); // Turn off edit mode
-      })
-      .catch(() => toast.error('Failed to update outfit metadata.'));
+    try {
+      await updateOutfit(payload).unwrap();
+      toast.success('Outfit updated successfully!');
+      onEditComplete();
+    } catch {
+      toast.error('Failed to update outfit metadata.');
+    }
   };
 
-  const handleAddSelectedItems = async () => {
+  const handleAddSelectedItems = async (): Promise<void> => {
     if (selectedToAdd.length === 0) return;
     setIsAddingItems(true);
 
     let successCount = 0;
     for (const clothingId of selectedToAdd) {
       try {
-        await dispatch(
-          clothingActions.addItemToOutfit({ outfitId: outfit.id, clothingId }),
-        ).unwrap();
+        await addItemToOutfit({ outfitId: outfit.id, clothingId }).unwrap();
         successCount++;
-      } catch (error) {
-        console.error(error);
-        toast.error(`Failed to add item ID ${clothingId}`);
+      } catch {
+        toast.error(`Failed to add item ID ${String(clothingId)}`);
       }
     }
 
-    if (successCount > 0) toast.success(`Added ${successCount} items to outfit!`);
+    if (successCount > 0) toast.success(`Added ${String(successCount)} items to outfit!`);
     setSelectedToAdd([]);
     setIsAddingItems(false);
   };
 
-  const handleRemoveItem = (clothingId: number) => {
-    dispatch(clothingActions.removeItemFromOutfit({ outfitId: outfit.id, clothingId }))
-      .unwrap()
-      .then(() => toast.success('Item removed from outfit.'))
-      .catch(() => toast.error('Failed to remove item.'));
+  const handleRemoveItem = async (clothingId: number): Promise<void> => {
+    try {
+      await removeItemFromOutfit({ outfitId: outfit.id, clothingId }).unwrap();
+      toast.success('Item removed from outfit.');
+    } catch {
+      toast.error('Failed to remove item.');
+    }
   };
 
   return (
@@ -123,7 +122,7 @@ const OutfitEdit: FC<OutfitEditProps> = ({ outfit, onEditComplete }) => {
               <Form.Label>Occasion</Form.Label>
               <Form.Select {...register('occasion')}>
                 <option value="">Select Occasion</option>
-                {occasions.map((opt) => (
+                {occasions.map((opt: Occasion) => (
                   <option key={opt.id} value={opt.id}>
                     {opt.occasionName}
                   </option>
@@ -164,10 +163,10 @@ const OutfitEdit: FC<OutfitEditProps> = ({ outfit, onEditComplete }) => {
         </p>
         {Array.isArray(outfit.clothings) && outfit.clothings.length > 0 ? (
           <Row xs={2} md={3} lg={4} className="g-3">
-            {outfit.clothings.map((item, index) => {
+            {outfit.clothings.map((item) => {
               if (typeof item === 'number') return null;
               return (
-                <Col key={item.id ?? index}>
+                <Col key={item.id}>
                   <ClothingCard item={item} removable={true} onRemove={handleRemoveItem} />
                 </Col>
               );
@@ -186,7 +185,11 @@ const OutfitEdit: FC<OutfitEditProps> = ({ outfit, onEditComplete }) => {
             onClick={() => void handleAddSelectedItems()}
             disabled={selectedToAdd.length === 0 || isAddingItems}
           >
-            {isAddingItems ? <Spinner size="sm" /> : `Add ${selectedToAdd.length} Selected Items`}
+            {isAddingItems ? (
+              <Spinner size="sm" />
+            ) : (
+              `Add ${String(selectedToAdd.length)} Selected Items`
+            )}
           </Button>
         </div>
 

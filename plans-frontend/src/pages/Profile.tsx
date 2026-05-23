@@ -13,9 +13,7 @@ const Profile: React.FC = () => {
         </Spinner>
       </Container>
     );
-  } else if (!user) {
-    return <p>Failed to load profile</p>;
-  } else {
+  } else if (user) {
     return (
       <Container className="mt-4">
         <Row>
@@ -39,6 +37,8 @@ const Profile: React.FC = () => {
         </Row>
       </Container>
     );
+  } else {
+    return <p>Failed to load profile</p>;
   }
 };
 

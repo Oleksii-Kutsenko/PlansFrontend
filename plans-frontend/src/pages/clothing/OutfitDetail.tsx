@@ -1,56 +1,48 @@
-import { FC, useEffect, useState } from 'react';
+import { FC, useState } from 'react';
 import { Button, Container, Spinner } from 'react-bootstrap';
-import { useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
+import { useDeleteOutfitMutation, useFetchOutfitQuery } from '@/store/api/clothingApi';
+
 import ConfirmModal from '../../components/ConfirmModal';
-import { RootState } from '../../store';
-import { useAppDispatch } from '../../store/hooks';
-import { clothingActions } from '../../store/slices/clothing';
 import OutfitEdit from './OutfitEdit';
-// Import our newly separated components
 import OutfitView from './OutfitView';
 
 const OutfitDetail: FC = () => {
   const { id } = useParams<{ id: string }>();
   const outfitId = Number(id);
-  const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
-  // Global State
-  const currentOutfit = useSelector((state: RootState) => state.clothing.currentOutfit);
+  const { data: currentOutfit, isLoading, isError } = useFetchOutfitQuery(outfitId);
+  const [deleteOutfit] = useDeleteOutfitMutation();
 
-  // Local State
   const [isEditing, setIsEditing] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
-  // Initialization
-  useEffect(() => {
-    if (outfitId) {
-      void dispatch(clothingActions.fetchOutfit(outfitId));
-      void dispatch(clothingActions.fetchClothing());
-      void dispatch(clothingActions.fetchOccasions());
-      void dispatch(clothingActions.fetchClothingOptions());
-      void dispatch(clothingActions.fetchOutfitOptions());
+  const handleDeleteOutfit = async (): Promise<void> => {
+    try {
+      await deleteOutfit(outfitId).unwrap();
+      toast.success('Outfit deleted.');
+      void navigate('/clothing');
+    } catch {
+      toast.error('Failed to delete outfit.');
     }
-  }, [dispatch, outfitId]);
-
-  const handleDeleteOutfit = () => {
-    dispatch(clothingActions.deleteOutfit(outfitId))
-      .unwrap()
-      .then(() => {
-        toast.success('Outfit deleted.');
-        void navigate('/clothing');
-      })
-      .catch(() => toast.error('Failed to delete outfit.'));
   };
 
-  if (!currentOutfit) {
+  if (isLoading) {
     return (
       <Container className="mt-5 text-center">
         <Spinner animation="border" variant="primary" />
         <p className="mt-3">Loading outfit details...</p>
+      </Container>
+    );
+  }
+
+  if (isError || !currentOutfit) {
+    return (
+      <Container className="mt-5 text-center">
+        <p>Failed to load outfit.</p>
       </Container>
     );
   }

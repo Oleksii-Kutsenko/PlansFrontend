@@ -4,9 +4,9 @@ import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
+import { useLoginMutation } from '../store/api/authApi';
 import { useAppDispatch } from '../store/hooks';
 import { loginSuccess } from '../store/slices/auth';
-import { useLoginMutation } from '../store/api/authApi';
 
 interface LoginFormInputs {
   username: string;
@@ -30,12 +30,14 @@ const Login: React.FC = () => {
     };
 
     void toast.promise(
-      login(params).unwrap().then((response) => {
-        localStorage.setItem('access', response.access);
-        localStorage.setItem('refresh', response.refresh);
-        dispatch(loginSuccess());
-        void navigate('/');
-      }),
+      login(params)
+        .unwrap()
+        .then((response) => {
+          localStorage.setItem('access', response.access);
+          localStorage.setItem('refresh', response.refresh);
+          dispatch(loginSuccess());
+          void navigate('/');
+        }),
       {
         pending: 'Logging in...',
         success: 'Logged in!',

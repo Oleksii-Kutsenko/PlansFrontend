@@ -1,43 +1,17 @@
 import React, { useState } from 'react';
 
-import { CurrencyInput } from '@/components/CurrencyInput';
-import { PercentageInput } from '@/components/PercentageInput';
-
-import { type Allocation, type Currency, wealthManagementActions } from '../../store';
-import { useAppDispatch } from '../../store/hooks';
-import { fetcher } from '../../utils/axios';
+import { type Allocation, type Currency } from '../../store';
+import { AssetAllocationItem } from './AssetAllocationItem.tsx';
 import { formatNumber, formatPercentage } from './formatting';
 
 export const AssetAllocationRow = ({
   allocation,
   baseCurrency,
-  wealthManagementID,
 }: {
   allocation: Allocation;
   baseCurrency: Currency;
-  wealthManagementID: number;
 }): React.ReactElement => {
-  const dispatch = useAppDispatch();
   const [expanded, setExpanded] = useState(false);
-
-  const handleSubmit =
-    (fieldName: string, assetAllocationId: number) =>
-    async (value: number): Promise<void> => {
-      try {
-        await fetcher.patch(`/api/assets/asset-allocation/${String(assetAllocationId)}/`, {
-          [fieldName]: value,
-        });
-        await dispatch(wealthManagementActions.fetchWealthManagement(wealthManagementID)).unwrap();
-      } catch (error: unknown) {
-        console.log(error);
-
-        if (error instanceof Error) {
-          throw error;
-        }
-        throw new Error(String(error));
-      }
-    };
-
   return (
     <>
       <tr
@@ -47,7 +21,7 @@ export const AssetAllocationRow = ({
         }}
       >
         <td>
-          <i className={`bi bi-chevron-${expanded ? 'down' : 'right'}`}></i>
+          <i className={`bi bi-chevron-${expanded ? 'down' : 'right'}`} />
         </td>
         <td>{allocation.assetType.name}</td>
         <td>{formatNumber(allocation.currentAmount, baseCurrency.symbol)}</td>
@@ -76,46 +50,9 @@ export const AssetAllocationRow = ({
                 </tr>
               </thead>
               <tbody>
-                {allocation.assetAllocations.map((assetAllocation, index) => {
-                  return (
-                    <tr key={index}>
-                      <td>{assetAllocation.name}</td>
-                      <td>{assetAllocation.asset.name}</td>
-                      <td>
-                        <CurrencyInput
-                          symbol={assetAllocation.currency.symbol}
-                          value={assetAllocation.currentAmount}
-                          onSubmit={handleSubmit('current_amount', assetAllocation.id)}
-                        />
-                      </td>
-                      <td>
-                        <CurrencyInput
-                          symbol={assetAllocation.currency.symbol}
-                          value={assetAllocation.targetAmount}
-                          onSubmit={handleSubmit('target_amount', assetAllocation.id)}
-                        />
-                      </td>
-                      <td>{formatPercentage(assetAllocation.allocatedPercentage)}</td>
-                      <td>
-                        {assetAllocation.targetPercentage === null ? (
-                          <span>N/A</span>
-                        ) : (
-                          <PercentageInput
-                            value={assetAllocation.targetPercentage}
-                            onSubmit={handleSubmit('target_percentage', assetAllocation.id)}
-                          />
-                        )}
-                      </td>
-                      {assetAllocation.targetPercentage === null ? (
-                        <td>
-                          {formatNumber(assetAllocation.delta, assetAllocation.currency.symbol)}
-                        </td>
-                      ) : (
-                        <td>{formatPercentage(assetAllocation.delta)}</td>
-                      )}
-                    </tr>
-                  );
-                })}
+                {allocation.assetAllocations.map((assetAllocation) => (
+                  <AssetAllocationItem key={assetAllocation.id} assetAllocation={assetAllocation} />
+                ))}
               </tbody>
             </table>
           </td>

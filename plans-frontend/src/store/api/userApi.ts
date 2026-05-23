@@ -10,7 +10,7 @@ export interface User {
 
 export const userApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    fetchCurrentUser: builder.query<User, void>({
+    fetchCurrentUser: builder.query<User, undefined>({
       query: () => '/api/accounts/user/',
       providesTags: ['User'],
     }),

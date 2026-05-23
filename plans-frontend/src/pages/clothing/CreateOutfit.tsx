@@ -1,15 +1,20 @@
-import { FC, useEffect, useState } from 'react';
+import { FC, useState } from 'react';
 import { Button, Container, Form } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
-import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
+import {
+  OutfitCreate,
+  useCreateOutfitMutation,
+  useFetchClothingOptionsQuery,
+  useFetchClothingQuery,
+  useFetchOccasionsQuery,
+  useFetchOutfitOptionsQuery,
+} from '@/store/api/clothingApi';
+import { handleApiFormError } from '@/utils/errorUtils';
+
 import ClothingPicker from '../../components/clothing/ClothingPicker';
-import { RootState } from '../../store';
-import { useAppDispatch } from '../../store/hooks';
-import { clothingActions, createOutfit, OutfitCreate } from '../../store/slices/clothing';
-import { ValidationErrors } from '../../store/slices/utils';
 
 interface CreateOutfitFormValues {
   outfitName: string;
@@ -20,33 +25,16 @@ interface CreateOutfitFormValues {
 }
 
 const CreateOutfit: FC = () => {
-  const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
-  // Redux state
-  const clothingItems = useSelector((state: RootState) => state.clothing.clothing);
-  const occasions = useSelector((state: RootState) => state.clothing.occasions);
-  const clothingOptions = useSelector(
-    (state: RootState) =>
-      state.clothing.options as {
-        clothingType?: { value: string; displayName: string }[];
-      } | null,
-  );
-  const outfitOptions = useSelector(
-    (state: RootState) =>
-      state.clothing.outfitOptions as {
-        season?: { value: string; displayName: string }[];
-      } | null,
-  );
+  const { data: clothingItems = [] } = useFetchClothingQuery();
+  const { data: occasions = [] } = useFetchOccasionsQuery();
+  const { data: clothingOptions } = useFetchClothingOptionsQuery();
+  const { data: outfitOptions } = useFetchOutfitOptionsQuery();
+
+  const [createOutfit] = useCreateOutfitMutation();
 
   const [selectedClothings, setSelectedClothings] = useState<number[]>([]);
-
-  useEffect(() => {
-    void dispatch(clothingActions.fetchClothing());
-    void dispatch(clothingActions.fetchOccasions());
-    void dispatch(clothingActions.fetchClothingOptions());
-    void dispatch(clothingActions.fetchOutfitOptions());
-  }, [dispatch]);
 
   const {
     register,
@@ -57,38 +45,22 @@ const CreateOutfit: FC = () => {
 
   const onSubmit = async (data: CreateOutfitFormValues): Promise<void> => {
     const previewImage = data.previewImage[0] ?? null;
-    if (previewImage) {
-      const payload: OutfitCreate = {
-        ...data,
-        clothingIds: selectedClothings,
-        previewImage: previewImage,
-      };
-
-      try {
-        const newOutfit = await dispatch(createOutfit(payload)).unwrap();
-
-        void dispatch(clothingActions.fetchOutfits());
-        void navigate(`/clothing/outfit/${newOutfit.id}`);
-      } catch (error_: any) {
-        console.error('Failed to create outfit:', error_);
-        const error = error_ as ValidationErrors;
-
-        const errorMessage = error?.errorMessage ?? 'Error creating outfit.';
-        toast.error(errorMessage);
-
-        if (error) {
-          for (const field of Object.keys(error)) {
-            const key = field as keyof CreateOutfitFormValues;
-            error[key]?.forEach((message: string) => {
-              toast.error(`${key}: ${message}`);
-              setError(key, { type: 'custom', message: message });
-            });
-          }
-        }
-      }
-    } else {
+    if (!previewImage) {
       toast.error('Please upload an image!');
-      throw new Error('Image is null or undefined.');
+      return;
+    }
+
+    const payload: OutfitCreate = {
+      ...data,
+      clothingIds: selectedClothings,
+      previewImage: previewImage,
+    };
+    try {
+      const newOutfit = await createOutfit(payload).unwrap();
+      toast.success('Outfit created successfully!');
+      void navigate(`/clothing/outfit/${String(newOutfit.id)}`);
+    } catch (error: unknown) {
+      handleApiFormError(error, setError, 'Failed to create outfit item.');
     }
   };
 
