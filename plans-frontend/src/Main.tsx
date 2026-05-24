@@ -1,61 +1,60 @@
-import type { FC } from 'react';
-import React from 'react';
+import { type FC, lazy, Suspense } from 'react';
 import { Route, Routes } from 'react-router-dom';
 
 import OutfitDetail from './pages/clothing/OutfitDetail';
 import ProtectedRoutes from './routes/ProtectedRoutes';
 
-const CreateClothing = React.lazy(async () => {
+const CreateClothing = lazy(async () => {
   const module = await import('./pages/clothing/CreateClothing');
   return { default: module.default };
 });
 
-const CreateOutfit = React.lazy(async () => {
+const CreateOutfit = lazy(async () => {
   const module = await import('./pages/clothing/CreateOutfit');
   return { default: module.default };
 });
 
-const Login = React.lazy(async () => {
+const Login = lazy(async () => {
   const module = await import('./pages/Login');
   return { default: module.default };
 });
 
-const SignUp = React.lazy(async () => {
+const SignUp = lazy(async () => {
   const module = await import('./pages/SignUp');
   return { default: module.default };
 });
 
-const Home = React.lazy(async () => {
+const Home = lazy(async () => {
   const module = await import('./pages/Home');
   return { default: module.default };
 });
 
-const CountriesRating = React.lazy(async () => {
+const CountriesRating = lazy(async () => {
   const module = await import('./pages/countriesRating/CountriesRating');
   return { default: module.default };
 });
 
-const Profile = React.lazy(async () => {
+const Profile = lazy(async () => {
   const module = await import('./pages/Profile');
   return { default: module.default };
 });
 
-const Portfolios = React.lazy(async () => {
+const Portfolios = lazy(async () => {
   const module = await import('./pages/portfolios/Portfolios');
   return { default: module.default };
 });
 
-const WealthManagement = React.lazy(async () => {
+const WealthManagement = lazy(async () => {
   const module = await import('./pages/wealthManagement/WealthManagement');
   return { default: module.default };
 });
 
-const ListClothing = React.lazy(async () => {
+const ListClothing = lazy(async () => {
   const module = await import('./pages/clothing/ListClothing');
   return { default: module.default };
 });
 
-const ListOutfit = React.lazy(async () => {
+const ListOutfit = lazy(async () => {
   const module = await import('./pages/clothing/ListOutfit');
   return { default: module.default };
 });
@@ -64,7 +63,7 @@ const Loading: FC = () => <p>Loading ...</p>;
 
 const Main: FC = () => {
   return (
-    <React.Suspense fallback={<Loading />}>
+    <Suspense fallback={<Loading />}>
       <Routes>
         {/** Protected Routes */}
         <Route path="/" element={<ProtectedRoutes />}>
@@ -91,7 +90,7 @@ const Main: FC = () => {
         <Route path="/register" element={<SignUp />} />
         <Route path="*" element={<h1>Not Found</h1>} />
       </Routes>
-    </React.Suspense>
+    </Suspense>
   );
 };
 export default Main;

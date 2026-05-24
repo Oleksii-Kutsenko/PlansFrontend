@@ -10,7 +10,8 @@ export interface User {
 
 export const userApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    fetchCurrentUser: builder.query<User, undefined>({
+    // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
+    fetchCurrentUser: builder.query<User, void>({
       query: () => '/api/accounts/user/',
       providesTags: ['User'],
     }),

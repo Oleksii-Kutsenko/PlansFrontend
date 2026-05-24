@@ -33,23 +33,27 @@ interface PersonalMaxDrawdownResponse {
 
 export const portfoliosApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    fetchPortfolios: builder.query<Portfolio[], undefined>({
+    // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
+    fetchPortfolios: builder.query<Portfolio[], void>({
       query: () => '/api/investments/portfolios/',
       providesTags: ['Portfolios'],
     }),
 
-    fetchPortfolioBacktestResults: builder.query<BacktestResults[], undefined>({
+    // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
+    fetchPortfolioBacktestResults: builder.query<BacktestResults[], void>({
       query: () => '/api/investments/portfolio-backtest-results/',
       providesTags: ['Portfolios'],
     }),
 
-    fetchPersonalMaxDrawdown: builder.query<number, undefined>({
+    // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
+    fetchPersonalMaxDrawdown: builder.query<number, void>({
       query: () => '/api/investments/portfolios/personal-max-drawdown/',
       transformResponse: (response: PersonalMaxDrawdownResponse) => response.personalMaxDrawdown,
       providesTags: ['Portfolios'],
     }),
 
-    fetchAgeMaxDrawdownDependence: builder.query<AgeMaxDrawdownDependency[], number | undefined>({
+    // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
+    fetchAgeMaxDrawdownDependence: builder.query<AgeMaxDrawdownDependency[], number | void>({
       query: (age) =>
         age === undefined
           ? '/api/investments/portfolios/age-max-drawdown-dependence/'

@@ -5,8 +5,6 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
 import { useLoginMutation } from '../store/api/authApi';
-import { useAppDispatch } from '../store/hooks';
-import { loginSuccess } from '../store/slices/auth';
 
 interface LoginFormInputs {
   username: string;
@@ -19,7 +17,6 @@ const Login: React.FC = () => {
     handleSubmit,
     formState: { errors },
   } = useForm<LoginFormInputs>();
-  const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const [login] = useLoginMutation();
 
@@ -32,11 +29,9 @@ const Login: React.FC = () => {
     void toast.promise(
       login(params)
         .unwrap()
-        .then((response) => {
-          localStorage.setItem('access', response.access);
-          localStorage.setItem('refresh', response.refresh);
-          dispatch(loginSuccess());
+        .then(() => {
           void navigate('/');
+          return true;
         }),
       {
         pending: 'Logging in...',
@@ -60,7 +55,7 @@ const Login: React.FC = () => {
                     type="text"
                     placeholder="Enter username"
                     {...register('username', { required: true })}
-                    isInvalid={!(errors.username == null)}
+                    isInvalid={errors.username != null}
                   />
                   {errors.username != null && (
                     <Form.Control.Feedback type="invalid">
@@ -75,7 +70,7 @@ const Login: React.FC = () => {
                     type="password"
                     placeholder="Password"
                     {...register('password', { required: true })}
-                    isInvalid={!(errors.password == null)}
+                    isInvalid={errors.password != null}
                   />
                   {errors.password != null && (
                     <Form.Control.Feedback type="invalid">

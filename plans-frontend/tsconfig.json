@@ -36,5 +36,6 @@
     "allowJs": false
   },
   "include": ["src"],
+  "exclude": ["node_modules"],
   "types": ["vite/client"]
 }

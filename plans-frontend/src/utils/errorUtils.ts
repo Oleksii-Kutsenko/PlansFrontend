@@ -1,7 +1,7 @@
-import { type UseFormSetError } from 'react-hook-form';
+import { FieldValues, Path, type UseFormSetError } from 'react-hook-form';
 import { toast } from 'react-toastify';
 
-export const handleApiFormError = <T extends Record<string, string>>(
+export const handleApiFormError = <T extends FieldValues>(
   error: unknown,
   setError: UseFormSetError<T>,
   defaultMessage = 'An error occurred',
@@ -24,7 +24,7 @@ export const handleApiFormError = <T extends Record<string, string>>(
         if (typeof message === 'string') {
           toast.error(`${field}: ${message}`);
 
-          setError(field as unknown as keyof T, {
+          setError(field as Path<T>, {
             type: 'custom',
             message,
           });

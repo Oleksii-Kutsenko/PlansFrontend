@@ -1,13 +1,13 @@
-import axios from 'axios';
 import type { FC } from 'react';
-import { useEffect, useState } from 'react';
-import { Button, Card, Col, Container, Form, Row } from 'react-bootstrap';
+import { Button, Card, Col, Container, Form, Row, Spinner } from 'react-bootstrap';
 import { Controller, useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
 import Select from 'react-select';
 import { toast } from 'react-toastify';
 
-import { fetcher } from '../utils/axios';
+import { useRegisterMutation } from '../store/api/authApi';
+import { useFetchCountryListQuery } from '../store/api/countriesApi';
+import { handleApiFormError } from '../utils/errorUtils';
 
 interface FormValues {
   birthDate: string;
@@ -17,26 +17,12 @@ interface FormValues {
   password2: string;
 }
 
-interface CountryResponse {
-  id: number;
-  name: string;
-}
-
-interface NewOptions {
-  label: string;
-  value: number;
-}
-
-type DRFErrorPayload<Field extends string> = Partial<Record<Field, string[]>> & {
-  non_field_errors?: string[];
-  detail?: string;
-};
-
-type FormKey = Extract<keyof FormValues, string>;
-type SignUpFormDRFError = DRFErrorPayload<FormKey>;
-
 const SignUp: FC = () => {
   const navigate = useNavigate();
+
+  const { data: countries, isLoading } = useFetchCountryListQuery();
+  const [registerUser] = useRegisterMutation();
+
   const {
     control,
     register,
@@ -53,65 +39,36 @@ const SignUp: FC = () => {
       password2: '',
     },
   });
-  const [options, setOptions] = useState<NewOptions[]>([]);
-  const onSubmit = (data: FormValues): void => {
+
+  if (isLoading || !countries) {
+    return (
+      <Container className="mt-5 text-center">
+        <Spinner animation="border" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </Spinner>
+      </Container>
+    );
+  }
+
+  const countryOptions = countries.map((c) => ({ label: c.name, value: c.id }));
+
+  const onSubmit = async (data: FormValues): Promise<void> => {
     const params = {
-      // eslint-disable-next-line camelcase
-      birth_date: data.birthDate,
+      birthDate: data.birthDate,
       country: data.country.value,
       username: data.username,
       password: data.password,
       password2: data.password2,
     };
 
-    void toast.promise(
-      fetcher
-        .post('/api/accounts/register/', params)
-        .then(() => {
-          void navigate('/login');
-        })
-        .catch((error: unknown) => {
-          if (!axios.isAxiosError<SignUpFormDRFError>(error) || !error.response) {
-            throw error;
-          }
-
-          const errors = error.response.data;
-
-          for (const [key, value] of Object.entries(errors)) {
-            const message = Array.isArray(value) ? value.join(' ') : value;
-
-            if (key === 'non_field_errors' || key === 'detail') {
-              setError('root', { message });
-              continue;
-            }
-
-            setError(key as FormKey, { message });
-          }
-
-          throw error;
-        }),
-      {
-        pending: 'Signing up...',
-        success: 'Signed up!',
-        error: 'Error signing up.',
-      },
-    );
+    try {
+      await registerUser(params).unwrap();
+      toast.success('Signed up!');
+      void navigate('/login');
+    } catch (error: unknown) {
+      handleApiFormError(error, setError, 'Error signing up.');
+    }
   };
-
-  useEffect(() => {
-    const fetchData = async (): Promise<void> => {
-      try {
-        const response = await fetcher.get<CountryResponse[]>('/api/countries/');
-        const newOptions = response.data.map((country: { name: string; id: number }) => {
-          return { label: country.name, value: country.id };
-        });
-        setOptions(newOptions);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-    void fetchData();
-  }, []);
 
   return (
     <Container>
@@ -153,7 +110,7 @@ const SignUp: FC = () => {
                         value={field.value}
                         onChange={field.onChange}
                         ref={field.ref}
-                        options={options}
+                        options={countryOptions}
                       />
                     )}
                   />

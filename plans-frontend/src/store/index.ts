@@ -11,7 +11,8 @@ const store = configureStore({
     [apiSlice.reducerPath]: apiSlice.reducer,
     auth: authReducer,
   },
-  middleware: (getDefaultMiddleware) => [...getDefaultMiddleware(), apiSlice.middleware],
+  // eslint-disable-next-line unicorn/prefer-spread
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(apiSlice.middleware),
 });
 
 export type RootState = ReturnType<typeof store.getState>;

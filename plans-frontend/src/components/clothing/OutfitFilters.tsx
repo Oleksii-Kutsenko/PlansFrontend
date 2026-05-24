@@ -1,7 +1,7 @@
 import { FC, useEffect, useState } from 'react';
 import { Button, Col, Form, InputGroup, Row } from 'react-bootstrap';
 
-import { Occasion } from '../../store/slices/clothing';
+import { Occasion } from '@/store/api/clothingApi';
 
 export interface FilterState {
   searchQuery: string;

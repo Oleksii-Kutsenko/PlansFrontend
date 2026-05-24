@@ -56,7 +56,6 @@ interface ClothingTypeChoice {
 
 export interface ClothingOptions {
   clothingType: ClothingTypeChoice[];
-  season: ClothingTypeChoice[];
 }
 
 export interface OutfitOptions {
@@ -93,12 +92,14 @@ export const clothingApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     // --- Queries ---
 
-    fetchClothing: builder.query<Clothing[], undefined>({
+    // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
+    fetchClothing: builder.query<Clothing[], void>({
       query: () => '/api/clothing/clothing/',
       providesTags: ['Clothing'],
     }),
 
-    fetchOutfits: builder.query<Outfit[], undefined>({
+    // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
+    fetchOutfits: builder.query<Outfit[], void>({
       query: () => '/api/clothing/outfit/',
       providesTags: ['Outfits'],
     }),
@@ -108,27 +109,28 @@ export const clothingApi = apiSlice.injectEndpoints({
       providesTags: (_result, _error, id) => [{ type: 'Outfits', id }],
     }),
 
-    fetchOccasions: builder.query<Occasion[], undefined>({
+    // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
+    fetchOccasions: builder.query<Occasion[], void>({
       query: () => '/api/clothing/occasion/',
       providesTags: ['Clothing'],
     }),
 
-    fetchClothingOptions: builder.query<ClothingOptions, undefined>({
+    // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
+    fetchClothingOptions: builder.query<ClothingOptions, void>({
       query: () => ({ url: '/api/clothing/clothing/', method: 'OPTIONS' }),
       transformResponse: (response: {
         actions: {
           POST: {
             clothingType: { choices: ClothingTypeChoice[] };
-            season: { choices: ClothingTypeChoice[] };
           };
         };
       }) => ({
         clothingType: response.actions.POST.clothingType.choices,
-        season: response.actions.POST.season.choices,
       }),
     }),
 
-    fetchOutfitOptions: builder.query<OutfitOptions, undefined>({
+    // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
+    fetchOutfitOptions: builder.query<OutfitOptions, void>({
       query: () => ({ url: '/api/clothing/outfit/', method: 'OPTIONS' }),
       transformResponse: (response: {
         actions: { POST: { season: { choices: ClothingTypeChoice[] } } };

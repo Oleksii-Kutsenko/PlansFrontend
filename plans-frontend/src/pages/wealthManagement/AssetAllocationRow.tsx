@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 import { type Allocation, type Currency } from '../../store';
-import { AssetAllocationItem } from './AssetAllocationItem.tsx';
+import { AssetAllocationItem } from './AssetAllocationItem';
 import { formatNumber, formatPercentage } from './formatting';
 
 export const AssetAllocationRow = ({

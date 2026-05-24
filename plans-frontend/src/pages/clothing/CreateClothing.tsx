@@ -1,4 +1,4 @@
-import { Button, Container, Form, Row } from 'react-bootstrap';
+import { Button, Container, Form, Row, Spinner } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -22,7 +22,7 @@ interface CreateClothingFormValues {
 const CreateClothing = () => {
   const navigate = useNavigate();
 
-  const { data: clothingOptions } = useFetchClothingOptionsQuery();
+  const { data: clothingOptions, isLoading } = useFetchClothingOptionsQuery();
   const [createClothing] = useCreateClothingMutation();
 
   const {
@@ -34,9 +34,20 @@ const CreateClothing = () => {
     formState: { errors },
   } = useForm<CreateClothingFormValues>();
 
+  if (isLoading || !clothingOptions) {
+    return (
+      <Container className="mt-5 text-center">
+        <Spinner animation="border" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </Spinner>
+      </Container>
+    );
+  }
+
   const imageFiles = watch('imagePath');
   let currentImageFile: File | null = null;
-  if (imageFiles.length > 0) {
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+  if (imageFiles && imageFiles.length > 0) {
     currentImageFile = imageFiles[0] ?? null;
   }
 

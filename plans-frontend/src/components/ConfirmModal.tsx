@@ -34,7 +34,7 @@ const ConfirmModal: FC<ConfirmModalProps> = ({
         <Button variant="secondary" onClick={onCancel}>
           {cancelLabel}
         </Button>
-        <Button variant={variant} onClick={onConfirm}>
+        <Button variant={variant} onClick={() => void onConfirm()}>
           {confirmLabel}
         </Button>
       </Modal.Footer>

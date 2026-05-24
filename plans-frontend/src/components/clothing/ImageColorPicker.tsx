@@ -6,6 +6,10 @@ interface ImageColorPickerProps {
   onColorPick: (hex: string) => void;
 }
 
+const rgbToHex = (r: number, g: number, b: number) => {
+  return '#' + [r, g, b].map((x) => x.toString(16).padStart(2, '0')).join('');
+};
+
 const ImageColorPicker: FC<ImageColorPickerProps> = ({ imageFile, onColorPick }) => {
   const [imgSrc, setImgSrc] = useState<string | null>(null);
 
@@ -20,10 +24,6 @@ const ImageColorPicker: FC<ImageColorPickerProps> = ({ imageFile, onColorPick })
     }
     setImgSrc(null);
   }, [imageFile]);
-
-  const rgbToHex = (r: number, g: number, b: number) => {
-    return '#' + [r, g, b].map((x) => x.toString(16).padStart(2, '0')).join('');
-  };
 
   const handleImageClick = (e: React.MouseEvent<HTMLImageElement>) => {
     const img = e.currentTarget;
@@ -69,6 +69,7 @@ const ImageColorPicker: FC<ImageColorPickerProps> = ({ imageFile, onColorPick })
           backgroundColor: '#f8f9fa',
         }}
       >
+        {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */}
         <img
           src={imgSrc}
           alt="Preview"

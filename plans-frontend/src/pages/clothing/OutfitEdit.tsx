@@ -29,7 +29,7 @@ interface OutfitFormValues {
   outfitName: string;
   season: string;
   occasion: number;
-  previewImage: FileList;
+  previewImage: FileList | undefined;
 }
 
 const OutfitEdit: FC<OutfitEditProps> = ({ outfit, onEditComplete }) => {
@@ -51,6 +51,7 @@ const OutfitEdit: FC<OutfitEditProps> = ({ outfit, onEditComplete }) => {
       outfitName: outfit.outfitName,
       occasion: outfit.occasion,
       season: outfit.season,
+      previewImage: undefined,
     },
   });
 
@@ -66,7 +67,7 @@ const OutfitEdit: FC<OutfitEditProps> = ({ outfit, onEditComplete }) => {
       occasion: data.occasion,
       season: data.season,
     };
-    if (data.previewImage.length > 0) {
+    if (data.previewImage && data.previewImage.length > 0) {
       payload.previewImage = data.previewImage[0] ?? null;
     }
 

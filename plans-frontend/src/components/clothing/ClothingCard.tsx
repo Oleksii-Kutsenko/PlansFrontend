@@ -1,7 +1,7 @@
 import { FC } from 'react';
 import { Badge, Button, Card, Form } from 'react-bootstrap';
 
-import { Clothing } from '../../store/slices/clothing';
+import { Clothing } from '@/store/api/clothingApi';
 
 interface ClothingCardProps {
   item: Clothing;
@@ -86,7 +86,7 @@ const ClothingCard: FC<ClothingCardProps> = ({
             className="w-100"
             onClick={(e) => {
               e.stopPropagation();
-              onRemove(item.id);
+              void onRemove(item.id);
             }}
           >
             Remove

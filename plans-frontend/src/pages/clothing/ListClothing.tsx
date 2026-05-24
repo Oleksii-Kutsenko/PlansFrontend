@@ -76,7 +76,8 @@ const ClothingList: FC = () => {
             <ClothingCard
               item={item}
               removable={true}
-              onRemove={() => {
+              // eslint-disable-next-line @typescript-eslint/require-await
+              onRemove={async () => {
                 setItemToDelete({ id: item.id, name: item.name });
               }}
             />

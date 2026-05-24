@@ -10,7 +10,7 @@ import {
 } from 'chart.js';
 import type { FC } from 'react';
 import { useMemo, useState } from 'react';
-import { Col, Container, Row } from 'react-bootstrap';
+import { Col, Container, Row, Spinner } from 'react-bootstrap';
 
 import {
   useFetchAgeMaxDrawdownDependenceQuery,
@@ -42,13 +42,19 @@ const Portfolios: FC = () => {
   const [filters, setFilters] = useState<PortfolioFilterFormInputs | null>(null);
 
   const defaultBacktestStartDate = useMemo(() => {
-    const d = new Date();
-    d.setFullYear(d.getFullYear() - 15);
-    return d.toISOString().split('T')[0];
+    const date = new Date();
+    date.setFullYear(date.getFullYear() - 15);
+    return date.toISOString().split('T')[0];
   }, []);
 
   if (isLoading || isPersonalMaxDrawdownLoading || isAgeMaxDrawdownLoading) {
-    return <p>Loading...</p>;
+    return (
+      <Container className="mt-4 text-center">
+        <Spinner animation="border" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </Spinner>
+      </Container>
+    );
   }
 
   if (isError || isPersonalMaxDrawdownError || isAgeMaxDrawdownError) {
@@ -65,32 +71,34 @@ const Portfolios: FC = () => {
     void refetchMaxDrawdown();
   };
 
-  return (
-    <Container>
-      <Row>
-        <h1 className="text-center">Portfolios</h1>
-      </Row>
-      <Row>
-        <Col xs={3} className="d-flex">
-          <PersonalMaxDrawdownForm
-            activeFilters={activeFilters}
-            onApply={setFilters}
-            onReset={handleReset}
-          />
-        </Col>
-        <Col xs={9}>
-          <AgeMaxDrawdownDependenceGraph
-            graphData={ageMaxDrawdownDependence}
-            currentMaxDrawdown={activeFilters.personalMaxDrawdown}
-            onMaxDrawdownSelect={(md) => {
-              setFilters({ ...activeFilters, personalMaxDrawdown: md });
-            }}
-          />
-        </Col>
-      </Row>
-      <PortfolioList backtestResults={backtestResults ?? []} filters={activeFilters} />
-    </Container>
-  );
+  if (ageMaxDrawdownDependence) {
+    return (
+      <Container>
+        <Row>
+          <h1 className="text-center">Portfolios</h1>
+        </Row>
+        <Row>
+          <Col xs={3} className="d-flex">
+            <PersonalMaxDrawdownForm
+              activeFilters={activeFilters}
+              onApply={setFilters}
+              onReset={handleReset}
+            />
+          </Col>
+          <Col xs={9}>
+            <AgeMaxDrawdownDependenceGraph
+              graphData={ageMaxDrawdownDependence}
+              currentMaxDrawdown={activeFilters.personalMaxDrawdown}
+              onMaxDrawdownSelect={(md) => {
+                setFilters({ ...activeFilters, personalMaxDrawdown: md });
+              }}
+            />
+          </Col>
+        </Row>
+        <PortfolioList backtestResults={backtestResults ?? []} filters={activeFilters} />
+      </Container>
+    );
+  }
 };
 
 export default Portfolios;

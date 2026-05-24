@@ -15,9 +15,15 @@ export interface CountryOption {
   normalizedName: string;
 }
 
+export interface CountryListItem {
+  id: number;
+  name: string;
+}
+
 export const countriesApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    fetchCountries: builder.query<Country[], undefined>({
+    // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
+    fetchCountries: builder.query<Country[], void>({
       query: () => '/api/countries/rating/',
       providesTags: ['Countries'],
     }),
@@ -27,11 +33,18 @@ export const countriesApi = apiSlice.injectEndpoints({
       providesTags: (_result, _error, countryId) => [{ type: 'Countries', id: countryId }],
     }),
 
-    fetchCountriesOptions: builder.query<CountryOption[], undefined>({
+    // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
+    fetchCountriesOptions: builder.query<CountryOption[], void>({
       query: () => ({
         url: '/api/countries/rating/',
         method: 'OPTIONS',
       }),
+      providesTags: ['Countries'],
+    }),
+
+    // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
+    fetchCountryList: builder.query<CountryListItem[], void>({
+      query: () => '/api/countries/',
       providesTags: ['Countries'],
     }),
   }),
@@ -41,4 +54,5 @@ export const {
   useFetchCountriesQuery,
   useFetchCountryRatingHistoryQuery,
   useFetchCountriesOptionsQuery,
+  useFetchCountryListQuery,
 } = countriesApi;
