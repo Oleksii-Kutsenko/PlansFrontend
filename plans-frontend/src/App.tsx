@@ -1,8 +1,9 @@
-import { JSX } from 'react';
-
-import { ToastContainer } from 'react-toastify';
 import './App.css';
-import Header from './pages/Header';
+
+import { JSX } from 'react';
+import { ToastContainer } from 'react-toastify';
+
+import Header from './components/Header';
 import Main from './Main';
 
 function App(): JSX.Element {

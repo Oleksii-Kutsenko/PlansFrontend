@@ -1,62 +1,61 @@
-import OutfitDetail from './pages/clothing/OutfitDetail';
-
+import { type FC, lazy, Suspense } from 'react';
 import { Route, Routes } from 'react-router-dom';
-import type { FC } from 'react';
-import React from 'react';
+
+import OutfitDetail from './features/clothing/pages/OutfitDetail';
 import ProtectedRoutes from './routes/ProtectedRoutes';
 
-const CreateClothing = React.lazy(async () => {
-  const module = await import('./pages/clothing/CreateClothing');
+const CreateClothing = lazy(async () => {
+  const module = await import('./features/clothing/pages/CreateClothing');
   return { default: module.default };
 });
 
-const CreateOutfit = React.lazy(async () => {
-  const module = await import('./pages/clothing/CreateOutfit');
+const CreateOutfit = lazy(async () => {
+  const module = await import('./features/clothing/pages/CreateOutfit');
   return { default: module.default };
 });
 
-const Login = React.lazy(async () => {
-  const module = await import('./pages/Login');
+const Login = lazy(async () => {
+  const module = await import('./features/auth/pages/Login');
   return { default: module.default };
 });
 
-const SignUp = React.lazy(async () => {
-  const module = await import('./pages/SignUp');
+const SignUp = lazy(async () => {
+  const module = await import('./features/auth/pages/SignUp');
   return { default: module.default };
 });
 
-const Home = React.lazy(async () => {
+const Home = lazy(async () => {
   const module = await import('./pages/Home');
   return { default: module.default };
 });
 
-const CountriesRating = React.lazy(async () => {
-  const module = await import('./pages/countriesRating/CountriesRating');
+const CountriesRating = lazy(async () => {
+  const module = await import('./features/countries/pages/CountriesRating');
   return { default: module.default };
 });
 
-const Profile = React.lazy(async () => {
-  const module = await import('./pages/Profile');
+const Profile = lazy(async () => {
+  const module = await import('./features/profile/pages/Profile');
   return { default: module.default };
 });
 
-const Portfolios = React.lazy(async () => {
-  const module = await import('./pages/portfolios/Portfolios');
+const Portfolios = lazy(async () => {
+  const module = await import('./features/portfolios/pages/Portfolios');
   return { default: module.default };
 });
 
-const WealthManagement = React.lazy(async () => {
-  const module = await import('./pages/wealthManagement/WealthManagement');
+const WealthManagement = lazy(async () => {
+  const module = await import('./features/wealthManagement/pages/WealthManagement');
   return { default: module.default };
 });
 
-const ListClothing = React.lazy(async () => {
-  const module = await import('./pages/clothing/ListClothing');
+const ListClothing = lazy(async () => {
+  const module = await import('./features/clothing/pages/ListClothing');
   return { default: module.default };
 });
 
-const ListOutfit = React.lazy(async () => {
-  const module = await import('./pages/clothing/ListOutfit');
+const ListOutfit = lazy(async () => {
+  const module = await import('./features/clothing/pages/ListOutfit');
   return { default: module.default };
 });
 
@@ -64,34 +63,34 @@ const Loading: FC = () => <p>Loading ...</p>;
 
 const Main: FC = () => {
   return (
-    <React.Suspense fallback={<Loading />}>
+    <Suspense fallback={<Loading />}>
       <Routes>
         {/** Protected Routes */}
-        <Route path='/' element={<ProtectedRoutes />}>
-          <Route path='/' element={<Home />} />
+        <Route path="/" element={<ProtectedRoutes />}>
+          <Route path="/" element={<Home />} />
 
-          <Route path='/countries' element={<CountriesRating />} />
+          <Route path="/countries" element={<CountriesRating />} />
 
-          <Route path='/portfolios' element={<Portfolios />} />
+          <Route path="/portfolios" element={<Portfolios />} />
 
-          <Route path='/profile' element={<Profile />} />
+          <Route path="/profile" element={<Profile />} />
 
-          <Route path='/wealth-management' element={<WealthManagement />} />
+          <Route path="/wealth-management" element={<WealthManagement />} />
 
-          <Route path='/clothing/clothing' element={<ListClothing />} />
-          <Route path='/clothing' element={<ListOutfit />} />
-          <Route path='/clothing/create' element={<CreateClothing />} />
-          <Route path='/clothing/outfit/create' element={<CreateOutfit />} />
-          <Route path='/clothing/outfit/create' element={<CreateOutfit />} />
-          <Route path='/clothing/outfit/:id' element={<OutfitDetail />} />
+          <Route path="/clothing/clothing" element={<ListClothing />} />
+          <Route path="/clothing" element={<ListOutfit />} />
+          <Route path="/clothing/create" element={<CreateClothing />} />
+          <Route path="/clothing/outfit/create" element={<CreateOutfit />} />
+          <Route path="/clothing/outfit/create" element={<CreateOutfit />} />
+          <Route path="/clothing/outfit/:id" element={<OutfitDetail />} />
         </Route>
 
         {/** Public Routes */}
-        <Route path='/login' element={<Login />} />
-        <Route path='/register' element={<SignUp />} />
-        <Route path='*' element={<h1>Not Found</h1>} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<SignUp />} />
+        <Route path="*" element={<h1>Not Found</h1>} />
       </Routes>
-    </React.Suspense>
+    </Suspense>
   );
 };
 export default Main;

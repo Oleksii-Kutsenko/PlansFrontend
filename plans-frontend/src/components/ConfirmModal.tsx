@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { Modal, Button } from 'react-bootstrap';
+import { Button, Modal } from 'react-bootstrap';
 
 interface ConfirmModalProps {
   show: boolean;
@@ -8,7 +8,7 @@ interface ConfirmModalProps {
   confirmLabel?: string;
   cancelLabel?: string;
   variant?: 'primary' | 'danger' | 'warning' | 'success';
-  onConfirm: () => void;
+  onConfirm: () => Promise<void>;
   onCancel: () => void;
 }
 
@@ -20,7 +20,7 @@ const ConfirmModal: FC<ConfirmModalProps> = ({
   cancelLabel = 'Cancel',
   variant = 'danger',
   onConfirm,
-  onCancel
+  onCancel,
 }) => {
   return (
     <Modal show={show} onHide={onCancel} centered>
@@ -28,13 +28,13 @@ const ConfirmModal: FC<ConfirmModalProps> = ({
         <Modal.Title>{title}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <p className='mb-0'>{message}</p>
+        <p className="mb-0">{message}</p>
       </Modal.Body>
       <Modal.Footer>
-        <Button variant='secondary' onClick={onCancel}>
+        <Button variant="secondary" onClick={onCancel}>
           {cancelLabel}
         </Button>
-        <Button variant={variant} onClick={onConfirm}>
+        <Button variant={variant} onClick={() => void onConfirm()}>
           {confirmLabel}
         </Button>
       </Modal.Footer>
