@@ -5,8 +5,8 @@ import {
   type FetchBaseQueryError,
 } from '@reduxjs/toolkit/query/react';
 
+import { logout } from '../../features/auth/slices/authSlice';
 import { keysToCamel, keysToSnake } from '../../utils/caseUtils';
-import { logout } from '../slices/auth';
 
 const rawBaseQuery = fetchBaseQuery({
   baseUrl: import.meta.env.VITE_API_URL,

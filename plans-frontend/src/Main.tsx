@@ -1,26 +1,26 @@
 import { type FC, lazy, Suspense } from 'react';
 import { Route, Routes } from 'react-router-dom';
 
-import OutfitDetail from './pages/clothing/OutfitDetail';
+import OutfitDetail from './features/clothing/pages/OutfitDetail';
 import ProtectedRoutes from './routes/ProtectedRoutes';
 
 const CreateClothing = lazy(async () => {
-  const module = await import('./pages/clothing/CreateClothing');
+  const module = await import('./features/clothing/pages/CreateClothing');
   return { default: module.default };
 });
 
 const CreateOutfit = lazy(async () => {
-  const module = await import('./pages/clothing/CreateOutfit');
+  const module = await import('./features/clothing/pages/CreateOutfit');
   return { default: module.default };
 });
 
 const Login = lazy(async () => {
-  const module = await import('./pages/Login');
+  const module = await import('./features/auth/pages/Login');
   return { default: module.default };
 });
 
 const SignUp = lazy(async () => {
-  const module = await import('./pages/SignUp');
+  const module = await import('./features/auth/pages/SignUp');
   return { default: module.default };
 });
 
@@ -30,32 +30,32 @@ const Home = lazy(async () => {
 });
 
 const CountriesRating = lazy(async () => {
-  const module = await import('./pages/countriesRating/CountriesRating');
+  const module = await import('./features/countries/pages/CountriesRating');
   return { default: module.default };
 });
 
 const Profile = lazy(async () => {
-  const module = await import('./pages/Profile');
+  const module = await import('./features/profile/pages/Profile');
   return { default: module.default };
 });
 
 const Portfolios = lazy(async () => {
-  const module = await import('./pages/portfolios/Portfolios');
+  const module = await import('./features/portfolios/pages/Portfolios');
   return { default: module.default };
 });
 
 const WealthManagement = lazy(async () => {
-  const module = await import('./pages/wealthManagement/WealthManagement');
+  const module = await import('./features/wealthManagement/pages/WealthManagement');
   return { default: module.default };
 });
 
 const ListClothing = lazy(async () => {
-  const module = await import('./pages/clothing/ListClothing');
+  const module = await import('./features/clothing/pages/ListClothing');
   return { default: module.default };
 });
 
 const ListOutfit = lazy(async () => {
-  const module = await import('./pages/clothing/ListOutfit');
+  const module = await import('./features/clothing/pages/ListOutfit');
   return { default: module.default };
 });
 

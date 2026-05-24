@@ -3,8 +3,8 @@ import './App.css';
 import { JSX } from 'react';
 import { ToastContainer } from 'react-toastify';
 
+import Header from './components/Header';
 import Main from './Main';
-import Header from './pages/Header';
 
 function App(): JSX.Element {
   return (
