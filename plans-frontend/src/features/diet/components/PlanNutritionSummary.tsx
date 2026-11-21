@@ -15,36 +15,19 @@ interface PlanNutritionSummaryProps {
 
 interface NutrientStatus {
   isCritical: boolean;
-  variant: 'danger' | 'warning' | 'success';
-  percentColor: string;
+  color: string;
   score: number;
 }
 
 const getNutrientStatus = (item: PlanSummaryItem): NutrientStatus => {
   const score = Math.round(item.accuracyScore);
-
-  if (score < 50) {
-    return {
-      isCritical: true,
-      variant: 'danger',
-      percentColor: 'text-danger',
-      score,
-    };
-  }
-
-  if (score < 100) {
-    return {
-      isCritical: false,
-      variant: 'warning',
-      percentColor: 'text-warning-emphasis',
-      score,
-    };
-  }
+  const clamped = Math.max(0, Math.min(score, 100));
+  // 0% = Red (hue 0), 50% = Amber/Yellow (hue 60), 100% = Green (hue 120)
+  const hue = Math.round((clamped / 100) * 120);
 
   return {
-    isCritical: false,
-    variant: 'success',
-    percentColor: 'text-success',
+    isCritical: score < 50,
+    color: `hsl(${String(hue)}, 75%, 40%)`,
     score,
   };
 };
@@ -113,7 +96,7 @@ const PlanNutritionSummary: FC<PlanNutritionSummaryProps> = ({ planId }) => {
 
                 <div className="d-flex flex-column gap-2">
                   {items.map((item) => {
-                    const { isCritical, variant, percentColor, score } = getNutrientStatus(item);
+                    const { isCritical, color, score } = getNutrientStatus(item);
 
                     return (
                       <div key={item.nutrientId}>
@@ -129,11 +112,21 @@ const PlanNutritionSummary: FC<PlanNutritionSummaryProps> = ({ planId }) => {
                               {item.actualAmount.toFixed(1)} / {item.targetAmount.toFixed(1)}{' '}
                               {item.unit}
                             </span>{' '}
-                            <span className={`fw-bold ${percentColor}`}>({score}%)</span>
+                            <span className="fw-bold" style={{ color }}>
+                              ({score}%)
+                            </span>
                           </span>
                         </div>
 
-                        <ProgressBar now={score} variant={variant} />
+                        <ProgressBar
+                          now={Math.min(score, 100)}
+                          style={
+                            {
+                              '--bs-progress-bar-bg': color,
+                              height: '6px',
+                            } as React.CSSProperties
+                          }
+                        />
                       </div>
                     );
                   })}
