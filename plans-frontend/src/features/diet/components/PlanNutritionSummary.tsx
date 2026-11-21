@@ -4,8 +4,8 @@ import { Badge, Card, ProgressBar, Spinner } from 'react-bootstrap';
 
 import { useFetchPlanSummaryQuery } from '@/features/diet/api/dietApi';
 import {
-  NUTRIENT_CATEGORIES,
-  NutrientCategory,
+  NUTRIENT_CATEGORY_KEYS,
+  type NutrientCategory,
   type PlanSummaryItem,
 } from '@/features/diet/types/diet';
 
@@ -55,12 +55,9 @@ const PlanNutritionSummary: FC<PlanNutritionSummaryProps> = ({ planId }) => {
   const groupedCategories = useMemo(() => {
     if (!summary?.items) return [];
 
-    const groups: Record<NutrientCategory, PlanSummaryItem[]> = {
-      macro: [],
-      fat: [],
-      mineral: [],
-      vitamin: [],
-    };
+    const groups = Object.fromEntries(
+      NUTRIENT_CATEGORY_KEYS.map((cat) => [cat, [] as PlanSummaryItem[]]),
+    ) as Record<NutrientCategory, PlanSummaryItem[]>;
 
     for (const item of summary.items) {
       if (item.category in groups) {
@@ -69,7 +66,7 @@ const PlanNutritionSummary: FC<PlanNutritionSummaryProps> = ({ planId }) => {
     }
 
     const categories: [NutrientCategory, PlanSummaryItem[]][] = [];
-    for (const cat of NUTRIENT_CATEGORIES) {
+    for (const cat of NUTRIENT_CATEGORY_KEYS) {
       const items = groups[cat];
       if (items.length > 0) {
         items.sort((a, b) => a.accuracyScore - b.accuracyScore);

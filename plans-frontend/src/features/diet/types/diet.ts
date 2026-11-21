@@ -1,7 +1,15 @@
-export const NUTRIENT_CATEGORIES = ['macro', 'fat', 'mineral', 'vitamin'] as const;
-export type NutrientCategory = (typeof NUTRIENT_CATEGORIES)[number];
+export const NUTRIENT_CATEGORIES = {
+  macro: { label: 'Macronutrients', badge: 'primary' },
+  fat: { label: 'Fats', badge: 'warning' },
+  mineral: { label: 'Minerals', badge: 'success' },
+  vitamin: { label: 'Vitamins', badge: 'info' },
+} as const;
 
-export type NutrientUnit = 'g' | 'mg' | 'mcg' | 'kcal';
+export type NutrientCategory = keyof typeof NUTRIENT_CATEGORIES;
+export const NUTRIENT_CATEGORY_KEYS = Object.keys(NUTRIENT_CATEGORIES) as NutrientCategory[];
+
+export const NUTRIENT_UNITS = ['g', 'mg', 'mcg', 'kcal'] as const;
+export type NutrientUnit = (typeof NUTRIENT_UNITS)[number];
 
 export interface Nutrient {
   id: number;

@@ -8,6 +8,7 @@ import {
   type Ingredient,
   type Nutrient,
   NUTRIENT_CATEGORIES,
+  NUTRIENT_CATEGORY_KEYS,
   type NutrientCategory,
 } from '@/features/diet/types/diet';
 
@@ -16,7 +17,6 @@ import {
   useFetchIngredientsQuery,
   useFetchNutrientsQuery,
 } from '../api/dietApi';
-import { CATEGORY_BADGES, CATEGORY_LABELS } from '../utils/recipeNutrition';
 
 const PAGE_SIZE = 100;
 
@@ -84,14 +84,11 @@ export const ListIngredients: FC = () => {
   const totalCount = ingredientsData?.count ?? 0;
   const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
 
-  // Group nutrients by category for a structured two-tier header
   const nutrientsByCategory = useMemo(() => {
-    const groups: Record<NutrientCategory, Nutrient[]> = {
-      macro: [],
-      fat: [],
-      mineral: [],
-      vitamin: [],
-    };
+    const groups = Object.fromEntries(
+      NUTRIENT_CATEGORY_KEYS.map((cat) => [cat, [] as Nutrient[]]),
+    ) as Record<NutrientCategory, Nutrient[]>;
+
     for (const nutrient of nutrients) {
       if (nutrient.category in groups) {
         groups[nutrient.category].push(nutrient);
@@ -101,7 +98,7 @@ export const ListIngredients: FC = () => {
   }, [nutrients]);
 
   const orderedNutrients = useMemo(() => {
-    return NUTRIENT_CATEGORIES.flatMap((cat) => nutrientsByCategory[cat]);
+    return NUTRIENT_CATEGORY_KEYS.flatMap((cat) => nutrientsByCategory[cat]);
   }, [nutrientsByCategory]);
 
   const sortedNutrient = useMemo(() => {
@@ -315,9 +312,10 @@ export const ListIngredients: FC = () => {
                   >
                     Ingredient &bull; Actions
                   </th>
-                  {NUTRIENT_CATEGORIES.map((category) => {
+                  {NUTRIENT_CATEGORY_KEYS.map((category) => {
                     const count = nutrientsByCategory[category].length;
                     if (count === 0) return null;
+                    const config = NUTRIENT_CATEGORIES[category];
                     return (
                       <th
                         key={category}
@@ -325,8 +323,8 @@ export const ListIngredients: FC = () => {
                         className="py-1 border-end text-uppercase fw-bold"
                         style={{ fontSize: '11px', letterSpacing: '0.5px' }}
                       >
-                        <Badge bg={CATEGORY_BADGES[category]} className="me-1">
-                          {CATEGORY_LABELS[category]}
+                        <Badge bg={config.badge} className="me-1">
+                          {config.label}
                         </Badge>
                       </th>
                     );
