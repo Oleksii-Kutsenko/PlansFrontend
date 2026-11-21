@@ -9,7 +9,7 @@ import type { PlanDay, PlanMeal } from '@/features/diet/types/diet';
 
 interface DayColumnProps {
   planDay: PlanDay;
-  onAddMeal: (planDayId: number, dayName: string, mealsCount: number) => void;
+  onAddMeal: (planDay: PlanDay) => void;
 }
 
 const DayColumn: FC<DayColumnProps> = ({ planDay, onAddMeal }) => {
@@ -46,7 +46,7 @@ const DayColumn: FC<DayColumnProps> = ({ planDay, onAddMeal }) => {
   };
 
   const handleAddMealClick = (): void => {
-    onAddMeal(planDay.id, planDay.dayName, sortedMeals.length);
+    onAddMeal(planDay);
   };
 
   return (

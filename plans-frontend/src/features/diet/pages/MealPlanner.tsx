@@ -15,7 +15,7 @@ import DayColumn from '@/features/diet/components/DayColumn';
 import PlanFormModal from '@/features/diet/components/PlanFormModal';
 import PlanNutritionSummary from '@/features/diet/components/PlanNutritionSummary';
 import TargetManagerModal from '@/features/diet/components/TargetManagerModal';
-import type { Plan } from '@/features/diet/types/diet';
+import type { Plan, PlanDay } from '@/features/diet/types/diet';
 
 const MealPlanner: FC = () => {
   const { id } = useParams<{ id?: string }>();
@@ -26,13 +26,7 @@ const MealPlanner: FC = () => {
   const [deletePlanTarget, setDeletePlanTarget] = useState<Plan | null>(null);
   const [showTargetsModal, setShowTargetsModal] = useState(false);
 
-  // Add Meal Modal state
-  const [activeAddMeal, setActiveAddMeal] = useState<{
-    show: boolean;
-    planDayId: number;
-    dayName: string;
-    nextOrder: number;
-  }>({ show: false, planDayId: 0, dayName: '', nextOrder: 1 });
+  const [activePlanDay, setActivePlanDay] = useState<PlanDay | null>(null);
 
   const { data: allPlans = [], isLoading: isPlansLoading } = useFetchPlansQuery();
 
@@ -76,15 +70,6 @@ const MealPlanner: FC = () => {
     } catch {
       toast.error('Failed to delete plan.');
     }
-  };
-
-  const handleOpenAddMeal = (planDayId: number, dayName: string, mealsCount: number): void => {
-    setActiveAddMeal({
-      show: true,
-      planDayId,
-      dayName,
-      nextOrder: mealsCount + 1,
-    });
   };
 
   if (isPlansLoading) {
@@ -231,7 +216,7 @@ const MealPlanner: FC = () => {
           <div className="row flex-nowrap overflow-auto g-2 pb-3">
             {activePlan.days.map((planDay) => (
               <div key={planDay.id} className="col-10 col-sm-6 col-md-4 col-lg flex-lg-fill d-flex">
-                <DayColumn planDay={planDay} onAddMeal={handleOpenAddMeal} />
+                <DayColumn planDay={planDay} onAddMeal={setActivePlanDay} />
               </div>
             ))}
           </div>
@@ -272,15 +257,14 @@ const MealPlanner: FC = () => {
         }}
       />
 
-      <AddMealModal
-        show={activeAddMeal.show}
-        planDayId={activeAddMeal.planDayId}
-        dayName={activeAddMeal.dayName}
-        nextOrder={activeAddMeal.nextOrder}
-        onClose={() => {
-          setActiveAddMeal((prev) => ({ ...prev, show: false }));
-        }}
-      />
+      {activePlanDay && (
+        <AddMealModal
+          planDay={activePlanDay}
+          onClose={() => {
+            setActivePlanDay(null);
+          }}
+        />
+      )}
 
       <ConfirmModal
         show={Boolean(deletePlanTarget)}

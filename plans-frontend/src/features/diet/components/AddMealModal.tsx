@@ -4,24 +4,21 @@ import { Button, Card, Form, InputGroup, Modal, Spinner } from 'react-bootstrap'
 import { toast } from 'react-toastify';
 
 import { useCreatePlanMealMutation, useFetchRecipesQuery } from '@/features/diet/api/dietApi';
-import type { Recipe } from '@/features/diet/types/diet';
+import type { PlanDay, Recipe } from '@/features/diet/types/diet';
 
 interface AddMealModalProps {
-  show: boolean;
+  planDay: PlanDay;
   onClose: () => void;
-  planDayId: number;
-  dayName: string;
-  nextOrder: number;
 }
 
-const AddMealModal: FC<AddMealModalProps> = ({ show, onClose, planDayId, dayName, nextOrder }) => {
+const AddMealModal: FC<AddMealModalProps> = ({ planDay, onClose }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedRecipeId, setSelectedRecipeId] = useState<number | null>(null);
 
-  const { data: recipes = [], isLoading: isRecipesLoading } = useFetchRecipesQuery(undefined, {
-    skip: !show,
-    refetchOnMountOrArgChange: true,
-  });
+  const nextOrder = planDay.meals.length + 1;
+  const dayName = planDay.dayName;
+
+  const { data: recipes = [], isLoading: isRecipesLoading } = useFetchRecipesQuery();
   const [createPlanMeal, { isLoading: isCreating }] = useCreatePlanMealMutation();
 
   const filteredRecipes = useMemo(() => {
@@ -49,7 +46,7 @@ const AddMealModal: FC<AddMealModalProps> = ({ show, onClose, planDayId, dayName
 
     try {
       await createPlanMeal({
-        planDay: planDayId,
+        planDay: planDay.id,
         recipe: selectedRecipeId,
         order: nextOrder,
       }).unwrap();
@@ -68,7 +65,7 @@ const AddMealModal: FC<AddMealModalProps> = ({ show, onClose, planDayId, dayName
   };
 
   return (
-    <Modal show={show} onHide={handleClose} size="lg" centered>
+    <Modal show onHide={handleClose} size="lg" centered>
       <Modal.Header closeButton>
         <Modal.Title className="h5">
           <i className="bi bi-calendar-plus me-2 text-primary"></i>

@@ -117,10 +117,6 @@ export interface PlanDay {
   dayName: string;
   meals: PlanMeal[];
 }
-export interface CreatePlanDayPayload {
-  plan: number;
-  dayOfWeek: number;
-}
 export interface Plan {
   id: number;
   name: string;

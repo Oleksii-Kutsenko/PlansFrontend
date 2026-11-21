@@ -3,40 +3,23 @@ import { createSelector } from '@reduxjs/toolkit';
 import type {
   CreateIngredientPayload,
   CreateNutrientPayload,
-  CreatePlanDayPayload,
   CreatePlanMealPayload,
   CreatePlanPayload,
   CreateRecipePayload,
-  CreateRecipePayload,
   CreateTargetPayload,
   FetchIngredientsParams,
-  FetchIngredientsParams,
-  FetchPlansParams,
   FetchPlansParams,
   Ingredient,
-  Ingredient,
-  Nutrient,
   Nutrient,
   PaginatedResponse,
-  PaginatedResponse,
   Plan,
-  Plan,
-  PlanDay,
-  PlanDay,
-  PlanMeal,
   PlanMeal,
   PlanSummary,
   Recipe,
-  Recipe,
-  UpdateIngredientPayload,
   UpdateIngredientPayload,
   UpdateNutrientPayload,
-  UpdateNutrientPayload,
-  UpdatePlanMealPayload,
   UpdatePlanMealPayload,
   UpdatePlanPayload,
-  UpdatePlanPayload,
-  UpdateRecipePayload,
   UpdateRecipePayload,
   UpdateTargetPayload,
   UserNutrientTarget,
@@ -208,24 +191,6 @@ export const dietApi = apiSlice.injectEndpoints({
       invalidatesTags: ['Plans'],
     }),
 
-    // --- Plan Days ---
-    createPlanDay: builder.mutation<PlanDay, CreatePlanDayPayload>({
-      query: (body) => ({
-        url: '/api/diet/plan-days/',
-        method: 'POST',
-        body,
-      }),
-      invalidatesTags: ['Plans'],
-    }),
-
-    deletePlanDay: builder.mutation<undefined, number>({
-      query: (id) => ({
-        url: `/api/diet/plan-days/${String(id)}/`,
-        method: 'DELETE',
-      }),
-      invalidatesTags: ['Plans'],
-    }),
-
     // --- Plan Meals ---
     createPlanMeal: builder.mutation<PlanMeal, CreatePlanMealPayload>({
       query: (body) => ({
@@ -322,8 +287,6 @@ export const {
   useCreatePlanMutation,
   useUpdatePlanMutation,
   useDeletePlanMutation,
-  useCreatePlanDayMutation,
-  useDeletePlanDayMutation,
   useCreatePlanMealMutation,
   useUpdatePlanMealMutation,
   useDeletePlanMealMutation,
