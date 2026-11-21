@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import { Nav, Navbar } from 'react-bootstrap';
+import { Nav, Navbar, NavDropdown } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { NavLink } from 'react-router-dom';
 
@@ -46,6 +46,20 @@ const Header: FC = () => {
                 Clothing
               </NavLink>
             </Nav.Item>
+            <NavDropdown title="Diet" id="diet-nav-dropdown">
+              <NavDropdown.Item as={NavLink} to="/diet/plans">
+                Meal Planner
+              </NavDropdown.Item>
+              <NavDropdown.Item as={NavLink} to="/diet/recipes">
+                Recipes
+              </NavDropdown.Item>
+              <NavDropdown.Item as={NavLink} to="/diet/ingredients">
+                Ingredients
+              </NavDropdown.Item>
+              <NavDropdown.Item as={NavLink} to="/diet/nutrients">
+                Nutrients
+              </NavDropdown.Item>
+            </NavDropdown>
           </Nav>
           <Nav>
             <Nav.Item>
