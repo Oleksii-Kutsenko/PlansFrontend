@@ -125,7 +125,6 @@ const Main: FC = () => {
           <Route path="/clothing" element={<ListOutfit />} />
           <Route path="/clothing/create" element={<CreateClothing />} />
           <Route path="/clothing/outfit/create" element={<CreateOutfit />} />
-          <Route path="/clothing/outfit/create" element={<CreateOutfit />} />
           <Route path="/clothing/outfit/:id" element={<OutfitDetail />} />
 
           <Route path="/diet" element={<ListIngredients />} />

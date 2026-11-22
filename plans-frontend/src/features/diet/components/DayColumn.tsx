@@ -17,7 +17,7 @@ const DayColumn: FC<DayColumnProps> = ({ planDay, onAddMeal }) => {
   const [deletePlanMeal] = useDeletePlanMealMutation();
 
   const sortedMeals = useMemo(
-    () => planDay.meals.toSorted((a, b) => a.order - b.order),
+    () => planDay.meals.toSorted((firstMeal, secondMeal) => firstMeal.order - secondMeal.order),
     [planDay.meals],
   );
 

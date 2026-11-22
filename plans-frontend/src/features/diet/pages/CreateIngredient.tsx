@@ -23,22 +23,20 @@ export const CreateIngredient: FC = () => {
   });
 
   const onFormSubmit = async (data: IngredientFormValues): Promise<void> => {
-    const trimmedName = data.name.trim();
-
     const payloadNutrients = Object.entries(data.nutrients)
-      .map(([nutrientId, amount]) => ({
-        nutrient: Number(nutrientId),
-        amountPer100g: amount.trim(),
-      }))
-      .filter((item) => item.amountPer100g !== '' && Number(item.amountPer100g) > 0);
+      .filter(([, amount]) => Number(amount) > 0)
+      .map(([id, amount]) => ({
+        nutrient: Number(id),
+        amountPer100g: amount,
+      }));
 
     try {
       await createIngredient({
-        name: trimmedName,
+        name: data.name.trim(),
         nutrientValues: payloadNutrients,
       }).unwrap();
 
-      toast.success(`Created "${trimmedName}" successfully!`);
+      toast.success(`Created "${data.name.trim()}" successfully!`);
       void navigate('/diet/ingredients');
     } catch {
       toast.error('Failed to create ingredient. Please verify the input values.');

@@ -50,9 +50,9 @@ export const ListIngredients: FC = () => {
   }, [searchTerm]);
 
   // Pressing Enter triggers immediate search without waiting for debounce
-  const handleSearchKeyDown = (e: KeyboardEvent<HTMLInputElement>): void => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
+  const handleSearchKeyDown = (event: KeyboardEvent<HTMLInputElement>): void => {
+    if (event.key === 'Enter') {
+      event.preventDefault();
       setDebouncedSearch(searchTerm.trim());
       setPage(1);
     }
@@ -86,7 +86,7 @@ export const ListIngredients: FC = () => {
 
   const nutrientsByCategory = useMemo(() => {
     const groups = Object.fromEntries(
-      NUTRIENT_CATEGORY_KEYS.map((cat) => [cat, [] as Nutrient[]]),
+      NUTRIENT_CATEGORY_KEYS.map((category) => [category, [] as Nutrient[]]),
     ) as Record<NutrientCategory, Nutrient[]>;
 
     for (const nutrient of nutrients) {
@@ -98,12 +98,12 @@ export const ListIngredients: FC = () => {
   }, [nutrients]);
 
   const orderedNutrients = useMemo(() => {
-    return NUTRIENT_CATEGORY_KEYS.flatMap((cat) => nutrientsByCategory[cat]);
+    return NUTRIENT_CATEGORY_KEYS.flatMap((category) => nutrientsByCategory[category]);
   }, [nutrientsByCategory]);
 
   const sortedNutrient = useMemo(() => {
     if (!sortState.nutrientId) return null;
-    return nutrients.find((n) => n.id === sortState.nutrientId) ?? null;
+    return nutrients.find((nutrient) => nutrient.id === sortState.nutrientId) ?? null;
   }, [nutrients, sortState.nutrientId]);
 
   const handleNutrientHeaderClick = (nutrientId: number): void => {
@@ -209,8 +209,8 @@ export const ListIngredients: FC = () => {
                   placeholder="Search 8,200+ whole foods..."
                   value={searchTerm}
                   onKeyDown={handleSearchKeyDown}
-                  onChange={(e) => {
-                    setSearchTerm(e.target.value);
+                  onChange={(event) => {
+                    setSearchTerm(event.target.value);
                   }}
                 />
                 {searchTerm && (

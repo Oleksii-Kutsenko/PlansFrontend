@@ -1,18 +1,15 @@
 import type { FC } from 'react';
 import { Badge, Card, Col, Row } from 'react-bootstrap';
 
-import type { CalculatedNutrient, NutrientCategory } from '@/features/diet/types/diet';
-
 import {
-  CATEGORY_BADGES,
-  CATEGORY_LABELS,
-  formatNutrientAmount,
+  type CalculatedNutrient,
   NUTRIENT_CATEGORIES,
-} from '../utils/recipeNutrition';
+  NUTRIENT_CATEGORY_KEYS,
+} from '@/features/diet/types/diet';
 
 interface RecipeNutrientBreakdownProps {
   calculatedNutrients: CalculatedNutrient[];
-  totalWeightGrams?: number;
+  totalWeightGrams: number;
 }
 
 export const RecipeNutrientBreakdown: FC<RecipeNutrientBreakdownProps> = ({
@@ -27,20 +24,9 @@ export const RecipeNutrientBreakdown: FC<RecipeNutrientBreakdownProps> = ({
     );
   }
 
-  const nutrientsByCategory = Object.fromEntries(
-    NUTRIENT_CATEGORIES.map((cat) => [cat, [] as CalculatedNutrient[]]),
-  ) as Record<NutrientCategory, CalculatedNutrient[]>;
-
-  for (const item of calculatedNutrients) {
-    const category = item.nutrient.category;
-    if (category in nutrientsByCategory) {
-      nutrientsByCategory[category].push(item);
-    }
-  }
-
   return (
     <div className="d-flex flex-column gap-3">
-      {totalWeightGrams !== undefined && totalWeightGrams > 0 && (
+      {totalWeightGrams > 0 && (
         <div className="d-flex align-items-center gap-2">
           <span className="text-secondary small fw-medium">Total Recipe Weight:</span>
           <Badge bg="light" text="dark" className="border fs-6">
@@ -50,18 +36,18 @@ export const RecipeNutrientBreakdown: FC<RecipeNutrientBreakdownProps> = ({
       )}
 
       <Row className="g-3">
-        {NUTRIENT_CATEGORIES.map((category) => {
-          const categoryItems = nutrientsByCategory[category];
-          if (categoryItems.length === 0) {
-            return null;
-          }
+        {NUTRIENT_CATEGORY_KEYS.map((category) => {
+          const categoryItems = calculatedNutrients.filter(
+            (item) => item.nutrient.category === category,
+          );
+          if (categoryItems.length === 0) return null;
 
           return (
             <Col key={category} xs={12} md={4}>
               <Card className="h-100 shadow-sm border-0">
                 <Card.Header className="py-2 bg-white d-flex justify-content-between align-items-center">
-                  <span className="fw-semibold small">{CATEGORY_LABELS[category]}</span>
-                  <Badge bg={CATEGORY_BADGES[category]} pill>
+                  <span className="fw-semibold small">{NUTRIENT_CATEGORIES[category].label}</span>
+                  <Badge bg={NUTRIENT_CATEGORIES[category].badge} pill>
                     {categoryItems.length}
                   </Badge>
                 </Card.Header>
@@ -74,7 +60,7 @@ export const RecipeNutrientBreakdown: FC<RecipeNutrientBreakdownProps> = ({
                       >
                         <span className="text-secondary">{item.nutrient.name}</span>
                         <span className="fw-medium">
-                          {formatNutrientAmount(item.amount)} {item.nutrient.unit}
+                          {item.amount} {item.nutrient.unit}
                         </span>
                       </li>
                     ))}

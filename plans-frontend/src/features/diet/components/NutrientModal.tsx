@@ -3,10 +3,16 @@ import { Button, Form, Modal, Spinner } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 
-import type { Nutrient, NutrientCategory, NutrientUnit } from '@/features/diet/types/diet';
+import {
+  type Nutrient,
+  NUTRIENT_CATEGORIES,
+  NUTRIENT_CATEGORY_KEYS,
+  NUTRIENT_UNITS,
+  type NutrientCategory,
+  type NutrientUnit,
+} from '@/features/diet/types/diet';
 
 import { useCreateNutrientMutation, useUpdateNutrientMutation } from '../api/dietApi';
-import { CATEGORY_LABELS, NUTRIENT_CATEGORIES, NUTRIENT_UNITS } from '../utils/recipeNutrition';
 
 interface NutrientModalProps {
   show: boolean;
@@ -120,9 +126,9 @@ export const NutrientModal: FC<NutrientModalProps> = ({ show, nutrient, onHide }
           <Form.Group controlId="nutrientCategory">
             <Form.Label className="fw-medium">Category</Form.Label>
             <Form.Select disabled={isSubmitting} {...register('category')}>
-              {NUTRIENT_CATEGORIES.map((cat) => (
-                <option key={cat} value={cat}>
-                  {CATEGORY_LABELS[cat]}
+              {NUTRIENT_CATEGORY_KEYS.map((category) => (
+                <option key={category} value={category}>
+                  {NUTRIENT_CATEGORIES[category].label}
                 </option>
               ))}
             </Form.Select>
@@ -131,9 +137,9 @@ export const NutrientModal: FC<NutrientModalProps> = ({ show, nutrient, onHide }
           <Form.Group controlId="nutrientUnit">
             <Form.Label className="fw-medium">Unit of Measurement</Form.Label>
             <Form.Select disabled={isSubmitting} {...register('unit')}>
-              {NUTRIENT_UNITS.map((u) => (
-                <option key={u} value={u}>
-                  {u}
+              {NUTRIENT_UNITS.map((unit) => (
+                <option key={unit} value={unit}>
+                  {unit}
                 </option>
               ))}
             </Form.Select>

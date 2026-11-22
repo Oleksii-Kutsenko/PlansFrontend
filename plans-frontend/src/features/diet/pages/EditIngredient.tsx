@@ -48,25 +48,23 @@ export const EditIngredient: FC = () => {
   }, [ingredient, reset]);
 
   const onFormSubmit = async (data: IngredientFormValues): Promise<void> => {
-    const trimmedName = data.name.trim();
-
     const payloadNutrients = Object.entries(data.nutrients)
-      .map(([nId, amount]) => ({
-        nutrient: Number(nId),
-        amountPer100g: amount.trim(),
-      }))
-      .filter((item) => item.amountPer100g !== '' && Number(item.amountPer100g) > 0);
+      .filter(([, amount]) => Number(amount) > 0)
+      .map(([id, amount]) => ({
+        nutrient: Number(id),
+        amountPer100g: amount,
+      }));
 
     try {
       await updateIngredient({
         id: ingredientId,
         data: {
-          name: trimmedName,
+          name: data.name.trim(),
           nutrientValues: payloadNutrients,
         },
       }).unwrap();
 
-      toast.success(`Updated "${trimmedName}" successfully!`);
+      toast.success(`Updated "${data.name.trim()}" successfully!`);
       void navigate('/diet/ingredients');
     } catch {
       toast.error('Failed to update ingredient. Please verify the input values.');

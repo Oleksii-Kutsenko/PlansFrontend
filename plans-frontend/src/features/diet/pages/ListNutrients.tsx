@@ -16,25 +16,22 @@ import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
 import ConfirmModal from '@/components/ConfirmModal';
-import type { Nutrient, NutrientCategory } from '@/features/diet/types/diet';
+import {
+  type Nutrient,
+  NUTRIENT_CATEGORIES,
+  NUTRIENT_CATEGORY_KEYS,
+  type NutrientCategory,
+} from '@/features/diet/types/diet';
 
 import { useDeleteNutrientMutation, useFetchNutrientsQuery } from '../api/dietApi';
 import { NutrientModal } from '../components/NutrientModal';
-import { CATEGORY_BADGES } from '../utils/recipeNutrition';
-
-const CATEGORY_LABELS: Record<NutrientCategory, string> = {
-  macro: 'Macronutrient',
-  fat: 'Fat',
-  mineral: 'Mineral',
-  vitamin: 'Vitamin',
-};
 
 const CATEGORY_FILTERS: { key: 'all' | NutrientCategory; label: string }[] = [
   { key: 'all', label: 'All' },
-  { key: 'macro', label: 'Macros' },
-  { key: 'fat', label: 'Fats' },
-  { key: 'mineral', label: 'Minerals' },
-  { key: 'vitamin', label: 'Vitamins' },
+  ...NUTRIENT_CATEGORY_KEYS.map((key) => ({
+    key,
+    label: NUTRIENT_CATEGORIES[key].label,
+  })),
 ];
 
 export const ListNutrients: FC = () => {
@@ -49,18 +46,14 @@ export const ListNutrients: FC = () => {
 
   const filteredNutrients = useMemo(() => {
     if (!nutrients) return [];
-    let list = nutrients;
-
-    if (categoryFilter !== 'all') {
-      list = list.filter((n) => n.category === categoryFilter);
-    }
-
     const term = searchTerm.trim().toLowerCase();
-    if (term) {
-      list = list.filter((n) => n.name.toLowerCase().includes(term));
-    }
 
-    return list;
+    return nutrients.filter((nutrient) => {
+      const matchesCategory = categoryFilter === 'all' || nutrient.category === categoryFilter;
+      const matchesSearch = !term || nutrient.name.toLowerCase().includes(term);
+
+      return matchesCategory && matchesSearch;
+    });
   }, [nutrients, categoryFilter, searchTerm]);
 
   const handleOpenCreate = (): void => {
@@ -147,8 +140,8 @@ export const ListNutrients: FC = () => {
                   type="text"
                   placeholder="Search nutrients by name..."
                   value={searchTerm}
-                  onChange={(e) => {
-                    setSearchTerm(e.target.value);
+                  onChange={(event) => {
+                    setSearchTerm(event.target.value);
                   }}
                 />
                 {searchTerm && (
@@ -212,19 +205,19 @@ export const ListNutrients: FC = () => {
               </tr>
             </thead>
             <tbody>
-              {filteredNutrients.map((n) => (
-                <tr key={n.id}>
+              {filteredNutrients.map((nutrient) => (
+                <tr key={nutrient.id}>
                   <td>
-                    <span className="fw-semibold text-dark">{n.name}</span>
+                    <span className="fw-semibold text-dark">{nutrient.name}</span>
                   </td>
                   <td>
-                    <Badge bg={CATEGORY_BADGES[n.category]} pill>
-                      {CATEGORY_LABELS[n.category]}
+                    <Badge bg={NUTRIENT_CATEGORIES[nutrient.category].badge} pill>
+                      {NUTRIENT_CATEGORIES[nutrient.category].label}
                     </Badge>
                   </td>
                   <td>
                     <Badge bg="light" text="dark" className="border">
-                      {n.unit}
+                      {nutrient.unit}
                     </Badge>
                   </td>
                   <td className="text-end">
@@ -234,7 +227,7 @@ export const ListNutrients: FC = () => {
                       className="me-2"
                       title="Edit nutrient"
                       onClick={() => {
-                        handleOpenEdit(n);
+                        handleOpenEdit(nutrient);
                       }}
                     >
                       <i className="bi bi-pencil"></i>
@@ -244,7 +237,7 @@ export const ListNutrients: FC = () => {
                       size="sm"
                       title="Delete nutrient"
                       onClick={() => {
-                        setDeleteTarget(n);
+                        setDeleteTarget(nutrient);
                       }}
                     >
                       <i className="bi bi-trash"></i>

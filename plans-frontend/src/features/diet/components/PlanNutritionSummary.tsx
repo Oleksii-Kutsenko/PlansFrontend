@@ -3,11 +3,7 @@ import { useMemo } from 'react';
 import { Badge, Card, ProgressBar, Spinner } from 'react-bootstrap';
 
 import { useFetchPlanSummaryQuery } from '@/features/diet/api/dietApi';
-import {
-  NUTRIENT_CATEGORY_KEYS,
-  type NutrientCategory,
-  type PlanSummaryItem,
-} from '@/features/diet/types/diet';
+import { NUTRIENT_CATEGORY_KEYS, type PlanSummaryItem } from '@/features/diet/types/diet';
 
 interface PlanNutritionSummaryProps {
   planId: number;
@@ -21,13 +17,12 @@ interface NutrientStatus {
 
 const getNutrientStatus = (item: PlanSummaryItem): NutrientStatus => {
   const score = Math.round(item.accuracyScore);
-  const clamped = Math.max(0, Math.min(score, 100));
-  // 0% = Red (hue 0), 50% = Amber/Yellow (hue 60), 100% = Green (hue 120)
-  const hue = Math.round((clamped / 100) * 120);
+  // Cap hue at 100% so color stays green (120deg) when target is exceeded
+  const hue = Math.min(score, 100) * 1.2;
 
   return {
     isCritical: score < 50,
-    color: `hsl(${String(hue)}, 75%, 40%)`,
+    color: `hsl(${String(Math.round(hue))}, 75%, 40%)`,
     score,
   };
 };
@@ -38,26 +33,13 @@ const PlanNutritionSummary: FC<PlanNutritionSummaryProps> = ({ planId }) => {
   const groupedCategories = useMemo(() => {
     if (!summary?.items) return [];
 
-    const groups = Object.fromEntries(
-      NUTRIENT_CATEGORY_KEYS.map((cat) => [cat, [] as PlanSummaryItem[]]),
-    ) as Record<NutrientCategory, PlanSummaryItem[]>;
+    return NUTRIENT_CATEGORY_KEYS.flatMap((category) => {
+      const items = summary.items
+        .filter((item) => item.category === category)
+        .toSorted((firstItem, secondItem) => firstItem.accuracyScore - secondItem.accuracyScore);
 
-    for (const item of summary.items) {
-      if (item.category in groups) {
-        groups[item.category].push(item);
-      }
-    }
-
-    const categories: [NutrientCategory, PlanSummaryItem[]][] = [];
-    for (const cat of NUTRIENT_CATEGORY_KEYS) {
-      const items = groups[cat];
-      if (items.length > 0) {
-        items.sort((a, b) => a.accuracyScore - b.accuracyScore);
-        categories.push([cat, items]);
-      }
-    }
-
-    return categories;
+      return items.length > 0 ? [[category, items] as const] : [];
+    });
   }, [summary]);
 
   if (isLoading) {
@@ -119,7 +101,7 @@ const PlanNutritionSummary: FC<PlanNutritionSummaryProps> = ({ planId }) => {
                         </div>
 
                         <ProgressBar
-                          now={Math.min(score, 100)}
+                          now={score}
                           style={
                             {
                               '--bs-progress-bar-bg': color,

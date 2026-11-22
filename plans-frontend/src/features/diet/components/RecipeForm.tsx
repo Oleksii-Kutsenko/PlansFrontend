@@ -6,11 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import AsyncSelect from 'react-select/async';
 import { toast } from 'react-toastify';
 
-import type {
-  CalculatedNutrient,
-  CreateRecipePayload,
-  Ingredient,
-} from '@/features/diet/types/diet';
+import type { CreateRecipePayload, Ingredient } from '@/features/diet/types/diet';
 
 import {
   selectNutrientsRecord,
@@ -156,13 +152,6 @@ const RecipeForm: FC<RecipeFormProps> = ({
   const liveNutritionSummary = useMemo(() => {
     return computeRecipeNutrition(validIngredientPortions, nutrientsById);
   }, [validIngredientPortions, nutrientsById]);
-
-  const liveCalculatedNutrients: CalculatedNutrient[] = useMemo(() => {
-    return liveNutritionSummary.nutrients.map((item) => ({
-      nutrient: item.nutrient,
-      amount: item.formattedAmount,
-    }));
-  }, [liveNutritionSummary]);
 
   const onFormSubmit = async (data: RecipeFormData): Promise<void> => {
     if (data.ingredients.length === 0) {
@@ -342,7 +331,7 @@ const RecipeForm: FC<RecipeFormProps> = ({
         </Card.Header>
         <Card.Body className="p-4">
           <RecipeNutrientBreakdown
-            calculatedNutrients={liveCalculatedNutrients}
+            calculatedNutrients={liveNutritionSummary.nutrients}
             totalWeightGrams={liveNutritionSummary.totalWeightGrams}
           />
         </Card.Body>

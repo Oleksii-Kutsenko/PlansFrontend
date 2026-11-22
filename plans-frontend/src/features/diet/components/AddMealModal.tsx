@@ -22,15 +22,18 @@ const AddMealModal: FC<AddMealModalProps> = ({ planDay, onClose }) => {
   const [createPlanMeal, { isLoading: isCreating }] = useCreatePlanMealMutation();
 
   const filteredRecipes = useMemo(() => {
-    if (!searchTerm.trim()) return recipes;
-    const lower = searchTerm.toLowerCase();
+    const normalizedTerm = searchTerm.trim().toLowerCase();
+    if (!normalizedTerm) return recipes;
+
     return recipes.filter(
-      (r) => r.name.toLowerCase().includes(lower) || r.notes.toLowerCase().includes(lower),
+      (recipe) =>
+        recipe.name.toLowerCase().includes(normalizedTerm) ||
+        recipe.notes.toLowerCase().includes(normalizedTerm),
     );
   }, [recipes, searchTerm]);
 
   const selectedRecipe = useMemo(
-    () => recipes.find((r) => r.id === selectedRecipeId),
+    () => recipes.find((recipe) => recipe.id === selectedRecipeId),
     [recipes, selectedRecipeId],
   );
 
@@ -82,8 +85,8 @@ const AddMealModal: FC<AddMealModalProps> = ({ planDay, onClose }) => {
             type="text"
             placeholder="Search recipes by name..."
             value={searchTerm}
-            onChange={(e) => {
-              setSearchTerm(e.target.value);
+            onChange={(event) => {
+              setSearchTerm(event.target.value);
             }}
           />
           {searchTerm && (

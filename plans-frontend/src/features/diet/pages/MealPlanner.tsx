@@ -33,17 +33,15 @@ const MealPlanner: FC = () => {
   const [updatePlan] = useUpdatePlanMutation();
   const [deletePlan, { isLoading: isDeletingPlan }] = useDeletePlanMutation();
 
-  // Resolve currently active plan
   const activePlan = useMemo(() => {
     if (allPlans.length === 0) return null;
 
     if (id) {
-      const match = allPlans.find((p) => p.id === Number(id));
+      const match = allPlans.find((plan) => plan.id === Number(id));
       if (match) return match;
     }
 
-    // Default plan fallback
-    const defaultMatch = allPlans.find((p) => p.isDefault);
+    const defaultMatch = allPlans.find((plan) => plan.isDefault);
     return defaultMatch ?? allPlans[0];
   }, [allPlans, id]);
 
