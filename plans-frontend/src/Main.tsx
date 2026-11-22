@@ -59,6 +59,50 @@ const ListOutfit = lazy(async () => {
   return { default: module.default };
 });
 
+const ListIngredients = lazy(async () => {
+  const module = await import('./features/diet/pages/ListIngredients');
+  return { default: module.default };
+});
+
+const CreateIngredient = lazy(async () => {
+  const module = await import('./features/diet/pages/CreateIngredient');
+  return { default: module.default };
+});
+
+const EditIngredient = lazy(async () => {
+  const module = await import('./features/diet/pages/EditIngredient');
+  return { default: module.default };
+});
+
+const ListNutrients = lazy(async () => {
+  const module = await import('./features/diet/pages/ListNutrients');
+  return { default: module.default };
+});
+
+const ListRecipes = lazy(async () => {
+  const module = await import('./features/diet/pages/ListRecipes');
+  return { default: module.default };
+});
+
+const RecipeDetail = lazy(async () => {
+  const module = await import('./features/diet/pages/RecipeDetail');
+  return { default: module.default };
+});
+
+const CreateRecipe = lazy(async () => {
+  const module = await import('./features/diet/pages/CreateRecipe');
+  return { default: module.default };
+});
+
+const EditRecipe = lazy(async () => {
+  const module = await import('./features/diet/pages/EditRecipe');
+  return { default: module.default };
+});
+const MealPlanner = lazy(async () => {
+  const module = await import('./features/diet/pages/MealPlanner');
+  return { default: module.default };
+});
+
 const Loading: FC = () => <p>Loading ...</p>;
 
 const Main: FC = () => {
@@ -81,8 +125,19 @@ const Main: FC = () => {
           <Route path="/clothing" element={<ListOutfit />} />
           <Route path="/clothing/create" element={<CreateClothing />} />
           <Route path="/clothing/outfit/create" element={<CreateOutfit />} />
-          <Route path="/clothing/outfit/create" element={<CreateOutfit />} />
           <Route path="/clothing/outfit/:id" element={<OutfitDetail />} />
+
+          <Route path="/diet" element={<ListIngredients />} />
+          <Route path="/diet/ingredients" element={<ListIngredients />} />
+          <Route path="/diet/ingredients/create" element={<CreateIngredient />} />
+          <Route path="/diet/ingredients/:id/edit" element={<EditIngredient />} />
+          <Route path="/diet/nutrients" element={<ListNutrients />} />
+          <Route path="/diet/recipes" element={<ListRecipes />} />
+          <Route path="/diet/recipes/create" element={<CreateRecipe />} />
+          <Route path="/diet/recipes/:id" element={<RecipeDetail />} />
+          <Route path="/diet/recipes/:id/edit" element={<EditRecipe />} />
+          <Route path="/diet/plans" element={<MealPlanner />} />
+          <Route path="/diet/plans/:id" element={<MealPlanner />} />
         </Route>
 
         {/** Public Routes */}

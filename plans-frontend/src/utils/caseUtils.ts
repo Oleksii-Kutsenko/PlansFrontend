@@ -4,8 +4,9 @@
  * Already-camelCase strings pass through unchanged.
  */
 export const toCamel = (str: string): string =>
-  str.replaceAll(/([-_][a-z])/g, (group) => group.toUpperCase().replace('-', '').replace('_', ''));
-
+  str.replaceAll(/([-_][a-z0-9])/g, (group) =>
+    group.toUpperCase().replace('-', '').replace('_', ''),
+  );
 /**
  * Convert a single camelCase string to snake_case.
  * "clothingType" → "clothing_type"
