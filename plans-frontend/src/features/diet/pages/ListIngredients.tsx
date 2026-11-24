@@ -166,17 +166,18 @@ export const ListIngredients: FC = () => {
 
   return (
     <Container fluid className="py-4 px-4">
+      <title>Ingredients | Plans</title>
       {/* Top Header */}
       <div className="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
         <div>
-          <h2 className="mb-0 fw-bold">Pantry Ingredients</h2>
+          <h2 className="mb-0 fw-bold">Ingredients</h2>
           <small className="text-muted">
             All nutritional values per 100g &bull; {totalCount.toLocaleString()} total ingredients
           </small>
         </div>
         <div className="d-flex gap-2">
           <Link to="/diet/nutrients" className="btn btn-outline-secondary shadow-sm">
-            <i className="bi bi-capsule me-1"></i> Nutrients Catalog
+            <i className="bi bi-capsule me-1"></i> Nutrients
           </Link>
           <Link to="/diet/ingredients/create" className="btn btn-primary shadow-sm">
             <i className="bi bi-plus-lg me-1"></i> Add Ingredient
@@ -206,7 +207,7 @@ export const ListIngredients: FC = () => {
                   type="text"
                   size="sm"
                   className="border-start-0"
-                  placeholder="Search 8,200+ whole foods..."
+                  placeholder="Search ingredients..."
                   value={searchTerm}
                   onKeyDown={handleSearchKeyDown}
                   onChange={(event) => {

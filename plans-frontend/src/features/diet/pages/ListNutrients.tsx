@@ -110,6 +110,7 @@ export const ListNutrients: FC = () => {
 
   return (
     <Container className="py-4">
+      <title>Nutrients | Plans</title>
       <div className="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
         <div>
           <Link
@@ -118,7 +119,7 @@ export const ListNutrients: FC = () => {
           >
             <i className="bi bi-arrow-left me-1"></i> Back to Ingredients
           </Link>
-          <h2 className="mb-0 fw-bold">Nutrients Catalog</h2>
+          <h2 className="mb-0 fw-bold">Nutrients</h2>
           <small className="text-muted">
             Define and manage nutrients, units, and categories used across your ingredients
           </small>

@@ -45,6 +45,7 @@ export const CreateIngredient: FC = () => {
 
   return (
     <Container className="py-4" style={{ maxWidth: '960px' }}>
+      <title>Add Ingredient | Plans</title>
       <div className="mb-4">
         <Link
           to="/diet/ingredients"
@@ -52,7 +53,7 @@ export const CreateIngredient: FC = () => {
         >
           <i className="bi bi-arrow-left me-1"></i> Back to Ingredients
         </Link>
-        <h2 className="fw-bold mb-1">Add New Ingredient</h2>
+        <h2 className="fw-bold mb-1">Add Ingredient</h2>
         <p className="text-muted mb-0">
           Enter the ingredient name and its nutrient values per 100 grams.
         </p>

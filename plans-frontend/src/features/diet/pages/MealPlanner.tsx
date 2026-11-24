@@ -82,13 +82,16 @@ const MealPlanner: FC = () => {
 
   return (
     <Container fluid className="py-4 px-4">
+      <title>
+        {activePlan ? `${activePlan.name} - Meal Planner | Plans` : 'Meal Planner | Plans'}
+      </title>
       {/* Top Header & Plan Switcher Toolbar */}
       <div className="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
         <div className="d-flex align-items-center gap-3">
           <div>
             <h2 className="mb-0 fw-bold d-flex align-items-center gap-2">
               <i className="bi bi-calendar-week text-primary"></i>
-              Weekly Meal Planner
+              Meal Planner
             </h2>
             <small className="text-muted">
               Organize your weekly meals and track daily nutrition

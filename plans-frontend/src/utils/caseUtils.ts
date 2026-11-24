@@ -13,7 +13,10 @@ export const toCamel = (str: string): string =>
  * Already-snake_case strings pass through unchanged.
  */
 export const toSnake = (str: string): string =>
-  str.replaceAll(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`);
+  str
+    .replaceAll(/([a-zA-Z])(\d)/g, '$1_$2')
+    .replaceAll(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`)
+    .replace(/^_/, '');
 
 /**
  * Recursively convert all keys in an object/array from snake_case to camelCase.
