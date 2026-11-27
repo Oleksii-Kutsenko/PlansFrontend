@@ -3,7 +3,12 @@ import { useState } from 'react';
 import { Badge, Button, Form, InputGroup, Modal, Spinner, Table } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 
-import { useFetchTargetsQuery, useUpdateTargetMutation } from '@/features/diet/api/dietApi';
+import {
+  useFetchTargetsQuery,
+  useResetAllTargetsMutation,
+  useResetTargetMutation,
+  useUpdateTargetMutation,
+} from '@/features/diet/api/dietApi';
 import type { UserNutrientTarget } from '@/features/diet/types/diet';
 
 interface TargetManagerModalProps {
@@ -14,9 +19,14 @@ interface TargetManagerModalProps {
 const TargetManagerModal: FC<TargetManagerModalProps> = ({ show, onClose }) => {
   const { data: targets = [], isLoading } = useFetchTargetsQuery();
   const [updateTarget, { isLoading: isUpdating }] = useUpdateTargetMutation();
+  const [resetTarget, { isLoading: isResettingOne }] = useResetTargetMutation();
+  const [resetAllTargets, { isLoading: isResettingAll }] = useResetAllTargetsMutation();
 
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editValue, setEditValue] = useState<string>('');
+  const [confirmResetAll, setConfirmResetAll] = useState(false);
+
+  const isBusy = isUpdating || isResettingOne || isResettingAll;
 
   const handleStartEdit = (target: UserNutrientTarget): void => {
     setEditingId(target.id);
@@ -26,6 +36,12 @@ const TargetManagerModal: FC<TargetManagerModalProps> = ({ show, onClose }) => {
   const handleCancel = (): void => {
     setEditingId(null);
     setEditValue('');
+  };
+
+  const handleModalClose = (): void => {
+    setConfirmResetAll(false);
+    handleCancel();
+    onClose();
   };
 
   const handleSave = async (target: UserNutrientTarget): Promise<void> => {
@@ -48,6 +64,31 @@ const TargetManagerModal: FC<TargetManagerModalProps> = ({ show, onClose }) => {
     } catch (error) {
       console.error('Failed to update target:', error);
       toast.error('Failed to update target. Please try again.');
+    }
+  };
+
+  const handleResetSingle = async (target: UserNutrientTarget): Promise<void> => {
+    try {
+      await resetTarget(target.id).unwrap();
+      if (editingId === target.id) {
+        handleCancel();
+      }
+      toast.success(`Reset ${target.nutrientDisplayName} target to default.`);
+    } catch (error) {
+      console.error('Failed to reset target:', error);
+      toast.error(`No default configured for ${target.nutrientDisplayName}.`);
+    }
+  };
+
+  const handleResetAll = async (): Promise<void> => {
+    try {
+      await resetAllTargets().unwrap();
+      setConfirmResetAll(false);
+      handleCancel();
+      toast.success('Reset all nutrient targets to defaults.');
+    } catch (error) {
+      console.error('Failed to reset all targets:', error);
+      toast.error('Failed to reset targets. Please try again.');
     }
   };
 
@@ -100,7 +141,7 @@ const TargetManagerModal: FC<TargetManagerModalProps> = ({ show, onClose }) => {
                           type="number"
                           step="any"
                           min="0.01"
-                          disabled={isUpdating}
+                          disabled={isBusy}
                           value={editValue}
                           onChange={(e) => {
                             setEditValue(e.target.value);
@@ -128,7 +169,7 @@ const TargetManagerModal: FC<TargetManagerModalProps> = ({ show, onClose }) => {
                           variant="success"
                           size="sm"
                           className="py-0 px-2"
-                          disabled={isUpdating}
+                          disabled={isBusy}
                           onClick={() => {
                             void handleSave(target);
                           }}
@@ -144,7 +185,7 @@ const TargetManagerModal: FC<TargetManagerModalProps> = ({ show, onClose }) => {
                           variant="outline-secondary"
                           size="sm"
                           className="py-0 px-2"
-                          disabled={isUpdating}
+                          disabled={isBusy}
                           onClick={handleCancel}
                           title="Cancel"
                         >
@@ -152,16 +193,31 @@ const TargetManagerModal: FC<TargetManagerModalProps> = ({ show, onClose }) => {
                         </Button>
                       </div>
                     ) : (
-                      <Button
-                        variant="outline-primary"
-                        size="sm"
-                        className="py-0 px-2"
-                        onClick={() => {
-                          handleStartEdit(target);
-                        }}
-                      >
-                        <i className="bi bi-pencil me-1"></i> Edit
-                      </Button>
+                      <div className="d-flex justify-content-end gap-1">
+                        <Button
+                          variant="outline-primary"
+                          size="sm"
+                          className="py-0 px-2"
+                          disabled={isBusy}
+                          onClick={() => {
+                            handleStartEdit(target);
+                          }}
+                        >
+                          <i className="bi bi-pencil me-1"></i> Edit
+                        </Button>
+                        <Button
+                          variant="outline-secondary"
+                          size="sm"
+                          className="py-0 px-2"
+                          disabled={isBusy}
+                          title="Reset to default"
+                          onClick={() => {
+                            void handleResetSingle(target);
+                          }}
+                        >
+                          <i className="bi bi-arrow-counterclockwise"></i>
+                        </Button>
+                      </div>
                     )}
                   </td>
                 </tr>
@@ -174,7 +230,7 @@ const TargetManagerModal: FC<TargetManagerModalProps> = ({ show, onClose }) => {
   }
 
   return (
-    <Modal show={show} onHide={onClose} size="lg" centered>
+    <Modal show={show} onHide={handleModalClose} size="lg" centered>
       <Modal.Header closeButton>
         <Modal.Title className="h5 d-flex align-items-center gap-2">
           <i className="bi bi-bullseye text-primary"></i>
@@ -182,8 +238,47 @@ const TargetManagerModal: FC<TargetManagerModalProps> = ({ show, onClose }) => {
         </Modal.Title>
       </Modal.Header>
       <Modal.Body className="p-3">{content}</Modal.Body>
-      <Modal.Footer>
-        <Button variant="secondary" onClick={onClose}>
+      <Modal.Footer className="d-flex justify-content-between">
+        <div>
+          {targets.length > 0 &&
+            (confirmResetAll ? (
+              <div className="d-flex align-items-center gap-2">
+                <span className="small text-danger fw-medium">Reset all to defaults?</span>
+                <Button
+                  variant="danger"
+                  size="sm"
+                  disabled={isBusy}
+                  onClick={() => {
+                    void handleResetAll();
+                  }}
+                >
+                  Confirm
+                </Button>
+                <Button
+                  variant="outline-secondary"
+                  size="sm"
+                  disabled={isBusy}
+                  onClick={() => {
+                    setConfirmResetAll(false);
+                  }}
+                >
+                  Cancel
+                </Button>
+              </div>
+            ) : (
+              <Button
+                variant="outline-danger"
+                size="sm"
+                disabled={isBusy}
+                onClick={() => {
+                  setConfirmResetAll(true);
+                }}
+              >
+                <i className="bi bi-arrow-counterclockwise me-1"></i> Reset All to Defaults
+              </Button>
+            ))}
+        </div>
+        <Button variant="secondary" disabled={isBusy} onClick={handleModalClose}>
           Done
         </Button>
       </Modal.Footer>

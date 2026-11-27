@@ -8,6 +8,7 @@ import ConfirmModal from '@/components/ConfirmModal';
 import {
   useDeletePlanMutation,
   useFetchPlansQuery,
+  useFetchPlanSummaryQuery,
   useUpdatePlanMutation,
 } from '@/features/diet/api/dietApi';
 import AddMealModal from '@/features/diet/components/AddMealModal';
@@ -27,6 +28,7 @@ const MealPlanner: FC = () => {
   const [showTargetsModal, setShowTargetsModal] = useState(false);
 
   const [activePlanDay, setActivePlanDay] = useState<PlanDay | null>(null);
+  const [selectedNutrientId, setSelectedNutrientId] = useState<number | null>(null);
 
   const { data: allPlans = [], isLoading: isPlansLoading } = useFetchPlansQuery();
 
@@ -44,6 +46,23 @@ const MealPlanner: FC = () => {
     const defaultMatch = allPlans.find((plan) => plan.isDefault);
     return defaultMatch ?? allPlans[0];
   }, [allPlans, id]);
+
+  const { data: planSummary } = useFetchPlanSummaryQuery(activePlan?.id ?? 0, {
+    skip: !activePlan,
+  });
+
+  const focusedNutrient = useMemo(() => {
+    if (!planSummary || selectedNutrientId === null) return null;
+    return (
+      planSummary.items.find((summaryItem) => summaryItem.nutrientId === selectedNutrientId) ?? null
+    );
+  }, [planSummary, selectedNutrientId]);
+
+  const handleSelectNutrient = (nutrientId: number): void => {
+    setSelectedNutrientId((previousNutrientId) =>
+      previousNutrientId === nutrientId ? null : nutrientId,
+    );
+  };
 
   const handleSelectPlan = (selectedId: number): void => {
     void navigate(`/diet/plans/${String(selectedId)}`);
@@ -217,11 +236,19 @@ const MealPlanner: FC = () => {
           <div className="row flex-nowrap overflow-auto g-2 pb-3">
             {activePlan.days.map((planDay) => (
               <div key={planDay.id} className="col-10 col-sm-6 col-md-4 col-lg flex-lg-fill d-flex">
-                <DayColumn planDay={planDay} onAddMeal={setActivePlanDay} />
+                <DayColumn
+                  planDay={planDay}
+                  focusedNutrient={focusedNutrient}
+                  onAddMeal={setActivePlanDay}
+                />
               </div>
             ))}
           </div>
-          <PlanNutritionSummary planId={activePlan.id} />
+          <PlanNutritionSummary
+            planId={activePlan.id}
+            selectedNutrientId={selectedNutrientId}
+            onSelectNutrient={handleSelectNutrient}
+          />
         </>
       ) : (
         <div className="card text-center py-5 border-dashed">

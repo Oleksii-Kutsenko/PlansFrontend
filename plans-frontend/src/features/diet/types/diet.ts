@@ -158,6 +158,23 @@ export interface CreateTargetPayload {
 }
 export type UpdateTargetPayload = Partial<CreateTargetPayload>;
 
+export interface NutrientIngredientContribution {
+  ingredientId: number;
+  ingredientName: string;
+  gramsPerMeal: number;
+  perMealAmount: number;
+  totalAmount: number;
+}
+
+export interface NutrientRecipeContribution {
+  recipeId: number;
+  recipeName: string;
+  mealCount: number;
+  perMealAmount: number;
+  totalAmount: number;
+  ingredients: NutrientIngredientContribution[];
+}
+
 export interface PlanSummaryItem {
   nutrientId: number;
   name: string;
@@ -168,6 +185,7 @@ export interface PlanSummaryItem {
   targetAmount: number;
   fulfillmentPercent: number;
   accuracyScore: number;
+  contributors: NutrientRecipeContribution[];
 }
 
 export interface PlanSummary {

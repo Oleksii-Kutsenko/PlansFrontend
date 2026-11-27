@@ -224,7 +224,6 @@ export const dietApi = apiSlice.injectEndpoints({
       query: () => '/api/diet/targets/',
       providesTags: ['Targets'],
     }),
-
     createTarget: builder.mutation<UserNutrientTarget, CreateTargetPayload>({
       query: (body) => ({
         url: '/api/diet/targets/',
@@ -233,12 +232,26 @@ export const dietApi = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ['Targets'],
     }),
-
     updateTarget: builder.mutation<UserNutrientTarget, { id: number; data: UpdateTargetPayload }>({
       query: ({ id, data }) => ({
         url: `/api/diet/targets/${String(id)}/`,
         method: 'PATCH',
         body: data,
+      }),
+      invalidatesTags: ['Targets'],
+    }),
+    resetTarget: builder.mutation<UserNutrientTarget, number>({
+      query: (id) => ({
+        url: `/api/diet/targets/${String(id)}/reset/`,
+        method: 'POST',
+      }),
+      invalidatesTags: ['Targets'],
+    }),
+    // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
+    resetAllTargets: builder.mutation<UserNutrientTarget[], void>({
+      query: () => ({
+        url: '/api/diet/targets/reset_all/',
+        method: 'POST',
       }),
       invalidatesTags: ['Targets'],
     }),
@@ -293,5 +306,7 @@ export const {
   useFetchTargetsQuery,
   useCreateTargetMutation,
   useUpdateTargetMutation,
+  useResetTargetMutation,
+  useResetAllTargetsMutation,
   useFetchPlanSummaryQuery,
 } = dietApi;

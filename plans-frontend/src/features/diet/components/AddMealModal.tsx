@@ -15,7 +15,7 @@ const AddMealModal: FC<AddMealModalProps> = ({ planDay, onClose }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedRecipeId, setSelectedRecipeId] = useState<number | null>(null);
 
-  const nextOrder = planDay.meals.length + 1;
+  const nextOrder = Math.max(0, ...planDay.meals.map((meal) => meal.order)) + 1;
   const dayName = planDay.dayName;
 
   const { data: recipes = [], isLoading: isRecipesLoading } = useFetchRecipesQuery();
